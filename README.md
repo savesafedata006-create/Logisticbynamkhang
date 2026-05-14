@@ -4,7 +4,7 @@
 
 ## 🌐 ทดสอบระบบออนไลน์
 
-> **Live Demo:** [https://silenttl.github.io/Logisticbynamkhang/](https://silenttl.github.io/Logisticbynamkhang/)
+> **Live Demo:** [https://savesafedata006-create.github.io/Logisticbynamkhang/](https://savesafedata006-create.github.io/Logisticbynamkhang/)
 
 หน้าแรกคือหน้า **Login** — ใช้บัญชีทดสอบด้านล่างเพื่อเข้าใช้งาน
 
@@ -75,7 +75,7 @@
 
 ```bash
 # Clone
-git clone https://github.com/Silenttl/Logisticbynamkhang.git
+git clone https://github.com/savesafedata006-create/Logisticbynamkhang.git
 cd Logisticbynamkhang
 
 # เปิดในเบราว์เซอร์ (แนะนำ Chrome / Edge)
@@ -128,4 +128,4 @@ Logisticbynamkhang/
 
 ---
 
-**Version:** 2.0.0 | **Last Updated:** May 2026 | **Author:** Silenttl
+**Version:** 2.0.0 | **Last Updated:** May 2026 | **Author:** savesafedata006-create
