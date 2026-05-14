@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📄 SOP / WI — โฟลการทำงานแบบละเอียด</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --primary:#2563eb;
+      --primary-dark:#1e40af;
+      --secondary:#10b981;
+      --danger:#ef4444;
+      --warning:#f59e0b;
+      --info:#06b6d4;
+      --dark:#1e293b;
+      --gray:#64748b;
+      --light:#f1f5f9;
+      --border:#e2e8f0;
+      --card:#ffffff;
+    }
+    body{
+      font-family:'Sarabun',sans-serif;
+      background:#f0f4f8;
+      color:var(--dark);
+      line-height:1.6;
+      min-height:100vh;
+    }
+    .topbar{
+      background:#fff;border-bottom:1px solid var(--border);
+      padding:0 1.5rem;height:60px;
+      display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:100;
+      box-shadow:0 1px 8px rgba(0,0,0,.06);
+    }
+    .topbar-left{display:flex;align-items:center;gap:1rem}
+    .topbar-logo{
+      width:36px;height:36px;border-radius:10px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Kanit',sans-serif;font-weight:900;color:#fff;font-size:.9rem;
+    }
+    .topbar-title{font-family:'Kanit',sans-serif;font-size:1.1rem;font-weight:800;color:var(--dark)}
+    .topbar-right{display:flex;align-items:center;gap:.75rem}
+    .btn{
+      display:inline-flex;align-items:center;gap:.35rem;
+      padding:.55rem 1rem;border-radius:10px;
+      border:none;cursor:pointer;font-family:'Sarabun',sans-serif;
+      font-size:.9rem;font-weight:700;transition:.2s;
+      text-decoration:none;
+    }
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .btn-ghost{background:#fff;color:var(--gray);border:1.5px solid var(--border)}
+    .btn-ghost:hover{border-color:var(--primary);color:var(--primary);background:#eff6ff}
+    .wrap{max-width:1200px;margin:0 auto;padding:1.75rem 1.5rem 2.5rem}
+    .hero{
+      background:#fff;border:1px solid var(--border);
+      border-radius:16px; padding:1.5rem 1.5rem;
+      box-shadow:0 2px 6px rgba(0,0,0,.04);
+      margin-bottom:1.5rem;
+    }
+    .hero h1{font-family:'Kanit',sans-serif;color:var(--primary);font-size:1.55rem}
+    .hero p{color:var(--gray);margin-top:.35rem;max-width:850px}
+    .grid{
+      display:grid;grid-template-columns:1fr;
+      gap:1.25rem;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .card-head{
+      padding:1rem 1.25rem;border-bottom:1px solid var(--border);
+      background:#fafafa;
+      display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+    }
+    .card-head h2{
+      font-family:'Kanit',sans-serif;
+      font-size:1.1rem;color:var(--dark);
+    }
+    .pill{
+      padding:.35rem .75rem;border-radius:999px;
+      background:#eff6ff;color:var(--primary);font-weight:800;font-size:.82rem;
+      border:1px solid #dbeafe;
+      white-space:nowrap;
+    }
+    .card-body{padding:1.25rem}
+    .toc{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+      gap:.75rem;
+    }
+    .toc a{
+      text-decoration:none;
+      padding:.85rem 1rem;
+      border:1px dashed #cbd5e1;
+      border-radius:12px;
+      color:var(--primary);
+      background:#f8fafc;
+      font-weight:800;
+      display:block;
+      transition:.2s;
+    }
+    .toc a:hover{border-style:solid;background:#eff6ff}
+    .section h3{
+      font-family:'Kanit',sans-serif;color:var(--dark);
+      margin-bottom:.75rem;font-size:1.05rem;
+      display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
+    }
+    .steps{
+      margin-top:.75rem;
+      border-left:4px solid var(--primary);
+      padding-left:1rem;
+      display:grid;gap:1rem;
+    }
+    .step{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:1rem;
+      background:#fff;
+    }
+    .step-top{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+      margin-bottom:.6rem;
+    }
+    .step-no{
+      min-width:44px;
+      height:28px;
+      border-radius:999px;
+      background:#eff6ff;
+      border:1px solid #dbeafe;
+      color:var(--primary);
+      font-weight:900;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Kanit',sans-serif;
+      font-size:.9rem;
+    }
+    .step-title{font-weight:900}
+    .meta-row{
+      display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.35rem
+    }
+    .tag{
+      padding:.25rem .6rem;border-radius:999px;
+      background:var(--light);color:var(--gray);
+      border:1px solid var(--border);
+      font-weight:800;font-size:.8rem;
+    }
+    .tag.role{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}
+    .tag.doc{background:#eff6ff;border-color:#dbeafe;color:#1e40af}
+    .tag.output{background:#fef3c7;border-color:#fde68a;color:#92400e}
+    .tag.risk{background:#fee2e2;border-color:#fecaca;color:#991b1b}
+    .bullets{margin-top:.5rem}
+    .bullets li{margin-left:1.1rem;color:var(--gray)}
+    .tables{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;
+      margin-top:1rem;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:.9rem;
+      overflow:hidden;
+      border-radius:12px;
+    }
+    th,td{border-bottom:1px solid var(--border);padding:.6rem .75rem;text-align:left}
+    th{background:#f8fafc;font-weight:900;color:var(--dark)}
+    .callout{
+      background:#f8fafc;border:1px solid var(--border);
+      border-radius:12px;padding:1rem;margin-top:1rem;
+    }
+    .callout strong{color:var(--primary)}
+    .footer-note{
+      margin-top:1.25rem;color:var(--gray);font-size:.86rem
+    }
+    @media(max-width:640px){
+      .wrap{padding:1.25rem 1rem}
+      .hero h1{font-size:1.25rem}
+    }
+    @media print{
+      .topbar,.footer-note,.toc a{display:none}
+      body{background:#fff}
+      .hero,.card{box-shadow:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">MCK</div>
+      <div>
+        <div class="topbar-title">SOP / WI</div>
+        <div style="font-size:.82rem;color:var(--gray);margin-top:.08rem">โฟลการทำงานแบบละเอียด (สำหรับทีมเอกสาร/การส่งออก)</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost" onclick="goBack()">⬅ กลับ</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์/Save PDF</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <h1>📄 โฟลการทำงาน (Work Flow) — SOP/WI</h1>
+      <p>
+        หน้านี้สรุป “ลำดับขั้นตอนทำงาน” แบบละเอียด แยกเป็นช่วง/บท พร้อมระบุ
+        <strong>ใครทำ (Role)</strong>, <strong>เอกสารที่ใช้</strong>, <strong>ผลลัพธ์ที่ต้องได้</strong>
+        และ <strong>จุดเสี่ยงที่ต้องเช็ค</strong>
+      </p>
+      <div class="meta-row" style="margin-top:.75rem">
+        <span class="tag role">Role-based</span>
+        <span class="tag doc">เอกสาร/หลักฐาน</span>
+        <span class="tag output">Output กำหนดชัด</span>
+        <span class="tag risk">Risk checkpoints</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-head">
+          <h2>📑 สารบัญ (Click เพื่อเลื่อนไปส่วน)</h2>
+          <span class="pill">SOP/WI</span>
+        </div>
+        <div class="card-body">
+          <div class="toc">
+            <a href="#s1">1) รับเคส/ตั้งค่าเริ่มงาน</a>
+            <a href="#s2">2) ตรวจข้อมูลก่อนทำเอกสาร</a>
+            <a href="#s3">3) ทำ Invoice + Validation</a>
+            <a href="#s4">4) ทำ Packing List</a>
+            <a href="#s5">5) ทำ Shipping Document (BL)</a>
+            <a href="#s6">6) ทำ Export Document</a>
+            <a href="#s7">7) ทวนสอบ/จัดเก็บ/ส่งมอบ</a>
+            <a href="#s-additional-work">8) การรายงานงานเพิ่ม (คนขับ)</a>
+            <a href="#s-quotation">9) การคำนวณต้นทุน & ใบเสนอราคา</a>
+            <a href="#s-fleet">10) การบริหารกองรถ & การจัดรถ</a>
+            <a href="#s-hr">11) การจัดการสิทธิ์ & ความปลอดภัย</a>
+            <a href="#s8">8) Checklist เอกสารต้องมี</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- s1 -->
+      <section id="s1" class="card section">
+        <div class="card-head">
+          <h2>🧩 1) รับเคส/ตั้งค่าเริ่มงาน</h2>
+          <span class="pill">Kickoff</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">1</div>
+                  <div class="step-title" style="margin-top:.35rem">รวบรวมข้อมูลเคสจากงาน/ฝ่ายที่เกี่ยวข้อง</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: CS/ประสานงาน</span>
+                    <span class="tag doc">เอกสาร: RN/CB, Booking/DO (ถ้ามี)</span>
+                    <span class="tag output">Output: เคสพร้อมทำเอกสาร</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: ข้อมูลไม่ครบ</span>
+              </div>
+              <ul class="bullets">
+                <li>ตรวจว่าได้เลขสำคัญครบ: RN, Container, ลูกค้า, ปลายทาง</li>
+                <li>บันทึก “สิ่งที่ยังรอ” แยกออกจากสิ่งที่พร้อมใช้แล้ว</li>
+                <li>กำหนด Timeline คร่าวๆ: วันที่ต้องส่งเอกสาร</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">2</div>
+                  <div class="step-title" style="margin-top:.35rem">ตั้งค่าระบบ/ค่ากำหนดบริษัทให้ถูกต้อง</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Documentation/Admin</span>
+                    <span class="tag doc">เอกสาร: ข้อมูลบริษัท, Tax ID</span>
+                    <span class="tag output">Output: Header เอกสารถูกต้อง</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: Tax/ข้อมูลบริษัทผิด</span>
+              </div>
+              <ul class="bullets">
+                <li>ตรวจข้อมูลบริษัท: ชื่อ, ที่อยู่, โทร, อีเมล, Tax ID</li>
+                <li>ถ้ามีหลาย Exchange Rate ให้ยืนยัน “อัตราใช้งาน” สำหรับรอบนี้</li>
+                <li>หากมีการเปลี่ยนค่ากลาง ต้องบันทึกใน Settings ก่อนออกเอกสาร</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- s2 -->
+      <section id="s2" class="card section">
+        <div class="card-head">
+          <h2>🔎 2) ตรวจข้อมูลก่อนทำเอกสาร</h2>
+          <span class="pill">Pre-check</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">3</div>
+                  <div class="step-title" style="margin-top:.35rem">ตรวจ “Master data” และความสัมพันธ์เอกสาร</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Documentation</span>
+                    <span class="tag doc">เอกสาร: Customer/Products/HS Database</span>
+                    <span class="tag output">Output: เอกสารสร้างได้ทันที</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: HS Code/ลูกค้าไม่ตรง</span>
+              </div>
+              <ul class="bullets">
+                <li>ยืนยันว่าลูกค้ามีในระบบ (ชื่อลูกค้า + country + currency)</li>
+                <li>ยืนยันว่าทุกรายการสินค้า “มี HS Code” และมี Weight/Unit</li>
+                <li>ตรวจความเข้ากันของ Currency ระหว่างใบเอกสารกับสินค้า</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">4</div>
+                  <div class="step-title" style="margin-top:.35rem">ตรวจข้อมูลที่ส่งผลต่อการคำนวณ</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Documentation/Verifier</span>
+                    <span class="tag doc">เอกสาร: Invoice header, Transport type</span>
+                    <span class="tag output">Output: ตัวเลข FOB/CNF/CIF น่าเชื่อถือ</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: น้ำหนัก 0 / สูตรคำนวณคลาดเคลื่อน</span>
+              </div>
+              <ul class="bullets">
+                <li>น้ำหนักต้องมากกว่า 0 และตรงกับหน่วยที่ใช้คำนวณ</li>
+                <li>ตรวจว่าเลือกประเภทการขนส่ง/เงื่อนไขให้ถูกต้อง</li>
+                <li>เช็ค duplicate product ว่าไม่ซ้ำในลิสต์สินค้า (ตาม validation)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- s3 -->
+      <section id="s3" class="card section">
+        <div class="card-head">
+          <h2>🧾 3) ทำ Invoice + Validation</h2>
+          <span class="pill">Invoice</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">5</div>
+                  <div class="step-title" style="margin-top:.35rem">สร้าง Invoice (เลือกประเภท/เลขที่/วันที่/ลูกค้า/สกุลเงิน)</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Documentation</span>
+                    <span class="tag doc">เอกสาร: Invoice No, Invoice Type, Customer</span>
+                    <span class="tag output">Output: Invoice header พร้อม</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: เลขเอกสารซ้ำ</span>
+              </div>
+              <ul class="bullets">
+                <li>กรอก Invoice No, Invoice Date, เลือกลูกค้า, เลือก Currency</li>
+                <li>เลือกประเภท Invoice ที่ตรงกับเคส</li>
+                <li>เลือก transport type เพื่อให้ template/เงื่อนไขสอดคล้อง</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">6</div>
+                  <div class="step-title" style="margin-top:.35rem">เพิ่มสินค้า + ตรวจ HS/Weight/Currency/Duplicate</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Documentation</span>
+                    <span class="tag doc">เอกสาร: Items (Qty/Weight/Unit Price/HS Code)</span>
+                    <span class="tag output">Output: Validation ผ่าน/แจ้งเตือนตามกติกา</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: HS Code ขาด / Weight = 0</span>
+              </div>
+              <ul class="bullets">
+                <li>ตรวจว่าแต่ละรายการมี HS Code (ห้ามบันทึกถ้าขาด)</li>
+                <li>Weight ต้องไม่เป็น 0 (ห้ามบันทึก)</li>
+                <li>ถ้า currency ของสินค้าไม่ตรงกับเอกสารให้ “แจ้งเตือน (Warning)”</li>
+                <li>ห้ามมีสินค้าชนิดเดียวกันซ้ำ (ตามกติกา duplicate validation)</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">7</div>
+                  <div class="step-title" style="margin-top:.35rem">คำนวณ FOB/CNF/CIF และตรวจยอดรวม</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Verifier</span>
+                    <span class="tag doc">เอกสาร: Total Weight, Items Total</span>
+                    <span class="tag output">Output: Grand Total ถูกต้อง</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: สรุปยอดรวมผิด</span>
+              </div>
+              <ul class="bullets">
+                <li>ตรวจ Total Weight (kg) และ Grand Total</li>
+                <li>ตรวจว่าแสดงหน่วย/สกุลเงินถูกต้อง</li>
+                <li>ดูตัวอย่าง (Preview) ก่อนพิมพ์/ส่งต่อ</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="callout">
+            <strong>ตัวอย่างหลักฐานที่ควรแนบ</strong>
+            <div class="bullets" style="margin-top:.5rem">
+              <ul>
+                <li>Screenshot/Print ของ Invoice Preview</li>
+                <li>บันทึกเลขเอกสารในทะเบียนเอกสาร (ตามระบบ Document Registry)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- s4 -->
+      <section id="s4" class="card section">
+        <div class="card-head">
+          <h2>📦 4) ทำ Packing List</h2>
+          <span class="pill">PL</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">8</div>
+                  <div class="step-title" style="margin-top:.35rem">สร้าง Packing List และจับคู่กับ Invoice</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Documentation</span>
+                    <span class="tag doc">เอกสาร: PL No, Customer, Items count</span>
+                    <span class="tag output">Output: PL พร้อมพิมพ์</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: จำนวนรายการไม่ตรง</span>
+              </div>
+              <ul class="bullets">
+                <li>เลือกเลข PL และกำหนดลูกค้าให้ตรง</li>
+                <li>จำนวนรายการต้องสอดคล้องกับ Invoice items</li>
+                <li>ใส่หมายเหตุ (ถ้ามี) ให้ครบถ้วน</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">9</div>
+                  <div class="step-title" style="margin-top:.35rem">ทวนสอบก่อนส่งต่อแผนกพิมพ์/ส่งมอบ</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Verifier</span>
+                    <span class="tag doc">เอกสาร: PL Preview</span>
+                    <span class="tag output">Output: ผ่านการตรวจ</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: รูปแบบ/การสะกดผิด</span>
+              </div>
+              <ul class="bullets">
+                <li>ตรวจชื่อ/ที่อยู่/หมายเหตุไม่เพี้ยนจากข้อมูลต้นทาง</li>
+                <li>ตรวจรูปแบบตาราง/จำนวนไม่ล้น/ไม่หาย</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- s5 -->
+      <section id="s5" class="card section">
+        <div class="card-head">
+          <h2>🚢 5) ทำ Shipping Document (BL)</h2>
+          <span class="pill">BL</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">10</div>
+                  <div class="step-title" style="margin-top:.35rem">สร้าง BL และระบุ Consignee + CBM</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Documentation</span>
+                    <span class="tag doc">เอกสาร: BL No, Consignee, CBM/Weight</span>
+                    <span class="tag output">Output: BL พร้อมพิมพ์</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: CBM/Weight ผิด</span>
+              </div>
+              <ul class="bullets">
+                <li>ระบุ BL No, Consignee ให้ตรงกับเคส</li>
+                <li>กำลัง/น้ำหนัก (CBM/Weight) ต้องถูกต้องตามข้อมูลขนส่ง</li>
+                <li>ใส่หมายเหตุ (ถ้ามี)</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">11</div>
+                  <div class="step-title" style="margin-top:.35rem">ทวนสอบความพร้อมก่อนออกเอกสารชุดสุดท้าย</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Verifier</span>
+                    <span class="tag doc">เอกสาร: BL Preview/Print</span>
+                    <span class="tag output">Output: BL ผ่านตรวจ</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: เลข BL ไม่ตรงชุดเอกสาร</span>
+              </div>
+              <ul class="bullets">
+                <li>ตรวจเลข BL/วันที่/ผู้รับสินค้าไม่ผิดพลาด</li>
+                <li>ตรวจว่าสรุปข้อมูลสอดคล้องกับ PL และ Invoice</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- s6 -->
+      <section id="s6" class="card section">
+        <div class="card-head">
+          <h2>📤 6) ทำ Export Document</h2>
+          <span class="pill">Export</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">12</div>
+                  <div class="step-title" style="margin-top:.35rem">สร้าง Export Doc และระบุปลายทาง/ผู้ส่งออก</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Documentation</span>
+                    <span class="tag doc">เอกสาร: Export No, Exporter, Country</span>
+                    <span class="tag output">Output: Export Doc พร้อม</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: ประเทศปลายทางผิด</span>
+              </div>
+              <ul class="bullets">
+                <li>กรอก Exporter/ผู้ส่งออก</li>
+                <li>เลือกประเทศปลายทางให้ตรงเคส</li>
+                <li>ใส่หมายเหตุถ้ามี</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- s7 -->
+      <section id="s7" class="card section">
+        <div class="card-head">
+          <h2>✅ 7) ทวนสอบ/จัดเก็บ/ส่งมอบ</h2>
+          <span class="pill">Final QA</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">13</div>
+                  <div class="step-title" style="margin-top:.35rem">ทวนสอบเอกสารชุดสุดท้ายและความครบถ้วน</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Verifier</span>
+                    <span class="tag doc">เอกสาร: ทุกหน้าที่เกี่ยวข้องในชุด</span>
+                    <span class="tag output">Output: ชุดเอกสารถูกต้องพร้อมส่ง</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: เอกสารขาด/ข้อมูลไม่ตรง</span>
+              </div>
+              <ul class="bullets">
+                <li>ตรวจเลขเอกสารทุกฉบับ: Invoice/PL/BL/Export</li>
+                <li>ตรวจข้อมูลหลักที่ต้องเหมือนกัน: ลูกค้า, ประเทศ, currency, น้ำหนัก/จำนวน</li>
+                <li>บันทึกหลักฐานการตรวจ (เช่น ลายเซ็น/วันที่ตรวจ)</li>
+              </ul>
+            </div>
+
+            <div class="step">
+              <div class="step-top">
+                <div>
+                  <div class="step-no">14</div>
+                  <div class="step-title" style="margin-top:.35rem">จัดเก็บไฟล์ + ส่งมอบ/อัปโหลด</div>
+                  <div class="meta-row">
+                    <span class="tag role">Role: Documentation</span>
+                    <span class="tag doc">เอกสาร: PDF ที่พิมพ์/ไฟล์แนบ</span>
+                    <span class="tag output">Output: ส่งมอบถึงผู้รับปลายทาง</span>
+                  </div>
+                </div>
+                <span class="tag risk">Risk: ไฟล์ไม่ถูกฉบับ</span>
+              </div>
+              <ul class="bullets">
+                <li>ตั้งชื่อไฟล์ให้สื่อความ: DOCTYPE_No_Date.pdf</li>
+                <li>อัปโหลด/ส่งมอบพร้อมหมายเหตุการแก้ไข (ถ้ามี)</li>
+                <li>เก็บสำเนาไว้ในโครงสร้างโฟลเดอร์เดียวกัน</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tables">
+            <div class="callout">
+              <strong>สถานะที่ควรบันทึกในระบบ</strong>
+              <ul class="bullets">
+                <li>draft → completed (ผ่านตรวจแล้ว)</li>
+                <li>exported (ถ้าส่งออกแล้ว)</li>
+              </ul>
+            </div>
+            <div class="callout">
+              <strong>กรอบเวลาแนะนำ</strong>
+              <ul class="bullets">
+                <li>Pre-check: ภายใน 1 วันหลังรับเคส</li>
+                <li>Draft ทำเอกสาร: ภายใน 1-2 วัน</li>
+                <li>Final QA + ส่งมอบ: อย่างน้อย 1 วันก่อนกำหนด</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- s-additional-work -->
+      <section id="s-additional-work" class="card section">
+        <div class="card-head">
+          <h2>📝 8) การรายงานงานเพิ่ม (คนขับ)</h2>
+          <span class="pill">Driver Task</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-title">1. คนขับรายงานงานเพิ่มผ่าน Mobile Portal</div>
+              <p class="text-sm text-slate-500 mt-1">คนขับบันทึกประเภทงาน (เช่น เวลารอ, โหลด/ลงของเพิ่ม), RN ที่เกี่ยวข้อง, ระยะเวลา/จำนวน, รายละเอียด และค่าใช้จ่ายที่เสนอ</p>
+              <div class="meta-row">
+                <span class="tag role">Role: Driver</span>
+                <span class="tag doc">Input: ประเภทงาน, RN, ระยะเวลา, รายละเอียด, ค่าใช้จ่าย</span>
+                <span class="tag output">Output: รายงานงานเพิ่มในระบบ</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-title">2. ฝ่ายออฟฟิศตรวจสอบและอนุมัติ</div>
+              <p class="text-sm text-slate-500 mt-1">ฝ่ายออฟฟิศ (Dispatch/Finance) ตรวจสอบรายงานงานเพิ่มจากคนขับในหน้า "ติดตามคนขับ" และดำเนินการอนุมัติ/ปฏิเสธ</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- s-quotation -->
+      <section id="s-quotation" class="card section">
+        <div class="card-head">
+          <h2>💰 9) การคำนวณต้นทุน & ใบเสนอราคา (Quotation & Costing)</h2>
+          <span class="pill">Finance & CS</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-title">1. ประเมินต้นทุนพื้นฐาน (Fleet Cost)</div>
+              <p class="text-sm text-slate-500 mt-1">ทีมจัดรถระบุ ระยะทาง, อัตราสิ้นเปลืองน้ำมัน และค่าเบี้ยเลี้ยงคนขับ</p>
+            </div>
+            <div class="step">
+              <div class="step-title">2. คำนวณ Margin และราคาเสนอขาย (CS Pricing)</div>
+              <p class="text-sm text-slate-500 mt-1">ทีม CS ปรับแต่ง Margin (%) เพื่อให้ได้ราคาที่แข่งขันได้และมีกำไร</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- s-fleet -->
+      <section id="s-fleet" class="card section">
+        <div class="card-head">
+          <h2>🚛 10) การบริหารกองรถ & การจัดรถ (Fleet Hub)</h2>
+          <span class="pill">Operations</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-title">1. การจัดรถ (Dispatch)</div>
+              <p class="text-sm text-slate-500 mt-1">ใช้ระบบ AI แนะนำรถที่เหมาะสมที่สุดตามประเภทตู้ และคะแนน KPI ของคนขับ</p>
+            </div>
+            <div class="step">
+              <div class="step-title">2. การติดตามสถานะ (Tracking)</div>
+              <p class="text-sm text-slate-500 mt-1">ตรวจสอบพิกัด Live GPS จากการเช็คอินของคนขับผ่าน Mobile Portal</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- s-hr -->
+      <section id="s-hr" class="card section">
+        <div class="card-head">
+          <h2>👥 11) การจัดการสิทธิ์ & ความปลอดภัย (HR & Security)</h2>
+          <span class="pill">Management</span>
+        </div>
+        <div class="card-body">
+          <div class="steps">
+            <div class="step">
+              <div class="step-title">1. การกำหนด Role-Based Access Control (RBAC)</div>
+              <p class="text-sm text-slate-500 mt-1">Admin/Boss กำหนดสิทธิ์พนักงานตามตำแหน่ง (CS, Finance, Dispatch, etc.)</p>
+            </div>
+            <div class="step">
+              <div class="step-title">2. การตรวจสอบประวัติ (Audit Logs)</div>
+              <p class="text-sm text-slate-500 mt-1">Boss ตรวจสอบความผิดปกติผ่านหน้า Security Overview เช่น การล็อกอินผิดพลาดหรือการแอบดูรหัสผ่าน</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- s8 -->
+      <section id="s8" class="card section">
+        <div class="card-head">
+          <h2>🧾 12) Checklist เอกสารต้องมี (SOP/WI)</h2>
+          <span class="pill">Must-have</span>
+        </div>
+        <div class="card-body">
+          <table>
+            <thead>
+              <tr>
+                <th>รายการ</th>
+                <th>เอกสาร</th>
+                <th>หลักฐาน/หมายเหตุ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Invoice</td>
+                <td>Preview/Print + วันที่ตรวจ</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Packing List (PL)</td>
+                <td>จำนวนรายการต้องตรง</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Shipping Document (BL)</td>
+                <td>Consignee/CBM ต้องถูกต้อง</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Export Document</td>
+                <td>ประเทศปลายทาง/ผู้ส่งออก</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Registry/ทะเบียนเอกสาร</td>
+                <td>บันทึกเลขเอกสาร + รอบการทำ</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="footer-note">
+            หมายเหตุ: หน้า SOP/WI นี้เป็น “แนวทางมาตรฐาน” สำหรับการทำงานแบบ Demo/ระบบเอกสารในโปรเจค
+            คุณสามารถแก้ชื่อเอกสาร/ขั้นตอนให้ตรงกับ SOP จริงของทีมคุณได้ทันที
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    function goBack() {
+      // ถ้ากดจากลิงก์/ใช้งานภายในหน้าเดียวกัน เบราว์เซอร์มักจะมี history ให้ย้อนกลับได้
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+</body>
+</html>

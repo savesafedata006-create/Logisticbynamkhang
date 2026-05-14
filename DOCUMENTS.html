@@ -1,0 +1,1347 @@
+ic<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 Document Management System - ระบบจัดการเอกสาร</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --success: #10b981;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #f1f5f9;
+            --border: #e2e8f0;
+            --text-light: #94a3b8;
+        }
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #f0f4f8;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 250px;
+            height: calc(100vh - 60px);
+            background: white;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding-top: 1rem;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--dark);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu a:hover {
+            background: var(--light-gray);
+            border-left-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(37, 99, 235, 0.1);
+            border-left-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main {
+            margin-left: 250px;
+            margin-top: 60px;
+            padding: 2rem;
+            min-height: calc(100vh - 60px);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .page-header h1 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.75rem;
+        }
+        
+        .page-header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .card-header h2 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.25rem;
+            margin: 0;
+        }
+        
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .document-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .document-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+            transform: translateY(-4px);
+        }
+        
+        .document-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .document-name {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .document-desc {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #059669;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        
+        thead {
+            background: var(--light-gray);
+            border-bottom: 2px solid var(--border);
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        tbody tr:hover {
+            background: var(--light-gray);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Sarabun', sans-serif;
+            font-weight: 600;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: var(--primary);
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-family: 'Kanit', sans-serif;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+        
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+        
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge-info {
+            background: #cffafe;
+            color: #164e63;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+                width: 100%;
+                z-index: 50;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1>📋 Document Management System - ระบบจัดการเอกสาร</h1>
+            <div class="user-info">
+                <button class="btn btn-ghost btn-sm" onclick="goBack()">⬅ กลับ</button>
+                <span id="userName">Admin</span>
+                <span style="color: rgba(255,255,255,0.7); font-size: 0.9rem;" id="userRole">ผู้จัดการ</span>
+                <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <ul class="sidebar-menu">
+            <li><a class="nav-link active" onclick="switchView('dashboard')">📊 Dashboard</a></li>
+            <li><a class="nav-link" onclick="switchView('documents')">📄 สร้างเอกสาร</a></li>
+            <li><a class="nav-link" onclick="goToInvoiceSystem()">🧾 Invoice System</a></li>
+            <li><a class="nav-link" onclick="switchView('invoice')">🧾 Invoice</a></li>
+            <li><a class="nav-link" onclick="switchView('packing')">📦 Packing List</a></li>
+            <li><a class="nav-link" onclick="switchView('shipping')">🚢 Shipping Doc</a></li>
+            <li><a class="nav-link" onclick="switchView('export')">📤 Export Doc</a></li>
+            <li><a class="nav-link" onclick="switchView('templates')">🎨 Templates</a></li>
+            <li><a class="nav-link" onclick="switchView('settings')">⚙️ Settings</a></li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main">
+        <div class="container">
+            
+            <!-- Dashboard View -->
+            <div id="dashboard" class="view">
+                <div class="page-header">
+                    <h1>📊 Dashboard</h1>
+                    <button class="btn btn-primary" onclick="switchView('documents')">สร้างเอกสารใหม่</button>
+                </div>
+                
+                <div class="grid">
+                    <div class="card" style="text-align: center; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📄</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;" id="totalDocs">0</div>
+                        <div>เอกสารทั้งหมด</div>
+                    </div>
+                    
+                    <div class="card" style="text-align: center; border: none; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🧾</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;" id="totalInvoices">0</div>
+                        <div>Invoice</div>
+                    </div>
+                    
+                    <div class="card" style="text-align: center; border: none; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📦</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;" id="totalPacking">0</div>
+                        <div>Packing List</div>
+                    </div>
+                    
+                    <div class="card" style="text-align: center; border: none; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🚢</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;" id="totalShipping">0</div>
+                        <div>Shipping Doc</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2>เอกสารล่าสุด</h2>
+                        <a href="#" onclick="switchView('documents')" style="color: var(--primary); text-decoration: none;">ดูทั้งหมด →</a>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ลำดับ</th>
+                                    <th>ประเภท</th>
+                                    <th>รายละเอียด</th>
+                                    <th>วันที่สร้าง</th>
+                                    <th>สถานะ</th>
+                                    <th>การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentDocsList">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: var(--gray);">ยังไม่มีเอกสาร</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Documents View -->
+            <div id="documents" class="view" style="display: none;">
+                <div class="page-header">
+                    <h1>📄 สร้างเอกสาร</h1>
+                </div>
+                
+                <div class="grid">
+                    <div class="document-card" onclick="openDocumentType('invoice')">
+                        <div class="document-icon">🧾</div>
+                        <div class="document-name">Invoice</div>
+                        <div class="document-desc">ใบแจ้งหนี้/ใบเรียกเก็บ</div>
+                    </div>
+                    
+                    <div class="document-card" onclick="openDocumentType('packing')">
+                        <div class="document-icon">📦</div>
+                        <div class="document-name">Packing List</div>
+                        <div class="document-desc">ใบรายการสินค้าในการ</div>
+                    </div>
+                    
+                    <div class="document-card" onclick="openDocumentType('shipping')">
+                        <div class="document-icon">🚢</div>
+                        <div class="document-name">Shipping Document</div>
+                        <div class="document-desc">เอกสารเรือนส่ง</div>
+                    </div>
+                    
+                    <div class="document-card" onclick="openDocumentType('export')">
+                        <div class="document-icon">📤</div>
+                        <div class="document-name">Export Document</div>
+                        <div class="document-desc">เอกสารส่งออก</div>
+                    </div>
+                    
+                    <div class="document-card" onclick="openDocumentType('proforma')">
+                        <div class="document-icon">📋</div>
+                        <div class="document-name">Proforma Invoice</div>
+                        <div class="document-desc">ใบแจ้งหนี้ก่อนส่ง</div>
+                    </div>
+                    
+                    <div class="document-card" onclick="openDocumentType('receipt')">
+                        <div class="document-icon">🧾</div>
+                        <div class="document-name">Receipt</div>
+                        <div class="document-desc">ใบเสร็จรับเงิน</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Invoice View -->
+            <div id="invoice" class="view" style="display: none;">
+                <div class="page-header">
+                    <h1>🧾 Invoice</h1>
+                    <button class="btn btn-primary" onclick="openModal('invoiceModal')">+ สร้าง Invoice</button>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('all-invoices', this)">ทั้งหมด</button>
+                    <button class="tab" onclick="switchTab('draft-invoices', this)">แบบร่าง</button>
+                    <button class="tab" onclick="switchTab('completed-invoices', this)">เสร็จสิ้น</button>
+                </div>
+                
+                <div id="all-invoices" class="tab-content active">
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Invoice No</th>
+                                        <th>ลูกค้า</th>
+                                        <th>ยอด</th>
+                                        <th>วันที่</th>
+                                        <th>สถานะ</th>
+                                        <th>การจัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoiceList">
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; color: var(--gray);">ยังไม่มี Invoice</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Packing List View -->
+            <div id="packing" class="view" style="display: none;">
+                <div class="page-header">
+                    <h1>📦 Packing List</h1>
+                    <button class="btn btn-primary" onclick="openModal('packingModal')">+ สร้าง Packing</button>
+                </div>
+                
+                <div class="card">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>PL No</th>
+                                    <th>ลูกค้า</th>
+                                    <th>จำนวนรายการ</th>
+                                    <th>วันที่</th>
+                                    <th>สถานะ</th>
+                                    <th>การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="packingList">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: var(--gray);">ยังไม่มี Packing List</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Shipping Doc View -->
+            <div id="shipping" class="view" style="display: none;">
+                <div class="page-header">
+                    <h1>🚢 Shipping Document</h1>
+                    <button class="btn btn-primary" onclick="openModal('shippingModal')">+ สร้าง Shipping</button>
+                </div>
+                
+                <div class="card">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>BL No</th>
+                                    <th>ลัดดา</th>
+                                    <th>กำลัง</th>
+                                    <th>วันที่</th>
+                                    <th>สถานะ</th>
+                                    <th>การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shippingList">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: var(--gray);">ยังไม่มี Shipping Doc</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Export Doc View -->
+            <div id="export" class="view" style="display: none;">
+                <div class="page-header">
+                    <h1>📤 Export Document</h1>
+                    <button class="btn btn-primary" onclick="openModal('exportModal')">+ สร้าง Export</button>
+                </div>
+                
+                <div class="card">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Export No</th>
+                                    <th>ผู้ส่งออก</th>
+                                    <th>ประเทศปลายทาง</th>
+                                    <th>วันที่</th>
+                                    <th>สถานะ</th>
+                                    <th>การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exportList">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: var(--gray);">ยังไม่มี Export Doc</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Templates View -->
+            <div id="templates" class="view" style="display: none;">
+                <div class="page-header">
+                    <h1>🎨 Templates</h1>
+                </div>
+                
+                <div class="grid">
+                    <div class="card" style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">🧾</div>
+                        <h3 style="margin-bottom: 0.5rem;">Invoice Template</h3>
+                        <p style="color: var(--gray); margin-bottom: 1rem;">ใบแจ้งหนี้มาตรฐาน</p>
+                        <button class="btn btn-primary btn-sm" onclick="previewTemplate('invoice')">ดูตัวอย่าง</button>
+                    </div>
+                    
+                    <div class="card" style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">📦</div>
+                        <h3 style="margin-bottom: 0.5rem;">Packing List Template</h3>
+                        <p style="color: var(--gray); margin-bottom: 1rem;">ใบรายการสินค้า</p>
+                        <button class="btn btn-primary btn-sm" onclick="previewTemplate('packing')">ดูตัวอย่าง</button>
+                    </div>
+                    
+                    <div class="card" style="text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">🚢</div>
+                        <h3 style="margin-bottom: 0.5rem;">Shipping Template</h3>
+                        <p style="color: var(--gray); margin-bottom: 1rem;">เอกสารเรือนส่ง</p>
+                        <button class="btn btn-primary btn-sm" onclick="previewTemplate('shipping')">ดูตัวอย่าง</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings View -->
+            <div id="settings" class="view" style="display: none;">
+                <div class="page-header">
+                    <h1>⚙️ Settings</h1>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2>ข้อกำหนดทั่วไป</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ชื่อบริษัท</label>
+                        <input type="text" id="companyName" value="ICL Logistics">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ที่อยู่บริษัท</label>
+                        <textarea id="companyAddress" rows="3">123 ถนนรัชดา กรุงเทพฯ 10110</textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>เบอร์โทรศัพท์</label>
+                            <input type="text" id="companyPhone" value="+66-2-999-9999">
+                        </div>
+                        <div class="form-group">
+                            <label>อีเมล</label>
+                            <input type="email" id="companyEmail" value="info@icl.co.th">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>เลขประจำตัวผู้เสียภาษี</label>
+                            <input type="text" id="taxId" value="0123456789012">
+                        </div>
+                        <div class="form-group">
+                            <label>เลขประจำตัวประชาชน</label>
+                            <input type="text" id="idNumber" value="1234567890123">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" onclick="saveSettings()">💾 บันทึก</button>
+                        <button class="btn btn-secondary" onclick="resetSettings()">🔄 รีเซ็ต</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Invoice Modal -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>สร้าง Invoice</h2>
+                <button class="modal-close" onclick="closeModal('invoiceModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="saveInvoice(event)">
+                    <div class="form-group">
+                        <label>Invoice No *</label>
+                        <input type="text" placeholder="INV-2024-001" required id="invoiceNo">
+                    </div>
+                    <div class="form-group">
+                        <label>ลูกค้า *</label>
+                        <input type="text" placeholder="ชื่อลูกค้า" required id="invoiceCustomer">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ยอด *</label>
+                            <input type="number" step="0.01" min="0" required id="invoiceAmount">
+                        </div>
+                        <div class="form-group">
+                            <label>วันที่</label>
+                            <input type="date" id="invoiceDate">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="invoiceNote" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('invoiceModal')">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Packing Modal -->
+    <div id="packingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>สร้าง Packing List</h2>
+                <button class="modal-close" onclick="closeModal('packingModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="savePacking(event)">
+                    <div class="form-group">
+                        <label>PL No *</label>
+                        <input type="text" placeholder="PL-2024-001" required id="packingNo">
+                    </div>
+                    <div class="form-group">
+                        <label>ลูกค้า *</label>
+                        <input type="text" placeholder="ชื่อลูกค้า" required id="packingCustomer">
+                    </div>
+                    <div class="form-group">
+                        <label>จำนวนรายการ *</label>
+                        <input type="number" min="1" required id="packingItems">
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="packingNote" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('packingModal')">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Shipping Modal -->
+    <div id="shippingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>สร้าง Shipping Document</h2>
+                <button class="modal-close" onclick="closeModal('shippingModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="saveShipping(event)">
+                    <div class="form-group">
+                        <label>BL No *</label>
+                        <input type="text" placeholder="BL-2024-001" required id="shippingNo">
+                    </div>
+                    <div class="form-group">
+                        <label>ลัดดา *</label>
+                        <input type="text" placeholder="ชื่อลัดดา" required id="shippingConsignee">
+                    </div>
+                    <div class="form-group">
+                        <label>กำลัง (CBM) *</label>
+                        <input type="number" step="0.01" min="0" required id="shippingWeight">
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="shippingNote" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('shippingModal')">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>สร้าง Export Document</h2>
+                <button class="modal-close" onclick="closeModal('exportModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="saveExport(event)">
+                    <div class="form-group">
+                        <label>Export No *</label>
+                        <input type="text" placeholder="EXP-2024-001" required id="exportNo">
+                    </div>
+                    <div class="form-group">
+                        <label>ผู้ส่งออก *</label>
+                        <input type="text" placeholder="ชื่อผู้ส่งออก" required id="exportExporter">
+                    </div>
+                    <div class="form-group">
+                        <label>ประเทศปลายทาง *</label>
+                        <input type="text" placeholder="เช่น จีน, สหรัฐ" required id="exportCountry">
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="exportNote" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('exportModal')">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Data Storage
+        const data = {
+            invoices: JSON.parse(localStorage.getItem('docInvoices')) || [],
+            packingLists: JSON.parse(localStorage.getItem('docPacking')) || [],
+            shippingDocs: JSON.parse(localStorage.getItem('docShipping')) || [],
+            exportDocs: JSON.parse(localStorage.getItem('docExport')) || [],
+            settings: JSON.parse(localStorage.getItem('docSettings')) || {
+                companyName: 'ICL Logistics',
+                companyAddress: '123 ถนนรัชดา กรุงเทพฯ 10110',
+                companyPhone: '+66-2-999-9999',
+                companyEmail: 'info@icl.co.th',
+                taxId: '0123456789012',
+                idNumber: '1234567890123'
+            }
+        };
+        
+        // Init
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            updateDashboard();
+        });
+        
+        // View Switching
+        function switchView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+            document.getElementById(viewName).style.display = 'block';
+            
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (viewName === 'invoice') loadInvoices();
+            if (viewName === 'packing') loadPackingLists();
+            if (viewName === 'shipping') loadShippingDocs();
+            if (viewName === 'export') loadExportDocs();
+        }
+        
+        // Tab Switching
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            btn.classList.add('active');
+        }
+        
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        // Dashboard
+        function updateDashboard() {
+            document.getElementById('totalDocs').textContent = 
+                data.invoices.length + data.packingLists.length + data.shippingDocs.length + data.exportDocs.length;
+            document.getElementById('totalInvoices').textContent = data.invoices.length;
+            document.getElementById('totalPacking').textContent = data.packingLists.length;
+            document.getElementById('totalShipping').textContent = data.shippingDocs.length;
+            
+            const allDocs = [
+                ...data.invoices.map(d => ({...d, type: 'Invoice'})),
+                ...data.packingLists.map(d => ({...d, type: 'Packing'})),
+                ...data.shippingDocs.map(d => ({...d, type: 'Shipping'}))
+            ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+            
+            const list = document.getElementById('recentDocsList');
+            if (allDocs.length === 0) {
+                list.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--gray);">ยังไม่มีเอกสาร</td></tr>';
+            } else {
+                list.innerHTML = allDocs.map(doc => `
+                    <tr>
+                        <td><strong>${doc.no || doc.invoiceNo || '-'}</strong></td>
+                        <td>${doc.type}</td>
+                        <td>${doc.customer || doc.consignee || '-'}</td>
+                        <td>${new Date(doc.createdAt).toLocaleDateString('th-TH')}</td>
+                        <td><span class="badge badge-success">เสร็จสิ้น</span></td>
+                        <td>
+                            <button class="btn btn-sm" style="background: var(--info); color: white;">👁️</button>
+                            <button class="btn btn-sm btn-danger">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        // Invoice Functions
+        function loadInvoices() {
+            const list = document.getElementById('invoiceList');
+            if (data.invoices.length === 0) {
+                list.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--gray);">ยังไม่มี Invoice</td></tr>';
+            } else {
+                list.innerHTML = data.invoices.map(inv => `
+                    <tr>
+                        <td><strong>${inv.invoiceNo}</strong></td>
+                        <td>${inv.customer}</td>
+                        <td>${inv.amount}</td>
+                        <td>${new Date(inv.createdAt).toLocaleDateString('th-TH')}</td>
+                        <td><span class="badge badge-success">เสร็จสิ้น</span></td>
+                        <td>
+                            <button class="btn btn-sm" style="background: var(--info); color: white;">👁️</button>
+                            <button class="btn btn-sm btn-danger">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        function saveInvoice(event) {
+            event.preventDefault();
+            const invoice = {
+                id: Date.now(),
+                invoiceNo: document.getElementById('invoiceNo').value,
+                customer: document.getElementById('invoiceCustomer').value,
+                amount: document.getElementById('invoiceAmount').value,
+                date: document.getElementById('invoiceDate').value,
+                note: document.getElementById('invoiceNote').value,
+                createdAt: new Date().toISOString()
+            };
+            data.invoices.push(invoice);
+            saveData();
+            closeModal('invoiceModal');
+            loadInvoices();
+            updateDashboard();
+            alert('บันทึก Invoice สำเร็จ');
+        }
+        
+        // Packing Functions
+        function loadPackingLists() {
+            const list = document.getElementById('packingList');
+            if (data.packingLists.length === 0) {
+                list.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--gray);">ยังไม่มี Packing List</td></tr>';
+            } else {
+                list.innerHTML = data.packingLists.map(pl => `
+                    <tr>
+                        <td><strong>${pl.packingNo}</strong></td>
+                        <td>${pl.customer}</td>
+                        <td>${pl.items}</td>
+                        <td>${new Date(pl.createdAt).toLocaleDateString('th-TH')}</td>
+                        <td><span class="badge badge-success">เสร็จสิ้น</span></td>
+                        <td>
+                            <button class="btn btn-sm" style="background: var(--info); color: white;">👁️</button>
+                            <button class="btn btn-sm btn-danger">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        function savePacking(event) {
+            event.preventDefault();
+            const packing = {
+                id: Date.now(),
+                packingNo: document.getElementById('packingNo').value,
+                customer: document.getElementById('packingCustomer').value,
+                items: document.getElementById('packingItems').value,
+                note: document.getElementById('packingNote').value,
+                createdAt: new Date().toISOString()
+            };
+            data.packingLists.push(packing);
+            saveData();
+            closeModal('packingModal');
+            loadPackingLists();
+            updateDashboard();
+            alert('บันทึก Packing List สำเร็จ');
+        }
+        
+        // Shipping Functions
+        function loadShippingDocs() {
+            const list = document.getElementById('shippingList');
+            if (data.shippingDocs.length === 0) {
+                list.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--gray);">ยังไม่มี Shipping Doc</td></tr>';
+            } else {
+                list.innerHTML = data.shippingDocs.map(sd => `
+                    <tr>
+                        <td><strong>${sd.shippingNo}</strong></td>
+                        <td>${sd.consignee}</td>
+                        <td>${sd.weight}</td>
+                        <td>${new Date(sd.createdAt).toLocaleDateString('th-TH')}</td>
+                        <td><span class="badge badge-success">เสร็จสิ้น</span></td>
+                        <td>
+                            <button class="btn btn-sm" style="background: var(--info); color: white;">👁️</button>
+                            <button class="btn btn-sm btn-danger">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        function saveShipping(event) {
+            event.preventDefault();
+            const shipping = {
+                id: Date.now(),
+                shippingNo: document.getElementById('shippingNo').value,
+                consignee: document.getElementById('shippingConsignee').value,
+                weight: document.getElementById('shippingWeight').value,
+                note: document.getElementById('shippingNote').value,
+                createdAt: new Date().toISOString()
+            };
+            data.shippingDocs.push(shipping);
+            saveData();
+            closeModal('shippingModal');
+            loadShippingDocs();
+            updateDashboard();
+            alert('บันทึก Shipping Document สำเร็จ');
+        }
+        
+        // Export Functions
+        function loadExportDocs() {
+            const list = document.getElementById('exportList');
+            if (data.exportDocs.length === 0) {
+                list.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--gray);">ยังไม่มี Export Doc</td></tr>';
+            } else {
+                list.innerHTML = data.exportDocs.map(ed => `
+                    <tr>
+                        <td><strong>${ed.exportNo}</strong></td>
+                        <td>${ed.exporter}</td>
+                        <td>${ed.country}</td>
+                        <td>${new Date(ed.createdAt).toLocaleDateString('th-TH')}</td>
+                        <td><span class="badge badge-success">เสร็จสิ้น</span></td>
+                        <td>
+                            <button class="btn btn-sm" style="background: var(--info); color: white;">👁️</button>
+                            <button class="btn btn-sm btn-danger">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        function saveExport(event) {
+            event.preventDefault();
+            const exportDoc = {
+                id: Date.now(),
+                exportNo: document.getElementById('exportNo').value,
+                exporter: document.getElementById('exportExporter').value,
+                country: document.getElementById('exportCountry').value,
+                note: document.getElementById('exportNote').value,
+                createdAt: new Date().toISOString()
+            };
+            data.exportDocs.push(exportDoc);
+            saveData();
+            closeModal('exportModal');
+            loadExportDocs();
+            updateDashboard();
+            alert('บันทึก Export Document สำเร็จ');
+        }
+        
+        // Settings
+        function loadSettings() {
+            document.getElementById('companyName').value = data.settings.companyName;
+            document.getElementById('companyAddress').value = data.settings.companyAddress;
+            document.getElementById('companyPhone').value = data.settings.companyPhone;
+            document.getElementById('companyEmail').value = data.settings.companyEmail;
+            document.getElementById('taxId').value = data.settings.taxId;
+            document.getElementById('idNumber').value = data.settings.idNumber;
+        }
+        
+        function saveSettings() {
+            data.settings = {
+                companyName: document.getElementById('companyName').value,
+                companyAddress: document.getElementById('companyAddress').value,
+                companyPhone: document.getElementById('companyPhone').value,
+                companyEmail: document.getElementById('companyEmail').value,
+                taxId: document.getElementById('taxId').value,
+                idNumber: document.getElementById('idNumber').value
+            };
+            saveData();
+            alert('บันทึกข้อมูลการตั้งค่าสำเร็จ');
+        }
+        
+        function resetSettings() {
+            if (confirm('คุณต้องการรีเซ็ตข้อมูลหรือไม่?')) {
+                localStorage.removeItem('docSettings');
+                location.reload();
+            }
+        }
+        
+        // Utility
+        function saveData() {
+            localStorage.setItem('docInvoices', JSON.stringify(data.invoices));
+            localStorage.setItem('docPacking', JSON.stringify(data.packingLists));
+            localStorage.setItem('docShipping', JSON.stringify(data.shippingDocs));
+            localStorage.setItem('docExport', JSON.stringify(data.exportDocs));
+            localStorage.setItem('docSettings', JSON.stringify(data.settings));
+        }
+        
+        function openDocumentType(type) {
+            if (type === 'invoice') switchView('invoice');
+            else if (type === 'packing') switchView('packing');
+            else if (type === 'shipping') switchView('shipping');
+            else if (type === 'export') switchView('export');
+        }
+        
+        function previewTemplate(type) {
+            alert('Template Preview: ' + type);
+        }
+        
+        function logout() {
+            if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
+                window.location.href = 'index.html';
+            }
+        }
+        
+        function goToInvoiceSystem() {
+            if (confirm('ไปยังระบบ Invoice Management System?')) {
+                window.location.href = 'INVOICE.html';
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

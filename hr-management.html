@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Management — MCK Logistics</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
+body{font-family:'Sarabun',sans-serif;background:#f8fafc;}
+.kanit{font-family:'Kanit',sans-serif;}
+.pass-hidden { filter: blur(5px); transition: 0.3s; cursor: pointer; }
+.pass-hidden:hover { filter: blur(2px); }
+.pass-visible { filter: none !important; color: #1e40af; font-weight: 700; }
+.manual-box { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.5rem; margin-bottom: 2rem; }
+.perm-table th { background: #f8fafc; color: #64748b; font-size: 0.7rem; text-transform: uppercase; padding: 0.75rem; }
+.perm-table td { padding: 0.75rem; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+.check-yes { color: #10b981; font-weight: bold; }
+</style>
+</head>
+<body class="p-4 md:p-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800 kanit">👥 HR & Permission Management</h1>
+        <p class="text-slate-500 text-sm">จัดการข้อมูลพนักงานและกำหนดสิทธิ์เข้าใช้งานระบบ</p>
+      </div>
+      <a href="index.html" class="bg-white border px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition">
+        <i class="fas fa-arrow-left mr-2"></i>กลับหน้าหลัก
+      </a>
+    </div>
+
+    <!-- HR Permission Guide (New Section) -->
+    <div class="manual-box shadow-sm">
+      <h2 class="font-bold text-slate-700 mb-4 kanit flex items-center gap-2">
+        <i class="fas fa-book-open text-blue-500"></i> คู่มือการกำหนดสิทธิ์และความรับผิดชอบ (HR Policy)
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="w-full perm-table text-left">
+          <thead>
+            <tr>
+              <th>ตำแหน่ง (Role)</th>
+              <th>ความรับผิดชอบหลัก</th>
+              <th>เข้าถึง Portal</th>
+              <th>เข้าถึง Fleet Hub</th>
+              <th>เข้าถึง Finance</th>
+              <th>สิทธิ์ Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge-purple px-2 py-0.5 rounded text-[10px] font-bold">Admin/Boss</span></td>
+              <td>ดูแลภาพรวมระบบและพนักงานทั้งหมด</td>
+              <td class="check-yes">✓ 100%</td><td class="check-yes">✓ 100%</td><td class="check-yes">✓ 100%</td><td class="check-yes">FULL</td>
+            </tr>
+            <tr>
+              <td><span class="badge-green px-2 py-0.5 rounded text-[10px] font-bold">CS / ประสานงาน</span></td>
+              <td>สร้างงานด่วน, ตามตู้, ติดต่อลูกค้า</td>
+              <td class="check-yes">✓ งาน/ตู้</td><td>✕ ไม่มี</td><td>✕ ไม่มี</td><td>✕</td>
+            </tr>
+            <tr>
+              <td><span class="badge-yellow px-2 py-0.5 rounded text-[10px] font-bold">Finance / การเงิน</span></td>
+              <td>ออก Invoice, จ่ายน้ำมัน, คำนวณกำไร</td>
+              <td>✓ สรุปงาน</td><td class="check-yes">✓ น้ำมัน/ค่าเที่ยว</td><td class="check-yes">✓ 100%</td><td>✕</td>
+            </tr>
+            <tr>
+              <td><span class="badge-orange px-2 py-0.5 rounded text-[10px] font-bold">Driver</span></td>
+              <td>รับงาน, อัปเดตพิกัด, แจ้งซ่อม</td>
+              <td>✓ Mobile Only</td><td>✕ ไม่มี</td><td>✕ ไม่มี</td><td>✕</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <!-- Payroll Summary -->
+      <div class="lg:col-span-1">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-4">
+          <h3 class="font-bold text-slate-700 mb-3 kanit">สรุปค่าใช้จ่ายเงินเดือน</h3>
+          <p class="text-xs font-bold text-slate-500 uppercase">ยอดรวมเงินเดือนสุทธิ (ต่อเดือน)</p>
+          <p class="text-3xl font-bold text-blue-600 kanit mt-1" id="total-payroll-summary">฿0</p>
+          <button onclick="generatePayrollReport()" class="w-full bg-blue-50 text-blue-700 py-2 rounded-xl text-sm font-bold mt-4 hover:bg-blue-100 transition"><i class="fas fa-file-invoice-dollar mr-2"></i>สร้างรายงานเงินเดือน</button>
+        </div>
+        <button onclick="openAddModal()" class="w-full bg-blue-600 text-white py-3 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition">
+          <i class="fas fa-user-plus mr-2"></i>เพิ่มพนักงานใหม่
+        </button>
+      </div>
+
+      <!-- Role Summary -->
+      <div class="lg:col-span-1 space-y-4">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <h3 class="font-bold text-slate-700 mb-4 kanit">ระดับสิทธิ์ (Roles)</h3>
+          <div class="space-y-2">
+            <div class="flex justify-between text-sm p-2 bg-purple-50 text-purple-700 rounded-lg"><strong>Admin</strong><span>Full Access</span></div>
+            <div class="flex justify-between text-sm p-2 bg-blue-50 text-blue-700 rounded-lg"><strong>Manager</strong><span>Full Access</span></div>
+            <div class="flex justify-between text-sm p-2 bg-green-50 text-green-700 rounded-lg"><strong>CS</strong><span>Jobs/QuickJob</span></div>
+            <div class="flex justify-between text-sm p-2 bg-yellow-50 text-yellow-700 rounded-lg"><strong>Finance</strong><span>Invoices/Fuel</span></div>
+            <div class="flex justify-between text-sm p-2 bg-orange-50 text-orange-700 rounded-lg"><strong>Driver</strong><span>Mobile Only</span></div>
+          </div>
+        </button>
+      </div>
+
+      <!-- User Table -->
+      <div class="lg:col-span-3">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-6 border-b flex justify-between items-center">
+            <h3 class="font-bold text-slate-700">รายชื่อพนักงานในระบบ</h3>
+            <div class="text-xs text-slate-400">พนักงานทั้งหมด <span id="user-count">0</span> คน</div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                  <th class="p-4 text-left">ชื่อ-นามสกุล</th>
+                  <th class="p-4 text-left">Username</th>
+                  <th class="p-4 text-left">แผนก</th>
+                  <th class="p-4 text-right">ฐานเงินเดือน</th>
+                  <th class="p-4 text-right">เบี้ยเลี้ยง</th>
+                  <th class="p-4 text-right">ค่าเที่ยว</th>
+                  <th class="p-4 text-right text-blue-600">รวมสุทธิ</th>
+                  <th class="p-4 text-left">Password</th>
+                  <th class="p-4 text-left">ตำแหน่ง</th>
+                  <th class="p-4 text-center" style="width:120px">สถานะ</th>
+                  <th class="p-4 text-right">จัดการ</th>
+                  <th class="p-4 text-center"></th>
+                </tr>
+              </thead>
+              <tbody id="user-table-body" class="divide-y text-slate-600">
+                <!-- JS Rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit Log Section -->
+    <div class="mt-8">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-6 border-b flex justify-between items-center bg-slate-50">
+          <h3 class="font-bold text-slate-700 kanit"><i class="fas fa-shield-alt mr-2 text-blue-500"></i>บันทึกประวัติการใช้งาน (Login & Action Audit Logs)</h3>
+          <button onclick="clearAuditLogs()" class="text-xs text-red-500 hover:underline">ล้างประวัติ</button>
+        </div>
+        <div class="overflow-x-auto" style="max-height: 400px;">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold sticky top-0 z-10">
+              <tr>
+                <th class="p-4 text-left">เวลา</th>
+                <th class="p-4 text-left">ผู้ใช้</th>
+                <th class="p-4 text-left">การดำเนินการ</th>
+                <th class="p-4 text-left">รายละเอียด</th>
+              </tr>
+            </thead>
+            <tbody id="audit-log-body" class="divide-y text-slate-600"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div id="userModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div class="p-6 bg-slate-900 text-white flex justify-between">
+        <h3 class="font-bold kanit">ข้อมูลพนักงาน</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ชื่อพนักงาน</label>
+          <input type="text" id="inp-name" class="w-full border rounded-xl px-4 py-2">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">แผนก</label>
+          <select id="inp-dept" class="w-full border rounded-xl px-4 py-2">
+            <option value="บริหาร">บริหาร</option>
+            <option value="ปฏิบัติการ">ปฏิบัติการ</option>
+            <option value="บัญชี/การเงิน">บัญชี/การเงิน</option>
+            <option value="เอกสาร">เอกสาร</option>
+            <option value="ขนส่ง">ขนส่ง</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Username</label>
+            <input type="text" id="inp-user" class="w-full border rounded-xl px-4 py-2">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ตำแหน่ง (Role)</label>
+            <select id="inp-role" class="w-full border rounded-xl px-4 py-2">
+              <option value="Admin">Admin</option>
+              <option value="Manager">Manager</option>
+              <option value="ประสานงาน">ประสานงาน</option>
+              <option value="Finance">Finance / การเงิน</option>
+              <option value="Dispatch">Dispatch / จัดรถ</option>
+              <option value="เอกสาร">เอกสาร</option>
+              <option value="Driver">พนักงานขับรถ</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ฐานเงินเดือน</label>
+            <input type="number" id="inp-salary" class="w-full border rounded-xl px-4 py-2" placeholder="0">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">เบี้ยเลี้ยง</label>
+            <input type="number" id="inp-allowance" class="w-full border rounded-xl px-4 py-2" placeholder="0">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ค่าเที่ยว</label>
+            <input type="number" id="inp-tripfees" class="w-full border rounded-xl px-4 py-2" placeholder="0">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">รหัสผ่าน</label>
+          <input type="password" id="inp-pass" class="w-full border rounded-xl px-4 py-2" placeholder="รหัสเริ่มต้น">
+        </div>
+
+        <h4 class="font-bold text-slate-700 kanit mt-6 mb-3">ข้อมูลติดต่อ</h4>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">เบอร์โทรศัพท์</label>
+            <input type="text" id="inp-phone" class="w-full border rounded-xl px-4 py-2" placeholder="08x-xxx-xxxx">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">อีเมล</label>
+            <input type="email" id="inp-email" class="w-full border rounded-xl px-4 py-2" placeholder="email@example.com">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ที่อยู่</label>
+          <textarea id="inp-address" class="w-full border rounded-xl px-4 py-2" rows="2" placeholder="ที่อยู่ปัจจุบัน"></textarea>
+        </div>
+
+        <h4 class="font-bold text-slate-700 kanit mt-6 mb-3">ข้อมูลส่วนตัวและธนาคาร</h4>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">วันเกิด</label>
+            <input type="date" id="inp-dob" class="w-full border rounded-xl px-4 py-2">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">วันที่เริ่มงาน</label>
+            <input type="date" id="inp-startdate" class="w-full border rounded-xl px-4 py-2">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">เลขบัญชีธนาคาร</label>
+          <input type="text" id="inp-bankaccount" class="w-full border rounded-xl px-4 py-2" placeholder="xxx-x-xxxxx-x (ชื่อธนาคาร)">
+        </div>
+      </div>
+      <div class="p-6 bg-slate-50 flex gap-3">
+        <button onclick="closeModal()" class="flex-1 py-2 font-bold text-slate-500">ยกเลิก</button>
+        <button onclick="saveUser()" class="flex-1 bg-blue-600 text-white py-2 rounded-xl font-bold shadow-lg">บันทึกข้อมูล</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payslip Modal -->
+  <div id="payslipModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
+      <div class="p-6 bg-blue-600 text-white flex justify-between">
+        <h3 class="font-bold kanit" id="payslip-name-header">สลิปเงินเดือน</h3>
+        <button onclick="closePayslipModal()" class="text-blue-200 hover:text-white">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <h4 class="font-bold text-slate-700 kanit mb-3">ข้อมูลพนักงาน</h4>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ชื่อ-นามสกุล</label><p class="font-semibold" id="payslip-name"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ตำแหน่ง</label><p class="font-semibold" id="payslip-role"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">แผนก</label><p class="font-semibold" id="payslip-dept"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">เดือน/ปี</label><p class="font-semibold" id="payslip-month-year"></p></div>
+        </div>
+
+        <h4 class="font-bold text-slate-700 kanit mt-6 mb-3">รายละเอียดรายรับ</h4>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span>ฐานเงินเดือน</span><span class="font-mono" id="payslip-base-salary">฿0</span></div>
+          <div class="flex justify-between"><span>เบี้ยเลี้ยง</span><span class="font-mono" id="payslip-allowance">฿0</span></div>
+          <div class="flex justify-between"><span>ค่าเที่ยว</span><span class="font-mono" id="payslip-tripfees">฿0</span></div>
+          <div class="flex justify-between"><span>OT 1.5 เท่า</span><span class="font-mono" id="payslip-ot1_5">฿0</span></div>
+          <div class="flex justify-between"><span>OT 2.0 เท่า</span><span class="font-mono" id="payslip-ot2_0">฿0</span></div>
+          <div class="flex justify-between"><span>โบนัส/อื่นๆ</span><span class="font-mono" id="payslip-other-bonus">฿0</span></div>
+          <div class="flex justify-between font-bold border-t pt-2"><span>รวมรายรับ</span><span class="font-mono text-green-700" id="payslip-total-earnings">฿0</span></div>
+        </div>
+
+        <h4 class="font-bold text-slate-700 kanit mt-6 mb-3">รายละเอียดรายหัก</h4>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span>หักอื่นๆ</span><span class="font-mono" id="payslip-deductions">฿0</span></div>
+          <div class="flex justify-between font-bold border-t pt-2"><span>รวมรายหัก</span><span class="font-mono text-red-700" id="payslip-total-deductions">฿0</span></div>
+        </div>
+
+        <div class="flex justify-between items-center bg-blue-50 p-4 rounded-xl mt-6">
+          <span class="font-bold text-blue-800 text-lg">เงินเดือนสุทธิ</span>
+          <span class="font-bold text-blue-800 text-2xl kanit" id="payslip-net-pay">฿0</span>
+        </div>
+
+        <h4 class="font-bold text-slate-700 kanit mt-6 mb-3">ข้อมูลคำนวณ (สำหรับเดือนนี้)</h4>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">จำนวนวันทำงาน</label>
+            <input type="number" id="payslip-working-days" class="w-full border rounded-xl px-4 py-2" value="22" oninput="calculatePayslip()">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">OT 1.5 เท่า (ชม.)</label>
+            <input type="number" id="payslip-ot1_5-hours" class="w-full border rounded-xl px-4 py-2" value="0" oninput="calculatePayslip()">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">OT 2.0 เท่า (ชม.)</label>
+            <input type="number" id="payslip-ot2_0-hours" class="w-full border rounded-xl px-4 py-2" value="0" oninput="calculatePayslip()">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">โบนัส/อื่นๆ</label>
+            <input type="number" id="payslip-other-bonuses" class="w-full border rounded-xl px-4 py-2" value="0" oninput="calculatePayslip()">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">หักอื่นๆ</label>
+            <input type="number" id="payslip-deductions-input" class="w-full border rounded-xl px-4 py-2" value="0" oninput="calculatePayslip()">
+          </div>
+        </div>
+      </div>
+      <div class="p-6 bg-slate-50 flex gap-3">
+        <button onclick="printPayslip()" class="flex-1 bg-blue-600 text-white py-2 rounded-xl font-bold shadow-lg"><i class="fas fa-print mr-2"></i>พิมพ์สลิป</button>
+        <button onclick="closePayslipModal()" class="flex-1 py-2 font-bold text-slate-500">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Detail Modal -->
+  <div id="employeeDetailModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div class="p-6 bg-slate-900 text-white flex justify-between">
+        <h3 class="font-bold kanit" id="detail-name-header">ข้อมูลพนักงาน</h3>
+        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <h4 class="font-bold text-slate-700 kanit mb-3">ข้อมูลส่วนตัว</h4>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ชื่อ-นามสกุล</label><p class="font-semibold" id="detail-name"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Username</label><p class="font-mono text-blue-600" id="detail-username"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">แผนก</label><p class="font-semibold" id="detail-dept"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ตำแหน่ง</label><p class="font-semibold" id="detail-role"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">วันเกิด</label><p id="detail-dob"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">วันที่เริ่มงาน</label><p id="detail-startdate"></p></div>
+        </div>
+
+        <h4 class="font-bold text-slate-700 kanit mt-6 mb-3">ข้อมูลติดต่อ</h4>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">เบอร์โทรศัพท์</label><p id="detail-phone"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">อีเมล</label><p id="detail-email"></p></div>
+        </div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ที่อยู่</label><p class="text-sm" id="detail-address"></p></div>
+
+        <h4 class="font-bold text-slate-700 kanit mt-6 mb-3">ข้อมูลเงินเดือน (ต่อเดือน)</h4>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ฐานเงินเดือน</label><p class="font-mono" id="detail-salary"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">เบี้ยเลี้ยง</label><p class="font-mono" id="detail-allowance"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ค่าเที่ยว</label><p class="font-mono" id="detail-tripfees"></p></div>
+          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">รวมสุทธิ</label><p class="font-mono font-bold text-blue-700" id="detail-total"></p></div>
+        </div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">เลขบัญชีธนาคาร</label><p class="font-mono" id="detail-bankaccount"></p></div>
+
+        <h4 class="font-bold text-slate-700 kanit mt-6 mb-3">สถานะ</h4>
+        <div class="text-sm">
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">สถานะ</label>
+          <span id="detail-status" class="px-3 py-1 rounded-full text-[10px] font-bold"></span>
+        </div>
+      </div>
+      <div class="p-6 bg-slate-50 flex gap-3">
+        <button onclick="editUserFromDetail()" class="flex-1 bg-blue-600 text-white py-2 rounded-xl font-bold shadow-lg">แก้ไขข้อมูล</button>
+        <button onclick="deleteUserFromDetail()" class="flex-1 bg-red-600 text-white py-2 rounded-xl font-bold shadow-lg">ลบพนักงาน</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SSO Login Overlay -->
+  <div id="loginOverlay" class="fixed inset-0 bg-slate-900/95 z-[999] flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden">
+      <div class="p-6 bg-slate-900 text-white text-center">
+        <div class="text-5xl mb-2">👥</div>
+        <h2 class="font-bold text-xl kanit">HR Management</h2>
+        <p class="text-slate-400 text-sm mt-1">MCK International Logistics</p>
+      </div>
+      <div class="p-6 space-y-4">
+        <div id="login-error" class="hidden bg-red-50 text-red-600 text-sm p-3 rounded-xl text-center"></div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Username</label>
+          <input type="text" id="ov-user" class="w-full border rounded-xl px-4 py-2" placeholder="username" onkeydown="if(event.key==='Enter')overlayLogin()">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Password</label>
+          <input type="password" id="ov-pass" class="w-full border rounded-xl px-4 py-2" placeholder="••••••" onkeydown="if(event.key==='Enter')overlayLogin()">
+        </div>
+        <button onclick="overlayLogin()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-700 transition">เข้าสู่ระบบ</button>
+        <div class="text-center text-xs text-slate-400 pt-1">
+          Quick:
+          <button onclick="quickLogin('boss','boss123')" class="ml-2 text-purple-600 hover:underline font-bold">Boss</button>
+          <button onclick="quickLogin('admin','admin123')" class="ml-2 text-blue-600 hover:underline font-bold">Admin</button>
+          <button onclick="quickLogin('finance','fin123')" class="ml-2 text-yellow-600 hover:underline font-bold">Finance</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payroll Run Modal -->
+  <div id="payrollRunModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <div class="p-5 bg-emerald-700 text-white flex justify-between items-center">
+        <div>
+          <h3 class="font-bold kanit text-lg">📊 รายงานเงินเดือนประจำเดือน</h3>
+          <p class="text-emerald-200 text-sm" id="payroll-month-label"></p>
+        </div>
+        <button onclick="document.getElementById('payrollRunModal').classList.add('hidden')" class="text-emerald-200 hover:text-white text-xl">✕</button>
+      </div>
+      <div class="overflow-auto flex-1">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase sticky top-0">
+            <tr>
+              <th class="p-3 text-left">ชื่อ-นามสกุล</th>
+              <th class="p-3 text-left">แผนก</th>
+              <th class="p-3 text-right">เงินเดือน</th>
+              <th class="p-3 text-right">เบี้ยเลี้ยง</th>
+              <th class="p-3 text-right">ค่าเที่ยว</th>
+              <th class="p-3 text-right text-green-700">รวมรายรับ</th>
+              <th class="p-3 text-right text-red-500">ประกันสังคม</th>
+              <th class="p-3 text-right text-blue-700">สุทธิ</th>
+            </tr>
+          </thead>
+          <tbody id="payroll-table-body"></tbody>
+          <tfoot class="bg-slate-900 text-white font-bold text-sm">
+            <tr>
+              <td colspan="5" class="p-3 text-right">รวมทั้งหมด</td>
+              <td class="p-3 text-right font-mono" id="payroll-total-gross"></td>
+              <td class="p-3 text-right font-mono" id="payroll-total-ss"></td>
+              <td class="p-3 text-right font-mono" id="payroll-total-net"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="p-4 bg-slate-50 flex gap-3 border-t">
+        <button onclick="window.print()" class="flex-1 bg-emerald-700 text-white py-2.5 rounded-xl font-bold hover:bg-emerald-800 transition"><i class="fas fa-print mr-2"></i>พิมพ์รายงาน</button>
+        <button onclick="document.getElementById('payrollRunModal').classList.add('hidden')" class="flex-1 py-2.5 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ใช้ LocalStorage แชร์ข้อมูล User กับหน้า Login
+    let users = JSON.parse(localStorage.getItem('mck_users') || JSON.stringify({
+      boss:    {password:'boss123',  name:'บอสใหญ่ใจดี',     role:'Boss', dept:'บริหาร', salary: 150000, allowance: 10000, tripFees: 0, status:'active',
+                phone:'081-111-2222', email:'boss@logistics.com', address:'123 ถนนสุขุมวิท กทม.', dob:'1980-01-01', startDate:'2010-01-01', bankAccount:'123-4-56789-0 (ธ.กรุงเทพ)'},
+      admin:   {password:'admin123', name:'Administrator', role:'Admin', dept:'บริหาร', salary: 45000, allowance: 3000, tripFees: 0, status:'active',
+                phone:'082-333-4444', email:'admin@logistics.com', address:'456 ถนนพหลโยธิน กทม.', dob:'1985-05-15', startDate:'2015-03-01', bankAccount:'234-5-67890-1 (ธ.กสิกรไทย)'},
+      manager: {password:'mgr123',   name:'บอส สั่งลุย',     role:'Manager', dept:'บริหาร', salary: 35000, allowance: 2500, tripFees: 0, status:'active',
+                phone:'083-555-6666', email:'manager@logistics.com', address:'789 ถนนเพชรบุรี กทม.', dob:'1990-10-20', startDate:'2018-07-15', bankAccount:'345-6-78901-2 (ธ.ไทยพาณิชย์)'},
+      cs:      {password:'cs123',    name:'น้องนุ่น CS',     role:'ประสานงาน', dept:'ปฏิบัติการ', salary: 22000, allowance: 1500, tripFees: 0, status:'active',
+                phone:'084-777-8888', email:'noon@logistics.com', address:'101 ถนนลาดพร้าว กทม.', dob:'1995-03-25', startDate:'2020-01-10', bankAccount:'456-7-89012-3 (ธ.กรุงไทย)'},
+      doc:     {password:'doc123',   name:'ฝ่ายเอกสาร',      role:'เอกสาร', dept:'เอกสาร', salary: 20000, allowance: 1000, tripFees: 0, status:'active',
+                phone:'085-999-0000', email:'doc@logistics.com', address:'202 ถนนรามคำแหง กทม.', dob:'1992-07-07', startDate:'2019-09-01', bankAccount:'567-8-90123-4 (ธ.กรุงศรี)'},
+      driver:  {password:'driver123',name:'นายประสิทธ์พร',  role:'Driver', dept:'ขนส่ง', salary: 15000, allowance: 2000, tripFees: 12500, status:'active',
+                phone:'086-123-4567', email:'driver@logistics.com', address:'303 ถนนบางนา-ตราด สมุทรปราการ', dob:'1988-11-11', startDate:'2017-04-20', bankAccount:'678-9-01234-5 (ธ.ทหารไทย)'},
+      tech:    {password:'tech123',  name:'ช่างเทคนิค',      role:'ช่าง', dept:'ปฏิบัติการ', salary: 25000, allowance: 2000, tripFees: 0, status:'active',
+                phone:'087-234-5678', email:'tech@logistics.com', address:'404 ถนนพระราม 2 สมุทรสาคร', dob:'1993-02-28', startDate:'2021-06-01', bankAccount:'789-0-12345-6 (ธ.ยูโอบี)'},
+      dispatch:{password:'disp123',  name:'ทีมจัดรถ',        role:'Dispatch', dept:'ปฏิบัติการ', salary: 28000, allowance: 2000, tripFees: 0, status:'active',
+                phone:'088-345-6789', email:'dispatch@logistics.com', address:'505 ถนนรัตนาธิเบศร์ นนทบุรี', dob:'1991-04-10', startDate:'2019-11-01', bankAccount:'890-1-23456-7 (ธ.ซีไอเอ็มบีไทย)'},
+      finance: {password:'fin123',   name:'ฝ่ายการเงิน',     role:'Finance', dept:'บัญชี/การเงิน', salary: 30000, allowance: 2500, tripFees: 0, status:'active',
+                phone:'089-456-7890', email:'finance@logistics.com', address:'606 ถนนสาทร กทม.', dob:'1987-08-08', startDate:'2016-02-01', bankAccount:'901-2-34567-8 (ธ.แลนด์แอนด์เฮ้าส์)'}
+    }));
+    let currentAdmin = JSON.parse(sessionStorage.getItem('mck_user') || '{}');
+    let currentPayslipUserKey = null; // To keep track of the user for payslip calculations
+    let editingUserKey = null; // Track which user is being edited
+
+    function renderTable() {
+      const tbody = document.getElementById('user-table-body');
+      const keys = Object.keys(users);
+      document.getElementById('user-count').innerText = keys.length;
+      
+      let totalPayroll = 0;
+      
+      tbody.innerHTML = keys.map(key => {
+        const u = users[key];
+        const salary = parseFloat(u.salary) || 0;
+        const allowance = parseFloat(u.allowance) || 0;
+        const tripFees = parseFloat(u.tripFees) || 0;
+        const total = salary + allowance + tripFees;
+        totalPayroll += total;
+
+        return `
+        <tr class="${u.status === 'suspended' ? 'bg-slate-50 opacity-60' : ''}">
+          <td class="p-4"><div class="font-bold text-slate-800">${u.name}</div></td>
+          <td class="p-4 font-mono text-blue-600">${key}</td>
+          <td class="p-4 text-xs font-semibold text-slate-500">${u.dept || '-'}</td>
+          <td class="p-4 text-right font-mono text-slate-600">฿${salary.toLocaleString()}</td>
+          <td class="p-4 text-right font-mono text-slate-600">฿${allowance.toLocaleString()}</td>
+          <td class="p-4 text-right font-mono text-slate-600">฿${tripFees.toLocaleString()}</td>
+          <td class="p-4 text-right font-mono font-bold text-blue-700">฿${total.toLocaleString()}</td>
+          <td class="p-4">
+            <span id="pass-${key}" class="pass-hidden font-mono text-xs bg-slate-100 px-2 py-1 rounded" onclick="viewPassword('${key}')">••••••••</span>
+            ${currentAdmin.role === 'Boss' ? 
+              `<button onclick="togglePasswordBoss('${key}')" class="ml-2 text-blue-500 hover:text-blue-700 text-xs" title="Boss Toggle View"><i id="eye-${key}" class="fas fa-eye"></i></button>` 
+              : ''}
+          </td>
+          <td class="p-4"><span class="px-3 py-1 rounded-full text-[10px] font-bold ${getRoleStyle(u.role)}">${u.role}</span></td>
+          <td class="p-4 text-center">
+            <span class="${u.status === 'suspended' ? 'text-red-500' : 'text-green-500'} text-xs font-bold uppercase">
+              ● ${u.status === 'suspended' ? 'Suspended' : 'Active'}
+            </span>
+          </td>
+          <td class="p-4 text-right flex gap-2 justify-end">
+            <button onclick="openEmployeeDetailModal('${key}')" class="p-2 rounded-lg text-blue-600 hover:bg-blue-50" title="ดูรายละเอียด">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button onclick="toggleUserStatus('${key}')" 
+              class="p-2 rounded-lg ${u.status === 'suspended' ? 'text-green-600 hover:bg-green-50' : 'text-orange-500 hover:bg-orange-50'}"
+              title="${u.status === 'suspended' ? 'เปิดใช้งาน' : 'ระงับสิทธิ์'}">
+              <i class="fas ${u.status === 'suspended' ? 'fa-user-check' : 'fa-user-slash'}"></i>
+            </button>
+            <button onclick="deleteUser('${key}')" class="text-red-400 hover:text-red-600 p-2">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+          <td class="p-4 text-center">
+            <button onclick="openPayslipModal('${key}')" class="p-2 rounded-lg text-blue-600 hover:bg-blue-50" title="ดูสลิปเงินเดือน"><i class="fas fa-file-invoice"></i></button>
+          </td>
+        </tr>
+      `; }).join('');
+      
+      document.getElementById('total-payroll-summary').textContent = `฿${totalPayroll.toLocaleString()}`;
+
+      localStorage.setItem('mck_users', JSON.stringify(users));
+    }
+
+    function getRoleStyle(role) {
+      const map = {
+        'Boss': 'bg-slate-900 text-white',
+        'Admin': 'bg-purple-100 text-purple-700',
+        'Manager': 'bg-blue-100 text-blue-700',
+        'ประสานงาน': 'bg-green-100 text-green-700',
+        'Finance': 'bg-yellow-100 text-yellow-700',
+        'Dispatch': 'bg-indigo-100 text-indigo-700',
+        'เอกสาร': 'bg-slate-100 text-slate-700',
+        'ช่าง': 'bg-orange-100 text-orange-700',
+        'Driver': 'bg-red-100 text-red-700'
+      };
+      return map[role] || 'bg-slate-100 text-slate-700';
+    }
+
+    function openAddModal(key = null) {
+      editingUserKey = key;
+      const modalTitle = document.querySelector('#userModal h3');
+      const userInputs = ['inp-user', 'inp-name', 'inp-role', 'inp-dept', 'inp-salary', 'inp-allowance', 'inp-tripfees', 'inp-pass', 'inp-phone', 'inp-email', 'inp-address', 'inp-dob', 'inp-startdate', 'inp-bankaccount'];
+      
+      userInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.getElementById('inp-user').disabled = false;
+
+      if (key && users[key]) {
+        const u = users[key];
+        modalTitle.textContent = 'แก้ไขข้อมูลพนักงาน';
+        document.getElementById('inp-user').value = key;
+        document.getElementById('inp-user').disabled = true; // Cannot change username
+        document.getElementById('inp-name').value = u.name || '';
+        document.getElementById('inp-role').value = u.role || '';
+        document.getElementById('inp-dept').value = u.dept || '';
+        document.getElementById('inp-salary').value = u.salary || 0;
+        document.getElementById('inp-allowance').value = u.allowance || 0;
+        document.getElementById('inp-tripfees').value = u.tripFees || 0;
+        document.getElementById('inp-pass').value = u.password || ''; // Pre-fill password for editing
+        document.getElementById('inp-phone').value = u.phone || '';
+        document.getElementById('inp-email').value = u.email || '';
+        document.getElementById('inp-address').value = u.address || '';
+        document.getElementById('inp-dob').value = u.dob || '';
+        document.getElementById('inp-startdate').value = u.startDate || '';
+        document.getElementById('inp-bankaccount').value = u.bankAccount || '';
+      } else {
+        modalTitle.textContent = 'เพิ่มพนักงานใหม่';
+      }
+      document.getElementById('userModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('userModal').classList.add('hidden');
+      editingUserKey = null;
+    }
+
+    function closeDetailModal() {
+      document.getElementById('employeeDetailModal').classList.add('hidden');
+    }
+
+    function editUserFromDetail() {
+      openAddModal(editingUserKey); // Re-use editingUserKey from detail modal
+      closeDetailModal();
+    }
+
+    function saveUser() {
+      const user = document.getElementById('inp-user').value.toLowerCase().trim();
+      const name = document.getElementById('inp-name').value.trim();
+      const role = document.getElementById('inp-role').value;
+      const dept = document.getElementById('inp-dept').value;
+      const salary = parseFloat(document.getElementById('inp-salary').value) || 0;
+      const allowance = parseFloat(document.getElementById('inp-allowance').value) || 0;
+      const tripFees = parseFloat(document.getElementById('inp-tripfees').value) || 0;
+      const pass = document.getElementById('inp-pass').value;
+      const phone = document.getElementById('inp-phone').value.trim();
+      const email = document.getElementById('inp-email').value.trim();
+      const address = document.getElementById('inp-address').value.trim();
+      const dob = document.getElementById('inp-dob').value;
+      const startDate = document.getElementById('inp-startdate').value;
+      const bankAccount = document.getElementById('inp-bankaccount').value.trim();
+
+      if(!user || !name || !pass) return alert('กรุณากรอกข้อมูลให้ครบ');
+
+      users[user] = { password: pass, name: name, role: role, dept: dept, salary: salary, allowance: allowance, tripFees: tripFees, status: 'active',
+                      phone: phone, email: email, address: address, dob: dob, startDate: startDate, bankAccount: bankAccount };
+      renderTable();
+      closeModal();
+    }
+
+    function viewPassword(key) {
+      const secondPass = prompt("🔐 กรุณากรอกรหัสผ่านของคุณ (Admin/Manager) เพื่อยืนยันสิทธิ์ในการดูรหัสผ่านพนักงาน:");
+      if (secondPass === currentAdmin.password) {
+        const passEl = document.getElementById(`pass-${key}`);
+        passEl.innerText = users[key].password;
+        passEl.classList.remove('pass-hidden');
+        
+        // บันทึก Audit Log แจ้งบอส
+        addAuditLog(currentAdmin.name, '👀 ดูรหัสผ่าน', `เข้าดูรหัสผ่านของ User: ${key}`);
+        alert(`⚠️ ระบบได้บันทึกการเข้าดูรหัสผ่านของคุณแล้ว และแจ้งเตือนไปยังฝ่ายบริหาร`);
+      } else if (secondPass !== null) {
+        alert("❌ รหัสผ่านยืนยันไม่ถูกต้อง");
+      }
+    }
+
+    function togglePasswordBoss(key) {
+      const passEl = document.getElementById(`pass-${key}`);
+      const iconEl = document.getElementById(`eye-${key}`);
+      const isHidden = passEl.classList.contains('pass-hidden');
+      passEl.innerText = isHidden ? users[key].password : '••••••••';
+      passEl.classList.toggle('pass-hidden');
+      iconEl.classList.toggle('fa-eye');
+      iconEl.classList.toggle('fa-eye-slash');
+    }
+
+    function openEmployeeDetailModal(key) {
+      editingUserKey = key; // Set for potential edit/delete from detail modal
+      const u = users[key];
+      if (!u) return;
+
+      document.getElementById('detail-name-header').textContent = `ข้อมูลพนักงาน: ${u.name}`;
+      document.getElementById('detail-name').textContent = u.name || '-';
+      document.getElementById('detail-username').textContent = key;
+      document.getElementById('detail-dept').textContent = u.dept || '-';
+      document.getElementById('detail-role').textContent = u.role || '-';
+      document.getElementById('detail-dob').textContent = u.dob ? new Date(u.dob).toLocaleDateString('th-TH') : '-';
+      document.getElementById('detail-startdate').textContent = u.startDate ? new Date(u.startDate).toLocaleDateString('th-TH') : '-';
+      document.getElementById('detail-phone').textContent = u.phone || '-';
+      document.getElementById('detail-email').textContent = u.email || '-';
+      document.getElementById('detail-address').textContent = u.address || '-';
+      document.getElementById('detail-salary').textContent = `฿${(u.salary || 0).toLocaleString()}`;
+      document.getElementById('detail-allowance').textContent = `฿${(u.allowance || 0).toLocaleString()}`;
+      document.getElementById('detail-tripfees').textContent = `฿${(u.tripFees || 0).toLocaleString()}`;
+      const total = (parseFloat(u.salary) || 0) + (parseFloat(u.allowance) || 0) + (parseFloat(u.tripFees) || 0);
+      document.getElementById('detail-total').textContent = `฿${total.toLocaleString()}`;
+      document.getElementById('detail-bankaccount').textContent = u.bankAccount || '-';
+      
+      const statusEl = document.getElementById('detail-status');
+      statusEl.textContent = u.status === 'suspended' ? '● Suspended' : '● Active';
+      statusEl.className = `px-3 py-1 rounded-full text-[10px] font-bold uppercase ${u.status === 'suspended' ? 'text-red-500' : 'text-green-500'}`;
+
+      document.getElementById('employeeDetailModal').classList.remove('hidden');
+    }
+
+    function deleteUserFromDetail() {
+      if (editingUserKey) {
+        deleteUser(editingUserKey);
+        closeDetailModal();
+      }
+    }
+
+    function toggleUserStatus(key) {
+      if(key === 'admin') return alert('ไม่สามารถระงับสิทธิ์ Admin หลักได้');
+      const currentStatus = users[key].status || 'active';
+      const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
+      
+      if(confirm(`ยืนยันการ${newStatus === 'suspended' ? 'ระงับสิทธิ์' : 'คืนสิทธิ์'}พนักงาน ${users[key].name}?`)) {
+        users[key].status = newStatus;
+        // บันทึก log
+        addAuditLog('System/Admin', newStatus === 'suspended' ? 'Account Suspended' : 'Account Activated', `Username: ${key}`);
+        
+        renderTable();
+        alert(`ทำรายการสำเร็จ`);
+      }
+    }
+
+    function deleteUser(key) {
+      if(key === 'admin') return alert('ไม่สามารถลบ Admin หลักได้');
+      if(confirm(`ยืนยันการลบผู้ใช้ ${users[key].name} (${key}) ออกจากระบบ?`)) {
+        delete users[key];
+        renderTable();
+        addAuditLog(currentAdmin.name, '🗑️ ลบพนักงาน', `ลบ User: ${key}`);
+      }
+    }
+
+    function generatePayrollReport() {
+      alert('✅ รายงานเงินเดือนประจำเดือนถูกสร้างขึ้นแล้ว (จำลอง)\nสามารถดาวน์โหลดไฟล์ Excel ได้จากระบบจริง');
+      addAuditLog(currentAdmin.name, '📊 สร้างรายงานเงินเดือน', 'สร้างรายงานเงินเดือนประจำเดือน');
+    }
+
+    // Payslip Logic
+    function openPayslipModal(key) {
+      currentPayslipUserKey = key;
+      const u = users[key];
+      if (!u) return;
+
+      document.getElementById('payslip-name-header').textContent = `สลิปเงินเดือน: ${u.name}`;
+      document.getElementById('payslip-name').textContent = u.name || '-';
+      document.getElementById('payslip-role').textContent = u.role || '-';
+      document.getElementById('payslip-dept').textContent = u.dept || '-';
+      
+      const today = new Date();
+      document.getElementById('payslip-month-year').textContent = today.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+
+      // Reset input fields to default or previous values if stored
+      document.getElementById('payslip-working-days').value = 22; // Default working days
+      document.getElementById('payslip-ot1_5-hours').value = 0;
+      document.getElementById('payslip-ot2_0-hours').value = 0;
+      document.getElementById('payslip-other-bonuses').value = 0;
+      document.getElementById('payslip-deductions-input').value = 0;
+
+      calculatePayslip();
+      document.getElementById('payslipModal').classList.remove('hidden');
+    }
+
+    function closePayslipModal() {
+      document.getElementById('payslipModal').classList.add('hidden');
+      currentPayslipUserKey = null;
+    }
+
+    function calculatePayslip() {
+      if (!currentPayslipUserKey) return;
+      const u = users[currentPayslipUserKey];
+
+      const baseSalary = parseFloat(u.salary) || 0;
+      const allowance = parseFloat(u.allowance) || 0;
+      const tripFees = parseFloat(u.tripFees) || 0;
+      
+      const workingDays = parseFloat(document.getElementById('payslip-working-days').value) || 0;
+      const ot1_5_hours = parseFloat(document.getElementById('payslip-ot1_5-hours').value) || 0;
+      const ot2_0_hours = parseFloat(document.getElementById('payslip-ot2_0-hours').value) || 0;
+      const otherBonuses = parseFloat(document.getElementById('payslip-other-bonuses').value) || 0;
+      const deductions = parseFloat(document.getElementById('payslip-deductions-input').value) || 0;
+
+      // Calculate OT pay (assuming 8 hours per working day)
+      const dailyRate = workingDays > 0 ? baseSalary / workingDays : 0;
+      const hourlyRate = dailyRate / 8;
+      const ot1_5_pay = ot1_5_hours * hourlyRate * 1.5;
+      const ot2_0_pay = ot2_0_hours * hourlyRate * 2.0;
+
+      const totalEarnings = baseSalary + allowance + tripFees + ot1_5_pay + ot2_0_pay + otherBonuses;
+      const totalDeductions = deductions;
+      const netPay = totalEarnings - totalDeductions;
+
+      document.getElementById('payslip-base-salary').textContent = `฿${baseSalary.toLocaleString()}`;
+      document.getElementById('payslip-allowance').textContent = `฿${allowance.toLocaleString()}`;
+      document.getElementById('payslip-tripfees').textContent = `฿${tripFees.toLocaleString()}`;
+      document.getElementById('payslip-ot1_5').textContent = `฿${ot1_5_pay.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('payslip-ot2_0').textContent = `฿${ot2_0_pay.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('payslip-other-bonus').textContent = `฿${otherBonuses.toLocaleString()}`;
+      document.getElementById('payslip-total-earnings').textContent = `฿${totalEarnings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('payslip-deductions').textContent = `฿${deductions.toLocaleString()}`;
+      document.getElementById('payslip-total-deductions').textContent = `฿${totalDeductions.toLocaleString()}`;
+      document.getElementById('payslip-net-pay').textContent = `฿${netPay.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
+
+    function printPayslip() {
+      const printContent = document.getElementById('payslipModal').querySelector('.bg-white.rounded-3xl').innerHTML;
+      const originalBody = document.body.innerHTML;
+      document.body.innerHTML = `
+        <div style="width: 210mm; margin: 0 auto; padding: 20mm; box-sizing: border-box; font-family: 'Sarabun', sans-serif;">
+          ${printContent}
+        </div>
+      `;
+      window.print();
+      document.body.innerHTML = originalBody; // Restore original content
+      location.reload(); // Reload to ensure all event listeners are re-attached
+    }
+
+    // Bilingual Guide Content
+    const guideContent = {
+      th: {
+        title: "คู่มือการกำหนดสิทธิ์และความรับผิดชอบ (HR Policy)",
+        headers: ["ตำแหน่ง (Role)", "ความรับผิดชอบหลัก", "Portal Access", "Fleet Hub", "Finance", "สิทธิ์ Admin"],
+        roles: [
+          ["Boss", "เจ้าของกิจการ เข้าถึงทุกส่วนและดูรหัสผ่านได้ทันที", "✓ 100%", "✓ 100%", "✓ 100%", "FULL+"],
+          ["Admin", "ดูแลภาพรวมระบบและพนักงานทั้งหมด", "✓ 100%", "✓ 100%", "✓ 100%", "FULL"],
+          ["Admin/Boss", "ดูแลภาพรวมระบบและพนักงานทั้งหมด", "✓ 100%", "✓ 100%", "✓ 100%", "FULL"],
+          ["CS / ประสานงาน", "สร้างงานด่วน, ตามตู้, ติดต่อลูกค้า", "✓ งาน/ตู้", "✕ ไม่มี", "✕ ไม่มี", "✕"],
+          ["Finance / การเงิน", "ออก Invoice, จ่ายน้ำมัน, คำนวณกำไร", "✓ สรุปงาน", "✓ น้ำมัน/ค่าเที่ยว", "✓ 100%", "✕"],
+          ["Dispatch / จัดรถ", "วางแผนเดินรถ, จ่ายงานคนขับ", "✓ สรุปงาน", "✓ ระบบจัดรถ", "✕ ไม่มี", "✕"],
+          ["Driver", "รับงาน, อัปเดตพิกัด, แจ้งซ่อม", "✓ Mobile Only", "✕ ไม่มี", "✕ ไม่มี", "✕"]
+        ],
+        functions: [
+          { title: "🚫 การระงับสิทธิ์ (Suspend)", desc: "กดปุ่ม 'User Slash' เพื่อหยุดการเข้าถึงของพนักงานชั่วคราว (เช่น ลาออก/พักงาน) โดยไม่ต้องลบข้อมูล" },
+          { title: "👀 ดูรหัสผ่าน (View Password)", desc: "คลิกที่แถบรหัสผ่าน ระบบจะถามรหัส Admin อีกครั้งเพื่อยืนยันสิทธิ์ และจะบันทึก Log แจ้งบอสทันที" },
+          { title: "🗑️ การลบผู้ใช้ (Delete)", desc: "ใช้สำหรับพนักงานที่ออกจากบริษัทอย่างเป็นทางการ ข้อมูลจะถูกลบถาวร" },
+          { title: "🛡️ ประวัติการใช้งาน (Audit Logs)", desc: "ตรวจสอบได้ว่าใครเข้าใช้งานเวลาไหน หรือแอบดูรหัสผ่านใคร เพื่อความปลอดภัยของข้อมูล" }
+        ]
+      },
+      en: {
+        title: "Permission & Responsibility Guide (HR Policy)",
+        headers: ["Position (Role)", "Key Responsibility", "Portal Access", "Fleet Hub", "Finance", "Admin Rights"],
+        roles: [
+          ["Boss", "Owner, unlimited access and direct password view", "✓ 100%", "✓ 100%", "✓ 100%", "FULL+"],
+          ["Admin", "Overall management & user control", "✓ 100%", "✓ 100%", "✓ 100%", "FULL"],
+          ["Admin/Boss", "Overall management & user control", "✓ 100%", "✓ 100%", "✓ 100%", "FULL"],
+          ["CS / Coordination", "Job creation, Tracking, Customer contact", "✓ Jobs/Units", "✕ None", "✕ None", "✕"],
+          ["Finance / Accounting", "Invoice, Fuel records, Profit analysis", "✓ Reports", "✓ Fuel/Payroll", "✓ 100%", "✕"],
+          ["Dispatch", "Route planning, Assigning jobs", "✓ Reports", "✓ Dispatching", "✕ None", "✕"],
+          ["Driver", "Accepting tasks, GPS, Repairs", "✓ Mobile Only", "✕ None", "✕ None", "✕"]
+        ],
+        functions: [
+          { title: "🚫 Suspend Account", desc: "Click 'User Slash' to temporarily block access (e.g., on leave) without deleting the account." },
+          { title: "👀 View Password", desc: "Click the password field. Re-entry of Admin password is required, and an alert is sent to Boss logs." },
+          { title: "🗑️ Delete User", desc: "Use for employees who officially left the company. This action is permanent." },
+          { title: "🛡️ Audit Logs", desc: "Track login times and critical actions (like viewing passwords) for high-level security." }
+        ]
+      }
+    };
+
+    function setLang(lang) {
+      const content = guideContent[lang];
+      document.getElementById('guide-title').innerText = content.title;
+      document.getElementById('btn-th').classList.toggle('active', lang === 'th');
+      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+      
+      // Table Headers
+      const headerIds = ['th-role', 'th-desc', 'th-portal', 'th-fleet', 'th-finance', 'th-admin'];
+      headerIds.forEach((id, i) => document.getElementById(id).innerText = content.headers[i]);
+
+      // Table Body
+      const badges = ['badge-boss','badge-purple','badge-purple','badge-green','badge-yellow','badge-blue','badge-orange']; // Adjusted for new Admin/Boss split
+      document.getElementById('guide-body').innerHTML = content.roles.map((r, i) => `
+        <tr>
+          <td><span class="${badges[i] || 'badge-gray'} px-2 py-0.5 rounded text-[10px] font-bold">${r[0]}</span></td>
+          <td>${r[1]}</td>
+          <td class="${r[2].includes('✓')?'check-yes':''}">${r[2]}</td>
+          <td class="${r[3].includes('✓')?'check-yes':''}">${r[3]}</td>
+          <td class="${r[4].includes('✓')?'check-yes':''}">${r[4]}</td>
+          <td class="font-bold">${r[5]}</td>
+        </tr>`).join('');
+
+      // Functions
+      document.getElementById('function-guide').innerHTML = content.functions.map(f => `
+        <div>
+          <strong class="text-slate-700 block mb-1">${f.title}</strong>
+          <p class="text-slate-500 leading-relaxed">${f.desc}</p>
+        </div>`).join('');
+    }
+
+    // Audit Logs Logic
+    function renderAuditLogs() {
+      const body = document.getElementById('audit-log-body');
+      const logs = JSON.parse(localStorage.getItem('mck_audit_logs') || '[]');
+      
+      body.innerHTML = logs.map(l => `
+        <tr>
+          <td class="p-4 text-xs font-mono text-slate-400">${l.time}</td>
+          <td class="p-4"><strong>${l.user}</strong></td>
+          <td class="p-4"><span class="badge ${l.action === 'Login' ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-600'} text-[10px] font-bold uppercase">${l.action}</span></td>
+          <td class="p-4 text-xs">${l.details}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="4" class="p-10 text-center text-slate-400">ยังไม่มีบันทึกประวัติ</td></tr>';
+    }
+
+    function addAuditLog(userName, action, details) {
+      const logs = JSON.parse(localStorage.getItem('mck_audit_logs') || '[]');
+      logs.unshift({ time: new Date().toLocaleString('th-TH'), user: userName, action, details, timestamp: Date.now() });
+      localStorage.setItem('mck_audit_logs', JSON.stringify(logs.slice(0, 100))); // เก็บ 100 รายการล่าสุด
+      renderAuditLogs();
+    }
+
+    function clearAuditLogs() {
+      const secondPass = prompt("🔐 การล้างประวัติเป็นรายการสำคัญ\nกรุณากรอกรหัสผ่านยืนยัน (admin123):");
+      if (secondPass !== 'admin123') {
+        alert("❌ รหัสผ่านไม่ถูกต้อง การดำเนินการถูกยกเลิก");
+        return;
+      }
+
+      if(confirm('ยืนยันลบประวัติการใช้งานทั้งหมด?')) {
+        localStorage.setItem('mck_audit_logs', '[]');
+        addAuditLog(currentAdmin.name, '🗑️ ล้างประวัติ', `ทำการล้าง Audit Logs ทั้งหมดออกจากระบบ`);
+        renderAuditLogs();
+      }
+    }
+
+    window.onload = () => {
+      renderTable();
+      renderAuditLogs();
+    };
+  </script>
+</body>
+</html>

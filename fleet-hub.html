@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleet Hub — ICL Logistics</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Kanit:wght@500;600&display=swap');
+body{font-family:'Sarabun',sans-serif;background:#f1f5f9;}
+.tab-pane{display:none;}.tab-pane.active{display:block;}
+.nav-btn{display:flex;align-items:center;padding:10px 14px;border-radius:8px;font-size:14px;cursor:pointer;transition:.2s;color:#94a3b8;gap:10px;border-left:3px solid transparent;}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:#e2e8f0;}
+.nav-btn.act{background:rgba(59,130,246,.15);color:#93c5fd;border-left-color:#3b82f6;}
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;}
+.s-run{background:#dcfce7;color:#166534;}.s-wait{background:#fef9c3;color:#854d0e;}
+.s-idle{background:#dbeafe;color:#1d4ed8;}.s-repair{background:#fee2e2;color:#991b1b;}
+.s-done{background:#f3f4f6;color:#374151;}.s-leave{background:#fce7f3;color:#9d174d;}
+.badge{display:inline-block;padding:2px 10px;border-radius:9999px;font-size:11px;font-weight:700;}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;color:#fff;font-weight:600;z-index:9999;opacity:0;transition:opacity .4s;pointer-events:none;min-width:220px;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+.toast.show{opacity:1;}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;}
+.modal-bg.hidden{display:none;}
+#login-overlay{position:fixed;inset:0;background:rgba(15,23,42,.96);z-index:9000;display:flex;align-items:center;justify-content:center;}
+.kpi-card{transition:transform .2s;}.kpi-card:hover{transform:translateY(-2px);}
+table thead th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
+tr:hover td{background:#f8fafc;}
+.prog-bar{height:6px;border-radius:9999px;background:#e2e8f0;}
+.prog-fill{height:6px;border-radius:9999px;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden">
+    <div class="bg-slate-900 p-6 text-center">
+      <div class="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <i class="fas fa-truck text-2xl text-white"></i>
+      </div>
+      <h1 class="text-xl font-bold text-white">Fleet Hub</h1>
+      <p class="text-slate-400 text-xs mt-1">ICL Logistics — ระบบบริหารจัดการรถ</p>
+    </div>
+    <div class="p-6">
+      <div class="mb-3">
+        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Username</label>
+        <input id="ov-user" type="text" placeholder="admin / manager / dispatch / finance / driver"
+          class="w-full border-2 rounded-lg px-3 py-2 text-sm focus:border-blue-500 border-slate-200">
+      </div>
+      <div class="mb-4">
+        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Password</label>
+        <input id="ov-pass" type="password" placeholder="รหัสผ่าน"
+          class="w-full border-2 rounded-lg px-3 py-2 text-sm focus:border-blue-500 border-slate-200"
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button onclick="doLogin()" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition">เข้าสู่ระบบ</button>
+      <div id="login-err" class="hidden mt-2 text-red-500 text-xs text-center font-semibold">Username หรือ Password ไม่ถูกต้อง</div>
+      <div class="mt-4">
+        <p class="text-xs text-slate-400 text-center mb-2">Quick Login (Demo)</p>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="quickLogin('admin','admin123')" class="text-xs bg-purple-100 text-purple-700 py-1.5 rounded hover:bg-purple-200 font-semibold">👑 Admin</button>
+          <button onclick="quickLogin('manager','mgr123')" class="text-xs bg-blue-100 text-blue-700 py-1.5 rounded hover:bg-blue-200 font-semibold">🚛 Manager</button>
+          <button onclick="quickLogin('dispatch','disp123')" class="text-xs bg-green-100 text-green-700 py-1.5 rounded hover:bg-green-200 font-semibold">📋 จัดรถ</button>
+          <button onclick="quickLogin('finance','fin123')" class="text-xs bg-yellow-100 text-yellow-700 py-1.5 rounded hover:bg-yellow-200 font-semibold">💰 การเงิน</button>
+          <button onclick="quickLogin('coord','coord123')" class="text-xs bg-teal-100 text-teal-700 py-1.5 rounded hover:bg-teal-200 font-semibold">📡 ประสานงาน</button>
+          <button onclick="quickLogin('driver','driver123')" class="text-xs bg-orange-100 text-orange-700 py-1.5 rounded hover:bg-orange-200 font-semibold">🚚 คนขับ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- MAIN LAYOUT -->
+<div class="flex min-h-screen">
+  <!-- SIDEBAR -->
+  <div class="w-64 bg-slate-900 flex flex-col" style="min-height:100vh;">
+    <div class="p-5 border-b border-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+          <i class="fas fa-truck text-white"></i>
+        </div>
+        <div>
+          <div class="text-white font-bold text-sm">Fleet Hub</div>
+          <div class="text-slate-400 text-xs">ICL Logistics</div>
+        </div>
+      </div>
+    </div>
+    <!-- user badge -->
+    <div class="px-4 py-3 border-b border-slate-700">
+      <div id="sb-user" class="text-white text-sm font-semibold">—</div>
+      <div id="sb-badge" class="text-xs mt-1 px-2 py-0.5 rounded-full bg-blue-700 text-blue-100 inline-block">—</div>
+    </div>
+    <!-- nav -->
+    <nav class="flex-1 p-3 space-y-1" id="sidebar-nav">
+      <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-btn w-full text-left act">
+        <i class="fas fa-tachometer-alt w-4"></i><span>Dashboard</span>
+      </button>
+      <button onclick="showTab('dispatch')" id="nav-dispatch" class="nav-btn w-full text-left">
+        <i class="fas fa-clipboard-list w-4"></i><span>จัดรถ (Dispatch)</span>
+      </button>
+      <button onclick="showTab('tracking')" id="nav-tracking" class="nav-btn w-full text-left">
+        <i class="fas fa-satellite-dish w-4"></i><span>ติดตามรถ</span>
+      </button>
+      <button onclick="showTab('payment')" id="nav-payment" class="nav-btn w-full text-left">
+        <i class="fas fa-wallet w-4"></i><span>ค่าเที่ยว</span>
+      </button>
+      <button onclick="showTab('fuel')" id="nav-fuel" class="nav-btn w-full text-left">
+        <i class="fas fa-gas-pump w-4"></i><span>น้ำมัน</span>
+      </button>
+      <button onclick="showTab('drivers')" id="nav-drivers" class="nav-btn w-full text-left">
+        <i class="fas fa-id-card w-4"></i><span>คนขับ</span>
+      </button>
+      <button onclick="showTab('vehicles')" id="nav-vehicles" class="nav-btn w-full text-left">
+        <i class="fas fa-truck-moving w-4"></i><span>รถ (Fleet)</span>
+      </button>
+      <button onclick="showTab('vehdocs')" id="nav-vehdocs" class="nav-btn w-full text-left">
+        <i class="fas fa-file-invoice w-4"></i><span>ทะเบียนเอกสารรถ</span>
+      </button>
+      <button onclick="showTab('trailers')" id="nav-trailers" class="nav-btn w-full text-left">
+        <i class="fas fa-trailer w-4"></i><span>หางรถเทลเลอร์</span>
+      </button>
+      <button onclick="showTab('pairing')" id="nav-pairing" class="nav-btn w-full text-left">
+        <i class="fas fa-link w-4"></i><span>วิเคราะห์การจับคู่</span>
+      </button>
+      <button onclick="showTab('costcalc')" id="nav-costcalc" class="nav-btn w-full text-left">
+        <i class="fas fa-calculator w-4"></i><span>คำนวณต้นทุน</span>
+      </button>
+      <button onclick="showTab('repair')" id="nav-repair" class="nav-btn w-full text-left">
+        <i class="fas fa-tools w-4"></i><span>แจ้งซ่อมรถ</span>
+      </button>
+    </nav>
+    <div class="p-3 border-t border-slate-700">
+      <a href="index.html" class="nav-btn w-full text-left text-slate-400 hover:text-white">
+        <i class="fas fa-arrow-left w-4"></i><span>หน้าหลัก</span>
+      </a>
+      <button onclick="doLogout()" class="nav-btn w-full text-left text-red-400 hover:text-red-300 mt-1">
+        <i class="fas fa-sign-out-alt w-4"></i><span>ออกจากระบบ</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="flex-1 overflow-auto">
+    <!-- header bar -->
+    <div class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+      <div>
+        <h2 class="text-xl font-bold text-slate-800" id="page-title">Dashboard</h2>
+        <p class="text-xs text-slate-400" id="page-sub">ภาพรวมระบบรถขนส่ง</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs text-slate-400">วันที่ <span id="hdr-date"></span></span>
+        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+          <i class="fas fa-user text-white text-sm"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: DASHBOARD ===== -->
+    <div id="tab-dashboard" class="tab-pane active p-8">
+      <!-- KPI -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div class="card p-5 kpi-card border-l-4 border-blue-500">
+          <p class="text-xs text-slate-400 uppercase font-semibold">รถออกวันนี้</p>
+          <h3 class="text-3xl font-bold text-slate-800 mt-1">12</h3>
+          <p class="text-xs text-blue-500 mt-1"><i class="fas fa-arrow-up mr-1"></i>+2 จากเมื่อวาน</p>
+        </div>
+        <div class="card p-5 kpi-card border-l-4 border-green-500">
+          <p class="text-xs text-slate-400 uppercase font-semibold">รถว่าง</p>
+          <h3 class="text-3xl font-bold text-slate-800 mt-1">8</h3>
+          <p class="text-xs text-green-500 mt-1"><i class="fas fa-circle mr-1"></i>พร้อมรับงาน</p>
+        </div>
+        <div class="card p-5 kpi-card border-l-4 border-red-500">
+          <p class="text-xs text-slate-400 uppercase font-semibold">รถซ่อม</p>
+          <h3 class="text-3xl font-bold text-slate-800 mt-1">3</h3>
+          <p class="text-xs text-red-500 mt-1"><i class="fas fa-tools mr-1"></i>อยู่ที่อู่</p>
+        </div>
+        <div class="card p-5 kpi-card border-l-4 border-yellow-500">
+          <p class="text-xs text-slate-400 uppercase font-semibold">งานรอจัด</p>
+          <h3 class="text-3xl font-bold text-slate-800 mt-1">5</h3>
+          <p class="text-xs text-yellow-500 mt-1"><i class="fas fa-clock mr-1"></i>รอจัดรถ</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- Active jobs -->
+        <div class="lg:col-span-2 card overflow-hidden">
+          <div class="px-6 py-4 border-b bg-slate-50 flex justify-between items-center">
+            <h3 class="font-bold text-slate-700"><i class="fas fa-route mr-2 text-blue-500"></i>งานวิ่งอยู่ตอนนี้</h3>
+            <button onclick="showTab('tracking')" class="text-xs text-blue-600 hover:underline">ดูทั้งหมด →</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead><tr class="bg-slate-50 text-slate-500">
+                <th class="p-3 text-left">Job ID</th>
+                <th class="p-3 text-left">รถ/คนขับ</th>
+                <th class="p-3 text-left">เส้นทาง</th>
+                <th class="p-3 text-left">สถานะ</th>
+                <th class="p-3 text-left">ETA</th>
+              </tr></thead>
+              <tbody class="text-slate-600">
+                <tr class="border-t">
+                  <td class="p-3 font-bold text-blue-700">JOB-241</td>
+                  <td class="p-3"><div class="font-semibold">70-0981 มห.</div><div class="text-xs text-slate-400">นายประสิทธ์พร</div></td>
+                  <td class="p-3 text-xs">ตลาดไท → หนองคาย<br><span class="text-slate-400">485 km</span></td>
+                  <td class="p-3"><span class="badge s-run">วิ่งอยู่</span></td>
+                  <td class="p-3 text-xs">วันนี้ 18:00</td>
+                </tr>
+                <tr class="border-t">
+                  <td class="p-3 font-bold text-blue-700">JOB-240</td>
+                  <td class="p-3"><div class="font-semibold">คร-3456 สมุทรสาคร</div><div class="text-xs text-slate-400">นายบุญมี</div></td>
+                  <td class="p-3 text-xs">สาทร → ท่าเรือหนองคาย<br><span class="text-slate-400">490 km</span></td>
+                  <td class="s-run badge p-3 hidden"></td>
+                  <td class="p-3"><span class="badge s-run">วิ่งอยู่</span></td>
+                  <td class="p-3 text-xs">วันนี้ 15:00</td>
+                </tr>
+                <tr class="border-t">
+                  <td class="p-3 font-bold text-blue-700">JOB-242</td>
+                  <td class="p-3"><div class="font-semibold text-slate-400">— ยังไม่ได้จัด —</div></td>
+                  <td class="p-3 text-xs">แหลมฉบัง → จันทบุรี<br><span class="text-slate-400">180 km</span></td>
+                  <td class="p-3"><span class="badge s-wait">รอจัดรถ</span></td>
+                  <td class="p-3 text-xs text-slate-400">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Truck status summary -->
+        <div class="card p-5">
+          <h3 class="font-bold text-slate-700 mb-4"><i class="fas fa-truck mr-2 text-slate-500"></i>สถานะรถทั้งหมด</h3>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-sm mb-1"><span>วิ่งอยู่</span><span class="font-bold text-green-600">12</span></div>
+              <div class="prog-bar"><div class="prog-fill bg-green-500" style="width:52%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1"><span>ว่าง/รองาน</span><span class="font-bold text-blue-600">8</span></div>
+              <div class="prog-bar"><div class="prog-fill bg-blue-500" style="width:35%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1"><span>ซ่อมบำรุง</span><span class="font-bold text-red-600">3</span></div>
+              <div class="prog-bar"><div class="prog-fill bg-red-500" style="width:13%"></div></div>
+            </div>
+          </div>
+          <hr class="my-4">
+          <h4 class="font-bold text-slate-600 text-sm mb-3">KPI ประจำเดือน</h4>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-slate-500">OTP (On-Time %)</span><span class="font-bold text-green-600">94.2%</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Acceptance Rate</span><span class="font-bold text-blue-600">91.8%</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">เฉลี่ย km/L</span><span class="font-bold text-slate-700">3.08</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Safety Score</span><span class="font-bold text-green-600">99%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Fuel Efficiency Comparison Chart -->
+        <div class="card p-5">
+          <h3 class="font-bold text-slate-700 mb-4"><i class="fas fa-gas-pump mr-2 text-orange-500"></i>เปรียบเทียบการกินน้ำมัน (km/L)</h3>
+          <div id="dashboard-fuel-chart" class="space-y-4 mt-2">
+            <!-- JS rendered content -->
+          </div>
+          <div class="mt-4 pt-4 border-t border-dashed flex justify-between items-center text-[10px] uppercase font-bold text-slate-400">
+            <span>เกณฑ์ปกติ: > 3.0 km/L</span>
+            <span class="text-red-500">เริ่มผิดปกติ: < 2.8 km/L</span>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="card p-5">
+          <h3 class="font-bold text-slate-700 mb-3"><i class="fas fa-exclamation-triangle mr-2 text-yellow-500"></i>แจ้งเตือน</h3>
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 bg-red-50 rounded-lg p-3 text-sm">
+              <i class="fas fa-file-alt text-red-500"></i>
+              <span class="text-red-700 font-semibold">ภาษีรถ คร-3456 หมดอายุ 30 พ.ค. 69 — อีก 19 วัน!</span>
+            </div>
+            <div class="flex items-center gap-3 bg-yellow-50 rounded-lg p-3 text-sm">
+              <i class="fas fa-oil-can text-yellow-500"></i>
+              <span class="text-yellow-700">ฮภ-5678 ถึงกำหนดเปลี่ยนน้ำมันเครื่อง (ทุก 20,000 km)</span>
+            </div>
+            <div class="flex items-center gap-3 bg-blue-50 rounded-lg p-3 text-sm">
+              <i class="fas fa-clock text-blue-500"></i>
+              <span class="text-blue-700">JOB-243 ยังไม่มีรถ — ออกพรุ่งนี้ 05:00 ต้องจัดด่วน!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: DISPATCH ===== -->
+    <div id="tab-dispatch" class="tab-pane p-8">
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <!-- New Job Form -->
+        <div class="xl:col-span-1 card overflow-hidden">
+          <div class="px-6 py-4 border-b bg-slate-800 text-white">
+            <h3 class="font-bold"><i class="fas fa-plus-circle mr-2 text-blue-400"></i>สร้างงานใหม่</h3>
+          </div>
+          <div class="p-5 space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Booking No.</label>
+              <input type="text" id="dsp-booking" placeholder="BK-2605XXXX" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ต้นทาง</label>
+                <input type="text" id="dsp-origin" placeholder="ต้นทาง" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ปลายทาง</label>
+                <input type="text" id="dsp-dest" placeholder="ปลายทาง" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ระยะทาง (km)</label>
+                <input type="number" id="dsp-km" placeholder="485" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ประเภทตู้</label>
+                <select id="dsp-ctype" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+                  <option>40HC</option><option>20GP</option><option>40GP</option><option>40RH (Reefer)</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">หมายเลขตู้</label>
+              <input type="text" id="dsp-container" placeholder="MSKU 9283741" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">วันที่ออก</label>
+              <input type="datetime-local" id="dsp-date" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">เรทค่าเที่ยว (บาท/km)</label>
+              <input type="number" id="dsp-rate" placeholder="28" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+            </div>
+            <button onclick="runAI()" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition">
+              <i class="fas fa-robot mr-2"></i>AI แนะนำรถ
+            </button>
+            <button onclick="createJob()" class="w-full bg-slate-800 text-white py-2.5 rounded-lg font-bold hover:bg-slate-700 transition">
+              <i class="fas fa-save mr-2"></i>บันทึกงาน
+            </button>
+          </div>
+        </div>
+
+        <!-- Job Queue + Available Trucks -->
+        <div class="xl:col-span-2 space-y-6">
+          <!-- AI Recommendation -->
+          <div id="ai-box" class="card p-5 border-2 border-blue-300 hidden">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fas fa-robot text-blue-500"></i>
+              <span class="font-bold text-blue-700">AI แนะนำ</span>
+            </div>
+            <div id="ai-result" class="text-sm text-slate-700"></div>
+          </div>
+
+          <!-- Job Queue -->
+          <div class="card overflow-hidden">
+            <div class="px-6 py-4 border-b bg-slate-50 flex justify-between items-center">
+              <h3 class="font-bold text-slate-700"><i class="fas fa-list mr-2"></i>คิวงานทั้งหมด</h3>
+              <select onchange="filterJobs(this.value)" class="text-xs border rounded px-2 py-1 border-slate-200">
+                <option value="">ทุกสถานะ</option>
+                <option value="wait">รอจัดรถ</option>
+                <option value="run">วิ่งอยู่</option>
+                <option value="done">เสร็จแล้ว</option>
+              </select>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm" id="job-table">
+                <thead><tr class="bg-slate-50 text-slate-500">
+                  <th class="p-3 text-left">Job</th>
+                  <th class="p-3 text-left">เส้นทาง</th>
+                  <th class="p-3 text-left">ตู้</th>
+                  <th class="p-3 text-left">รถ/คนขับ</th>
+                  <th class="p-3 text-left">สถานะ</th>
+                  <th class="p-3 text-center">จัดรถ</th>
+                </tr></thead>
+                <tbody id="job-tbody" class="text-slate-600"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Available Trucks -->
+          <div class="card overflow-hidden">
+            <div class="px-6 py-4 border-b bg-slate-50">
+              <h3 class="font-bold text-slate-700"><i class="fas fa-truck mr-2 text-green-500"></i>รถว่าง พร้อมรับงาน</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead><tr class="bg-slate-50 text-slate-500">
+                  <th class="p-3 text-left">ทะเบียน</th>
+                  <th class="p-3 text-left">ประเภท</th>
+                  <th class="p-3 text-left">ที่ตั้งปัจจุบัน</th>
+                  <th class="p-3 text-left">คนขับ</th>
+                  <th class="p-3 text-center">เลือก</th>
+                </tr></thead>
+                <tbody class="text-slate-600">
+                  <tr class="border-t"><td class="p-3 font-bold">กข-1234 กทม.</td><td class="p-3">20GP</td><td class="p-3 text-xs">CY ลาดกระบัง</td><td class="p-3">นายสมชาย</td><td class="p-3 text-center"><button onclick="selectTruck('กข-1234 กทม.','นายสมชาย')" class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200 font-semibold">เลือก</button></td></tr>
+                  <tr class="border-t"><td class="p-3 font-bold">นข-9012 กทม.</td><td class="p-3">40RH</td><td class="p-3 text-xs">CY สาทร</td><td class="p-3">นายอนันต์</td><td class="p-3 text-center"><button onclick="selectTruck('นข-9012 กทม.','นายอนันต์')" class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200 font-semibold">เลือก</button></td></tr>
+                  <tr class="border-t"><td class="p-3 font-bold">พก-7788 ขก.</td><td class="p-3">40HC</td><td class="p-3 text-xs">ขอนแก่น</td><td class="p-3">นายวิทยา</td><td class="p-3 text-center"><button onclick="selectTruck('พก-7788 ขก.','นายวิทยา')" class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200 font-semibold">เลือก</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: TRACKING ===== -->
+    <div id="tab-tracking" class="tab-pane p-8">
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <!-- Live Job List -->
+        <div class="xl:col-span-2 card overflow-hidden">
+          <div class="px-6 py-4 border-b bg-slate-50 flex justify-between items-center">
+            <h3 class="font-bold text-slate-700"><i class="fas fa-satellite-dish mr-2 text-blue-500"></i>รถที่กำลังวิ่ง</h3>
+            <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold">● Live</span>
+          </div>
+          <div id="tracking-list" class="divide-y"></div>
+        </div>
+        <!-- Contact Panel -->
+        <div class="space-y-4">
+          <div class="card p-5">
+            <h3 class="font-bold text-slate-700 mb-3"><i class="fas fa-phone mr-2"></i>ติดต่อคนขับ</h3>
+            <div class="space-y-3" id="driver-contacts"></div>
+          </div>
+          <div class="card p-5">
+            <h3 class="font-bold text-slate-700 mb-3"><i class="fas fa-history mr-2"></i>อัพเดทล่าสุด</h3>
+            <div class="space-y-3 text-sm">
+              <div class="flex gap-2"><span class="text-slate-400 text-xs w-12 flex-shrink-0">10:32</span><span>JOB-241 ผ่านด่านกาฬสินธุ์</span></div>
+              <div class="flex gap-2"><span class="text-slate-400 text-xs w-12 flex-shrink-0">09:15</span><span>JOB-240 หยุดพักที่ นครราชสีมา</span></div>
+              <div class="flex gap-2"><span class="text-slate-400 text-xs w-12 flex-shrink-0">08:00</span><span>JOB-241 ออกจากตลาดไท</span></div>
+              <div class="flex gap-2"><span class="text-slate-400 text-xs w-12 flex-shrink-0">07:30</span><span>JOB-240 โหลดตู้เสร็จ</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: COST CALC ===== -->
+    <div id="tab-costcalc" class="tab-pane p-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Calculator Card -->
+        <div class="card p-6 border-t-4 border-blue-600">
+          <h3 class="font-bold text-slate-700 mb-4"><i class="fas fa-calculator mr-2 text-blue-500"></i>เครื่องมือคำนวณต้นทุนน้ำมัน</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ราคาน้ำมันปัจจุบัน (บาท/ลิตร)</label>
+              <input type="number" id="calc-fuel-price" value="34.50" step="0.01" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200" oninput="runCostCalc()">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">อัตราสิ้นเปลือง (km/L)</label>
+                <input type="number" id="calc-consumption" value="3.0" step="0.1" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200" oninput="runCostCalc()">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ระยะทางวิ่ง (km)</label>
+                <input type="number" id="calc-distance" value="485" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200" oninput="runCostCalc()">
+              </div>
+            </div>
+            <div class="pt-4 border-t border-dashed">
+              <div class="bg-blue-50 rounded-xl p-5">
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-slate-600 text-sm">ต้นทุนน้ำมันรวมต่อทริป:</span>
+                  <span class="text-2xl font-bold text-blue-700" id="res-total-cost">฿ 5,577.50</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-600 text-sm">ต้นทุนต่อกิโลเมตร:</span>
+                  <span class="text-xl font-bold text-slate-800" id="res-cost-per-km">฿ 11.50 / km</span>
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400 mt-2 italic">* สูตร: (ระยะทาง / อัตราสิ้นเปลือง) x ราคาน้ำมัน</p>
+          </div>
+        </div>
+
+        <!-- Reference Data Card -->
+        <div class="card p-6">
+          <h3 class="font-bold text-slate-700 mb-4"><i class="fas fa-info-circle mr-2 text-slate-400"></i>เกณฑ์มาตรฐาน (Benchmarking)</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <span class="text-sm">ตู้ 20' Dry (Full Load)</span>
+              <span class="text-sm font-bold">3.2 - 3.5 km/L</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <span class="text-sm">ตู้ 40' High Cube (Full Load)</span>
+              <span class="text-sm font-bold">2.8 - 3.1 km/L</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <span class="text-sm">ตู้ 40' Reefer (เปิดเครื่องเย็น)</span>
+              <span class="text-sm font-bold">2.5 - 2.8 km/L</span>
+            </div>
+            <div class="mt-4 p-4 bg-orange-50 border border-orange-100 rounded-lg text-sm text-orange-800">
+              <p class="font-bold uppercase mb-1">กลยุทธ์การตั้งราคา</p>
+              <p class="text-xs">แนะนำให้ใช้ต้นทุนกิโลเมตรละ <span class="font-bold" id="rec-cost">11.50</span> บาท เป็นฐาน และบวกกำไรครอบคลุมค่าแรงคนขับและค่าเสื่อมรถอีกอย่างน้อย 60% เพื่อกำหนดเรทค่าเที่ยวที่ยั่งยืน</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Repair Approvals (Visible for Boss/Admin/Manager) -->
+        <div id="dash-repair-card" class="card p-5 hidden">
+          <h3 class="font-bold text-slate-700 mb-3"><i class="fas fa-tools mr-2 text-red-500"></i>รออนุมัติซ่อม (Quick Approve)</h3>
+          <div id="dash-repair-list" class="space-y-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: PAYMENT ===== -->
+    <div id="tab-payment" class="tab-pane p-8">
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+        <div class="card p-5 border-l-4 border-green-500">
+          <p class="text-xs text-slate-400 uppercase font-semibold">รวมค่าเที่ยวเดือนนี้</p>
+          <h3 class="text-2xl font-bold mt-1">฿ 842,500</h3>
+        </div>
+        <div class="card p-5 border-l-4 border-blue-500">
+          <p class="text-xs text-slate-400 uppercase font-semibold">จ่ายแล้ว</p>
+          <h3 class="text-2xl font-bold mt-1">฿ 630,000</h3>
+        </div>
+        <div class="card p-5 border-l-4 border-yellow-500">
+          <p class="text-xs text-slate-400 uppercase font-semibold">ค้างจ่าย</p>
+          <h3 class="text-2xl font-bold mt-1">฿ 212,500</h3>
+        </div>
+        <div class="card p-5 border-l-4 border-purple-500">
+          <p class="text-xs text-slate-400 uppercase font-semibold">งานเสร็จเดือนนี้</p>
+          <h3 class="text-2xl font-bold mt-1">84 เที่ยว</h3>
+        </div>
+      </div>
+
+      <!-- Rate Config -->
+      <div class="card p-5 mb-6">
+        <h3 class="font-bold text-slate-700 mb-3"><i class="fas fa-cog mr-2"></i>ตั้งค่าเรทค่าเที่ยว</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">เรทมาตรฐาน (บาท/km)</label>
+            <input type="number" id="rate-std" value="28" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">เรทเร่งด่วน (บาท/km)</label>
+            <input type="number" id="rate-urgent" value="35" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">โบนัส OTP ≥95%</label>
+            <input type="number" id="rate-bonus" value="500" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          </div>
+          <div class="flex items-end">
+            <button onclick="saveRates()" class="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-blue-700">บันทึกเรท</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Driver Payroll Table -->
+      <div class="card overflow-hidden">
+        <div class="px-6 py-4 border-b bg-slate-50 flex justify-between items-center">
+          <h3 class="font-bold text-slate-700"><i class="fas fa-table mr-2"></i>ตารางค่าเที่ยวคนขับ — พ.ค. 2569</h3>
+          <button onclick="exportPayroll()" class="text-xs bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700">
+            <i class="fas fa-download mr-1"></i>Export
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="bg-slate-50 text-slate-500">
+              <th class="p-3 text-left">คนขับ</th>
+              <th class="p-3 text-right">เที่ยว</th>
+              <th class="p-3 text-right">ระยะ (km)</th>
+              <th class="p-3 text-right">ค่าเที่ยวรวม</th>
+              <th class="p-3 text-right">โบนัส</th>
+              <th class="p-3 text-right">หักน้ำมัน</th>
+              <th class="p-3 text-right font-bold">สุทธิ</th>
+              <th class="p-3 text-center">สถานะ</th>
+              <th class="p-3 text-center">การจ่าย</th>
+            </tr></thead>
+            <tbody class="text-slate-600" id="payroll-tbody"></tbody>
+            <tfoot class="bg-slate-50 font-bold">
+              <tr>
+                <td class="p-3">รวม</td>
+                <td class="p-3 text-right">84</td>
+                <td class="p-3 text-right">40,320</td>
+                <td class="p-3 text-right">฿ 814,500</td>
+                <td class="p-3 text-right">฿ 28,000</td>
+                <td class="p-3 text-right text-red-600">฿ 0</td>
+                <td class="p-3 text-right text-green-700">฿ 842,500</td>
+                <td class="p-3"></td><td class="p-3"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: VEHICLE DOCUMENTS ===== -->
+    <div id="tab-vehdocs" class="tab-pane p-8">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="font-bold text-slate-700">คลังเอกสารเทคนิคและใบอนุญาต</h2>
+        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">
+          <i class="fas fa-upload mr-2"></i>อัปโหลดเอกสาร
+        </button>
+      </div>
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="bg-slate-50 text-slate-500">
+              <th class="p-4 text-left">รถ/ทะเบียน</th>
+              <th class="p-4 text-left">ประเภทเอกสาร</th>
+              <th class="p-4 text-left">เลขที่เอกสาร</th>
+              <th class="p-4 text-left">วันที่ออก</th>
+              <th class="p-4 text-left">วันหมดอายุ</th>
+              <th class="p-4 text-center">สถานะ</th>
+              <th class="p-4 text-center">ไฟล์</th>
+            </tr></thead>
+            <tbody id="vehdocs-tbody" class="text-slate-600">
+              <!-- JS Rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: TRAILERS ===== -->
+    <div id="tab-trailers" class="tab-pane p-8">
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex gap-4 items-center">
+          <h2 class="font-bold text-slate-700">จัดการหางรถเทลเลอร์</h2>
+          <div class="flex gap-2">
+            <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">ว่าง: 5</span>
+            <span class="text-[10px] bg-red-100 text-red-700 px-2 py-1 rounded-full font-bold">ชำรุด: 2</span>
+          </div>
+        </div>
+        <button class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-700">
+          <i class="fas fa-plus mr-2"></i>เพิ่มหางรถ
+        </button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="trailer-cards">
+        <!-- JS Rendered -->
+      </div>
+      
+      <div class="mt-8 card overflow-hidden">
+        <div class="px-6 py-4 border-b bg-slate-50">
+          <h3 class="font-bold text-slate-700 text-sm">ตารางตรวจสอบสถานะและเอกสารหางรถ</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="bg-slate-50 text-slate-500">
+              <th class="p-4 text-left">รหัสหาง</th>
+              <th class="p-4 text-left">ทะเบียนหาง</th>
+              <th class="p-4 text-left">ประเภท</th>
+              <th class="p-4 text-left">สถานะ</th>
+              <th class="p-4 text-left">พ่วงกับรถ</th>
+              <th class="p-4 text-left">ภาษีหาง</th>
+              <th class="p-4 text-left">ประกันหาง</th>
+              <th class="p-4 text-center">จัดการ</th>
+            </tr></thead>
+            <tbody id="trailers-tbody" class="text-slate-600">
+              <tr class="border-t">
+                <td class="p-4 font-bold text-blue-700">TLR-001</td>
+                <td class="p-4">82-XXXX ชป.</td>
+                <td class="p-4 text-xs">Skeleton 40'</td>
+                <td class="p-4"><span class="badge s-run">ใช้งานอยู่</span></td>
+                <td class="p-4 text-xs">70-0981 มห.</td>
+                <td class="p-4 text-xs">2026-09-12</td>
+                <td class="p-4 text-xs text-red-600 font-bold">2026-05-25 ⚠️</td>
+                <td class="p-4 text-center"><button class="text-blue-600 hover:underline text-xs">แก้ไข</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: PAIRING ANALYSIS ===== -->
+    <div id="tab-pairing" class="tab-pane p-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div class="card p-5 bg-gradient-to-br from-blue-600 to-blue-800 text-white border-none">
+          <p class="text-xs opacity-80 uppercase font-bold">Best Performance Pair</p>
+          <div class="flex items-center gap-4 mt-3">
+            <div class="text-3xl">🏆</div>
+            <div>
+              <div class="font-bold text-xl">70-0981 + TLR-001</div>
+              <div class="text-sm opacity-90">Efficiency: 3.45 km/L</div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 card p-5 flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-slate-700">คำแนะนำจากระบบ</h3>
+            <p class="text-sm text-slate-500 mt-1">จากการวิเคราะห์ รถหัวลาก 20GP ทำงานได้ดีที่สุดกับหางประเภท Skeleton เนื่องจากน้ำหนักเบาและลดการต้านลม</p>
+          </div>
+          <i class="fas fa-lightbulb text-yellow-400 text-3xl mr-4"></i>
+        </div>
+      </div>
+
+      <div class="card overflow-hidden">
+        <div class="px-6 py-4 border-b bg-slate-50">
+          <h3 class="font-bold text-slate-700 text-sm">สถิติประสิทธิภาพการจับคู่ (Truck + Trailer Pairing)</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <tbody id="pairing-tbody" class="text-slate-600"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: FUEL ===== -->
+    <div id="tab-fuel" class="tab-pane p-8">
+      <!-- Fuel Rate + Summary -->
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-5 mb-6">
+        <div class="card p-5 border-l-4 border-orange-500 lg:col-span-1">
+          <p class="text-xs text-slate-400 uppercase font-semibold">เรทน้ำมัน ปัจจุบัน</p>
+          <div class="flex items-center gap-2 mt-1">
+            <h3 class="text-2xl font-bold" id="fuel-rate-display">34.50</h3>
+            <span class="text-slate-400 text-sm">บาท/ลิตร</span>
+          </div>
+          <div class="flex gap-2 mt-3">
+            <input type="number" id="fuel-rate-input" step="0.01" placeholder="34.50" class="flex-1 border rounded px-2 py-1 text-sm border-slate-200">
+            <button onclick="updateFuelRate()" class="bg-orange-500 text-white px-3 py-1 rounded text-sm font-bold hover:bg-orange-600">อัพ</button>
+          </div>
+        </div>
+        <div class="card p-5 border-l-4 border-slate-400">
+          <p class="text-xs text-slate-400 uppercase font-semibold">ใช้น้ำมันเดือนนี้</p>
+          <h3 class="text-2xl font-bold mt-1">18,240 <span class="text-sm font-normal text-slate-400">ลิตร</span></h3>
+        </div>
+        <div class="card p-5 border-l-4 border-red-500">
+          <p class="text-xs text-slate-400 uppercase font-semibold">ต้นทุนน้ำมันรวม</p>
+          <h3 class="text-2xl font-bold mt-1">฿ 629,280</h3>
+        </div>
+        <div class="card p-5 border-l-4 border-green-500">
+          <p class="text-xs text-slate-400 uppercase font-semibold">เฉลี่ยกองรถ</p>
+          <h3 class="text-2xl font-bold mt-1">3.08 <span class="text-sm font-normal text-slate-400">km/L</span></h3>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <!-- Add Fuel Record -->
+        <div class="card overflow-hidden">
+          <div class="px-6 py-4 border-b bg-orange-700 text-white">
+            <h3 class="font-bold"><i class="fas fa-plus-circle mr-2"></i>บันทึกเติมน้ำมัน</h3>
+          </div>
+          <div class="p-5 space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ทะเบียนรถ</label>
+              <select id="fuel-truck" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+                <option>70-0981 มห.</option>
+                <option>กข-1234 กทม.</option>
+                <option>ฮภ-5678 ขก.</option>
+                <option>นข-9012 กทม.</option>
+                <option>คร-3456 สมุทรสาคร</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">วันที่เติม</label>
+              <input type="date" id="fuel-date" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">จำนวน (ลิตร)</label>
+                <input type="number" id="fuel-liters" placeholder="280" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">เลขไมล์</label>
+                <input type="number" id="fuel-odo" placeholder="485200" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">สถานีเติม</label>
+              <input type="text" id="fuel-station" placeholder="PTT / ปตท. / บางจาก" class="w-full border rounded-lg px-3 py-2 text-sm border-slate-200">
+            </div>
+            <div class="bg-orange-50 rounded-lg p-3 text-sm">
+              <div class="flex justify-between"><span class="text-slate-500">เรทปัจจุบัน</span><span id="fuel-cost-calc" class="font-bold">34.50 บาท/ลิตร</span></div>
+              <div class="flex justify-between mt-1"><span class="text-slate-500">ประมาณค่าใช้จ่าย</span><span class="font-bold text-orange-700" id="fuel-total-calc">— บาท</span></div>
+            </div>
+            <button onclick="addFuelRecord()" class="w-full bg-orange-600 text-white py-2.5 rounded-lg font-bold hover:bg-orange-700">บันทึก</button>
+          </div>
+        </div>
+
+        <!-- Fuel Records + Efficiency -->
+        <div class="xl:col-span-2 space-y-5">
+          <div class="card overflow-hidden">
+            <div class="px-6 py-4 border-b bg-slate-50">
+              <h3 class="font-bold text-slate-700"><i class="fas fa-list mr-2"></i>ประวัติการเติมน้ำมัน</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead><tr class="bg-slate-50 text-slate-500">
+                  <th class="p-3 text-left">วันที่</th>
+                  <th class="p-3 text-left">รถ</th>
+                  <th class="p-3 text-right">ลิตร</th>
+                  <th class="p-3 text-right">ค่าใช้จ่าย</th>
+                  <th class="p-3 text-right">km/L</th>
+                </tr></thead>
+                <tbody class="text-slate-600" id="fuel-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Efficiency by Truck -->
+          <div class="card p-5">
+            <h3 class="font-bold text-slate-700 mb-4"><i class="fas fa-chart-bar mr-2"></i>ประสิทธิภาพน้ำมันต่อรถ</h3>
+            <div class="space-y-3" id="fuel-eff-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: DRIVERS ===== -->
+    <div id="tab-drivers" class="tab-pane p-8">
+      <div class="flex justify-between items-center mb-6">
+        <div class="text-sm text-slate-500">คนขับทั้งหมด <span class="font-bold text-slate-800">23 คน</span></div>
+        <button onclick="document.getElementById('modal-add-driver').classList.remove('hidden')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">
+          <i class="fas fa-plus mr-2"></i>เพิ่มคนขับ
+        </button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="driver-cards"></div>
+    </div>
+
+    <!-- ===== TAB: VEHICLES ===== -->
+    <div id="tab-vehicles" class="tab-pane p-8">
+      <div class="flex justify-between items-center mb-6">
+        <div class="text-sm text-slate-500">รถทั้งหมด <span class="font-bold text-slate-800">23 คัน</span></div>
+        <div class="flex gap-2">
+          <select onchange="filterVehicles(this.value)" class="text-sm border rounded-lg px-3 py-2 border-slate-200">
+            <option value="">ทุกสถานะ</option>
+            <option value="running">วิ่งอยู่</option>
+            <option value="idle">ว่าง</option>
+            <option value="repair">ซ่อม</option>
+          </select>
+          <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">
+            <i class="fas fa-plus mr-2"></i>เพิ่มรถ
+          </button>
+        </div>
+      </div>
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm" id="vehicle-table">
+            <thead><tr class="bg-slate-50 text-slate-500">
+              <th class="p-4 text-left">ทะเบียน</th>
+              <th class="p-4 text-left">ประเภท</th>
+              <th class="p-4 text-left">สถานะ</th>
+              <th class="p-4 text-left">คนขับ</th>
+              <th class="p-4 text-left">ภาษี หมดอายุ</th>
+              <th class="p-4 text-left">ประกัน หมดอายุ</th>
+              <th class="p-4 text-left">พรบ. หมดอายุ</th>
+              <th class="p-4 text-right">เลขไมล์</th>
+              <th class="p-4 text-center">จัดการ</th>
+            </tr></thead>
+            <tbody class="text-slate-600" id="vehicle-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: REPAIR ===== -->
+    <div id="tab-repair" class="tab-pane p-8">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="font-bold text-slate-700">แจ้งซ่อมรถ</h2>
+        <button onclick="document.getElementById('modal-repair').classList.remove('hidden')" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700">
+          <i class="fas fa-plus mr-2"></i>แจ้งซ่อมใหม่
+        </button>
+      </div>
+
+      <!-- Repair summary -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="card p-4 text-center"><div class="text-2xl font-bold text-yellow-600">5</div><div class="text-xs text-slate-400 mt-1">รอดำเนินการ</div></div>
+        <div class="card p-4 text-center"><div class="text-2xl font-bold text-blue-600">3</div><div class="text-xs text-slate-400 mt-1">กำลังซ่อม</div></div>
+        <div class="card p-4 text-center"><div class="text-2xl font-bold text-green-600">18</div><div class="text-xs text-slate-400 mt-1">เสร็จแล้วเดือนนี้</div></div>
+        <div class="card p-4 text-center"><div class="text-2xl font-bold text-red-600">฿ 84,500</div><div class="text-xs text-slate-400 mt-1">ค่าซ่อมเดือนนี้</div></div>
+      </div>
+
+      <!-- Repair Queue -->
+      <div class="card overflow-hidden">
+        <div class="px-6 py-4 border-b bg-slate-50">
+          <h3 class="font-bold text-slate-700"><i class="fas fa-list mr-2"></i>รายการแจ้งซ่อม</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="bg-slate-50 text-slate-500">
+              <th class="p-3 text-left">รหัส</th>
+              <th class="p-3 text-left">รถ</th>
+              <th class="p-3 text-left">ปัญหา</th>
+              <th class="p-3 text-left">ความเร่งด่วน</th>
+              <th class="p-3 text-left">ผู้แจ้ง</th>
+              <th class="p-3 text-left">วันที่</th>
+              <th class="p-3 text-left">สถานะ</th>
+              <th class="p-3 text-left">ค่าซ่อม</th>
+              <th class="p-3 text-center">Action</th>
+            </tr></thead>
+            <tbody class="text-slate-600" id="repair-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end layout -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- Assign Job Modal -->
+<div id="modal-assign" class="modal-bg hidden">
+  <div class="bg-white rounded-xl w-full max-w-md mx-4 overflow-hidden shadow-2xl">
+    <div class="bg-blue-700 text-white px-6 py-4 flex justify-between">
+      <span class="font-bold">จัดรถสำหรับงาน</span>
+      <button onclick="closeModal('modal-assign')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div><label class="text-xs font-bold text-slate-500 uppercase">Job ID</label>
+        <div id="assign-jobid" class="font-bold text-blue-700 text-lg"></div></div>
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">เลือกรถ</label>
+        <select id="assign-truck" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          <option>70-0981 มห. (40HC) — ว่าง</option>
+          <option>กข-1234 กทม. (20GP) — ว่าง</option>
+          <option>นข-9012 กทม. (40RH) — ว่าง</option>
+        </select></div>
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">เลือกคนขับ</label>
+        <select id="assign-driver" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          <option>นายประสิทธ์พร สุขสม</option>
+          <option>นายสมชาย รักดี</option>
+          <option>นายอนันต์ พรหมมา</option>
+        </select></div>
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">หมายเหตุ</label>
+        <textarea class="w-full border rounded px-3 py-2 text-sm border-slate-200 h-20"></textarea></div>
+      <div class="flex gap-3">
+        <button onclick="closeModal('modal-assign')" class="flex-1 border rounded-lg py-2 text-sm text-slate-600 hover:bg-slate-50">ยกเลิก</button>
+        <button onclick="confirmAssign()" class="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm font-bold hover:bg-blue-700">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Driver Modal -->
+<div id="modal-add-driver" class="modal-bg hidden">
+  <div class="bg-white rounded-xl w-full max-w-md mx-4 overflow-hidden shadow-2xl">
+    <div class="bg-slate-800 text-white px-6 py-4 flex justify-between">
+      <span class="font-bold"><i class="fas fa-user-plus mr-2"></i>เพิ่มคนขับใหม่</span>
+      <button onclick="closeModal('modal-add-driver')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6 space-y-3">
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ชื่อ-นามสกุล</label>
+        <input type="text" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">เบอร์โทร</label>
+          <input type="text" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Line ID</label>
+          <input type="text" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+      </div>
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">เลขใบอนุญาตขับขี่</label>
+        <input type="text" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ทะเบียนรถที่รับผิดชอบ</label>
+        <select class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          <option>— ยังไม่มีรถ —</option>
+          <option>กข-1234 กทม.</option>
+          <option>นข-9012 กทม.</option>
+        </select></div>
+      <div class="flex gap-3 mt-4">
+        <button onclick="closeModal('modal-add-driver')" class="flex-1 border rounded-lg py-2 text-sm text-slate-600 hover:bg-slate-50">ยกเลิก</button>
+        <button onclick="addDriver()" class="flex-1 bg-slate-800 text-white rounded-lg py-2 text-sm font-bold hover:bg-slate-700">บันทึก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Vehicle Detail Modal -->
+<div id="modal-vehicle" class="modal-bg hidden">
+  <div class="bg-white rounded-xl w-full max-w-lg mx-4 overflow-hidden shadow-2xl">
+    <div class="bg-slate-800 text-white px-6 py-4 flex justify-between">
+      <span class="font-bold"><i class="fas fa-truck mr-2"></i>ข้อมูลรถ</span>
+      <button onclick="closeModal('modal-vehicle')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6" id="modal-vehicle-content"></div>
+  </div>
+</div>
+
+<!-- Repair Report Modal -->
+<div id="modal-repair" class="modal-bg hidden">
+  <div class="bg-white rounded-xl w-full max-w-md mx-4 overflow-hidden shadow-2xl">
+    <div class="bg-red-700 text-white px-6 py-4 flex justify-between">
+      <span class="font-bold"><i class="fas fa-exclamation-triangle mr-2"></i>แจ้งซ่อมรถ</span>
+      <button onclick="closeModal('modal-repair')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ทะเบียนรถ</label>
+        <select id="rep-truck" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          <option>70-0981 มห.</option><option>กข-1234 กทม.</option>
+          <option>ฮภ-5678 ขก.</option><option>นข-9012 กทม.</option><option>คร-3456 สมุทรสาคร</option>
+        </select></div>
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">อาการ/ปัญหา</label>
+        <textarea id="rep-issue" class="w-full border rounded px-3 py-2 text-sm border-slate-200 h-24" placeholder="อธิบายปัญหาที่พบ..."></textarea></div>
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ความเร่งด่วน</label>
+        <select id="rep-sev" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          <option value="low">🟢 ต่ำ — ซ่อมได้ภายหลัง</option>
+          <option value="medium">🟡 กลาง — ซ่อมภายใน 3 วัน</option>
+          <option value="high">🔴 สูง — ต้องซ่อมด่วน</option>
+        </select></div>
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ผู้แจ้ง</label>
+        <input type="text" id="rep-reporter" class="w-full border rounded px-3 py-2 text-sm border-slate-200" placeholder="ชื่อผู้แจ้ง"></div>
+      <div class="flex gap-3">
+        <button onclick="closeModal('modal-repair')" class="flex-1 border rounded-lg py-2 text-sm text-slate-600 hover:bg-slate-50">ยกเลิก</button>
+        <button onclick="submitRepair()" class="flex-1 bg-red-600 text-white rounded-lg py-2 text-sm font-bold hover:bg-red-700">ส่งใบแจ้งซ่อม</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Driver Profile Modal -->
+<div id="modal-driver" class="modal-bg hidden">
+  <div class="bg-white rounded-xl w-full max-w-lg mx-4 overflow-hidden shadow-2xl">
+    <div class="bg-slate-800 text-white px-6 py-4 flex justify-between">
+      <span class="font-bold"><i class="fas fa-id-card mr-2"></i>ข้อมูลคนขับ</span>
+      <button onclick="closeModal('modal-driver')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6" id="modal-driver-content"></div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const USERS = {
+  'admin':    { password:'admin123',  name:'ผู้ดูแลระบบ',       role:'Administrator' },
+  'manager':  { password:'mgr123',    name:'ผู้จัดการ สมชาย',   role:'Fleet Manager' },
+  'dispatch': { password:'disp123',   name:'ทีมจัดรถ',          role:'Dispatcher' },
+  'finance':  { password:'fin123',    name:'ฝ่ายการเงิน',       role:'Finance' },
+  'coord':    { password:'coord123',  name:'ทีมประสานงาน',      role:'Coordinator' },
+  'driver':   { password:'driver123', name:'นายประสิทธ์พร',     role:'Driver' }
+};
+const _FULL_FLEET_TABS = ['dashboard','dispatch','tracking','payment','fuel','drivers','vehicles','repair','costcalc','vehdocs','trailers','pairing'];
+const ROLE_CONFIG = {
+  // Native fleet-hub roles
+  'Administrator': { tabs:_FULL_FLEET_TABS, badge:'👑 ทุกระบบ',       color:'bg-purple-700' },
+  'Fleet Manager': { tabs:_FULL_FLEET_TABS, badge:'🚛 Fleet Manager', color:'bg-blue-700' },
+  'Dispatcher':    { tabs:['dashboard','dispatch','tracking','repair','costcalc','trailers','pairing'], badge:'📋 จัดรถ',       color:'bg-green-700' },
+  'Finance':       { tabs:['dashboard','payment','fuel','costcalc','vehdocs'],                         badge:'💰 การเงิน',    color:'bg-yellow-700' },
+  'Coordinator':   { tabs:['dashboard','tracking','dispatch','costcalc','pairing'],                    badge:'📡 ประสานงาน',  color:'bg-teal-700' },
+  'Driver':        { tabs:['repair'],                                                                   badge:'🚚 คนขับ',      color:'bg-orange-700' },
+  'ช่าง':          { tabs:['dashboard','vehicles','repair','vehdocs'],                                  badge:'🔧 ช่าง',       color:'bg-orange-600' },
+  // Aliases from index.html SSO (portal roles → fleet roles)
+  'Boss':          { tabs:_FULL_FLEET_TABS, badge:'🕶️ Boss',          color:'bg-slate-900' },
+  'Admin':         { tabs:_FULL_FLEET_TABS, badge:'👑 Admin',          color:'bg-purple-700' },
+  'Manager':       { tabs:_FULL_FLEET_TABS, badge:'👔 Manager',        color:'bg-blue-700' },
+  'ประสานงาน':     { tabs:['dashboard','tracking','dispatch','costcalc','pairing'], badge:'📞 ประสานงาน', color:'bg-teal-700' },
+  'เอกสาร':        { tabs:['dashboard'],                                            badge:'📄 เอกสาร',    color:'bg-slate-600' },
+  'Dispatch':      { tabs:['dashboard','dispatch','tracking','repair','costcalc','trailers','pairing'], badge:'📋 จัดรถ', color:'bg-green-700' },
+};
+
+const trucks = [
+  { id:'TRK001', plate:'70-0981 มห.',         type:'40HC', status:'running', driver:'DRV-001', km:485200, tax:'2026-08-15', ins:'2026-11-30', prb:'2026-08-15' },
+  { id:'TRK002', plate:'กข-1234 กทม.',        type:'20GP', status:'idle',    driver:'DRV-002', km:320100, tax:'2026-06-30', ins:'2026-12-31', prb:'2026-06-30' },
+  { id:'TRK003', plate:'ฮภ-5678 ขก.',         type:'40HC', status:'repair',  driver:'DRV-003', km:290500, tax:'2026-07-20', ins:'2026-09-15', prb:'2026-07-20' },
+  { id:'TRK004', plate:'นข-9012 กทม.',        type:'40RH', status:'idle',    driver:'DRV-004', km:180000, tax:'2026-10-31', ins:'2027-01-15', prb:'2026-10-31' },
+  { id:'TRK005', plate:'คร-3456 สมุทรสาคร',  type:'20GP', status:'running', driver:'DRV-005', km:420800, tax:'2026-05-30', ins:'2026-08-20', prb:'2026-05-30' },
+];
+
+const drivers = [
+  { id:'DRV-001', name:'นายประสิทธ์พร สุขสม',  phone:'081-234-5678', line:'prasitporn', truck:'70-0981 มห.',        otp:97, accept:95, safety:100, rating:4.8, trips:18, km_month:8640,  status:'running' },
+  { id:'DRV-002', name:'นายสมชาย รักดี',        phone:'089-876-5432', line:'somchai_rk', truck:'กข-1234 กทม.',       otp:91, accept:88, safety:98,  rating:4.5, trips:14, km_month:5800,  status:'idle' },
+  { id:'DRV-003', name:'นายวิชัย ทองดี',        phone:'062-111-2233', line:'wichai_td',  truck:'ฮภ-5678 ขก.',        otp:94, accept:92, safety:100, rating:4.7, trips:15, km_month:6200,  status:'leave' },
+  { id:'DRV-004', name:'นายอนันต์ พรหมมา',      phone:'085-444-5566', line:'anan_pr',    truck:'นข-9012 กทม.',       otp:96, accept:94, safety:99,  rating:4.6, trips:0,  km_month:0,     status:'idle' },
+  { id:'DRV-005', name:'นายบุญมี ดีงาม',        phone:'093-777-8899', line:'bunmee99',   truck:'คร-3456 สมุทรสาคร', otp:89, accept:90, safety:97,  rating:4.3, trips:20, km_month:9800,  status:'running' },
+];
+
+const jobs = [
+  { id:'JOB-241', booking:'BK-24051001', origin:'ตลาดไท ปทุมธานี',  dest:'ด่านหนองคาย',          km:485, container:'MSKU 9283741', type:'40HC', truck:'70-0981 มห.',       driver:'นายประสิทธ์พร', status:'running', depart:'2026-05-11 06:00', rate:28, bonus:0 },
+  { id:'JOB-242', booking:'BK-24051002', origin:'แหลมฉบัง',          dest:'จันทบุรี',               km:180, container:'TLLU 5522109', type:'20GP', truck:null,               driver:null,           status:'wait',    depart:'2026-05-11 10:00', rate:30, bonus:0 },
+  { id:'JOB-243', booking:'BK-24051003', origin:'ลาดกระบัง',         dest:'เชียงของ เชียงราย',      km:720, container:'SUDU 7738214', type:'40HC', truck:null,               driver:null,           status:'wait',    depart:'2026-05-12 05:00', rate:26, bonus:500 },
+  { id:'JOB-240', booking:'BK-24050901', origin:'สาทร กรุงเทพ',      dest:'ท่าเรือหนองคาย',        km:490, container:'COSCO 123456', type:'20GP', truck:'คร-3456 สมุทรสาคร', driver:'นายบุญมี',     status:'running', depart:'2026-05-10 22:00', rate:28, bonus:0 },
+  { id:'JOB-239', booking:'BK-24050801', origin:'ท่าเรือแหลมฉบัง',   dest:'อุดรธานี',               km:540, container:'MSCU 9876543', type:'20GP', truck:'กข-1234 กทม.',     driver:'นายสมชาย',     status:'done',    depart:'2026-05-09 07:00', rate:28, bonus:200 },
+];
+
+const fuelRecords = [
+  { date:'2026-05-11', truck:'70-0981 มห.',        liters:280, odo:485200, km:840,  cost_per_l:34.50, total:9660,  eff:3.00 },
+  { date:'2026-05-10', truck:'คร-3456 สมุทรสาคร', liters:310, odo:420800, km:970,  cost_per_l:34.50, total:10695, eff:3.13 },
+  { date:'2026-05-09', truck:'กข-1234 กทม.',       liters:260, odo:320100, km:830,  cost_per_l:34.50, total:8970,  eff:3.19 },
+  { date:'2026-05-08', truck:'ฮภ-5678 ขก.',        liters:295, odo:290500, km:855,  cost_per_l:34.50, total:10177, eff:2.90 },
+];
+
+const repairRequests = [
+  { id:'VR-001', truck:'ฮภ-5678 ขก.',  issue:'ยางหน้าซ้ายแตก ต้องเปลี่ยน', sev:'high',   reporter:'นายวิชัย',       date:'2026-05-09 14:30', status:'repairing', cost:8500 },
+  { id:'VR-002', truck:'70-0981 มห.',   issue:'ไฟท้ายขวาดับ',                sev:'low',    reporter:'นายประสิทธ์พร',  date:'2026-05-11 08:15', status:'pending',   cost:0    },
+  { id:'VR-003', truck:'นข-9012 กทม.', issue:'แอร์ไม่เย็น ต้องเติมน้ำยา',  sev:'medium', reporter:'นายอนันต์',      date:'2026-05-11 09:00', status:'pending',   cost:0    },
+  { id:'VR-004', truck:'กข-1234 กทม.', issue:'เบรคน้ำมันรั่ว',              sev:'high',   reporter:'นายสมชาย',       date:'2026-05-08 16:00', status:'done',      cost:3200 },
+];
+
+const payrollData = [
+  { name:'นายประสิทธ์พร สุขสม',  trips:18, km:8640,  base:241920, bonus:500,  net:242420, paid:true  },
+  { name:'นายสมชาย รักดี',        trips:14, km:5800,  base:162400, bonus:0,    net:162400, paid:true  },
+  { name:'นายบุญมี ดีงาม',        trips:20, km:9800,  base:274400, bonus:0,    net:274400, paid:false },
+  { name:'นายอนันต์ พรหมมา',      trips:12, km:5400,  base:151200, bonus:500,  net:151700, paid:false },
+  { name:'นายวิชัย ทองดี',        trips:15, km:6200,  base:173600, bonus:500,  net:174100, paid:false },
+];
+
+let currentUser = null;
+let selectedJobId = null;
+let fuelRate = 34.50;
+
+// ===== AUTH =====
+function doLogin() {
+  // ดึงข้อมูลผู้ใช้จาก Central Storage แทนการ Hardcode
+  const savedUsers = JSON.parse(localStorage.getItem('mck_users') || '{}');
+  const allUsers = { ...USERS, ...savedUsers };
+
+  const u = document.getElementById('ov-user').value.trim().toLowerCase();
+  const p = document.getElementById('ov-pass').value;
+  if (allUsers[u] && (allUsers[u].password === p || allUsers[u].pass === p)) {
+    currentUser = { username:u, ...allUsers[u] };
+    sessionStorage.setItem('mck_user', JSON.stringify(currentUser));
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('login-err').classList.add('hidden');
+    applyRole(currentUser.role);
+    const tabs = ROLE_CONFIG[currentUser.role].tabs;
+    showTab(tabs[0] === 'all' ? 'dashboard' : tabs[0]);
+    initPage();
+    showToast('ยินดีต้อนรับ ' + currentUser.name, 'success');
+  } else {
+    const errEl = document.getElementById('login-err');
+    errEl.classList.remove('hidden');
+    errEl.textContent = 'Username หรือ Password ไม่ถูกต้อง';
+  }
+}
+function quickLogin(u, p) {
+  document.getElementById('ov-user').value = u;
+  document.getElementById('ov-pass').value = p;
+  doLogin();
+}
+function doLogout() {
+  localStorage.removeItem('fleet_user');
+  sessionStorage.removeItem('mck_user'); // Clear central session
+  location.reload();
+}
+
+function applyRole(role) {
+  const cfg = ROLE_CONFIG[role] || ROLE_CONFIG['Administrator'];
+  document.getElementById('sb-user').textContent = currentUser.name;
+  const badge = document.getElementById('sb-badge');
+  badge.textContent = cfg.badge;
+  badge.className = 'text-xs mt-1 px-2 py-0.5 rounded-full inline-block text-white ' + cfg.color;
+
+  // hide all nav buttons first
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    const id = b.id ? b.id.replace('nav-', '') : '';
+    if (id && !cfg.tabs.includes(id)) b.style.display = 'none';
+  });
+}
+
+// ===== TABS =====
+function showTab(name) {
+  if (!currentUser) return;
+  const allowed = ROLE_CONFIG[currentUser.role].tabs;
+  if (!allowed.includes(name)) { showToast('คุณไม่มีสิทธิ์เข้าถึงหน้านี้', 'error'); return; }
+  if (!allowed.includes(name) && !allowed.includes('all')) { showToast('คุณไม่มีสิทธิ์เข้าถึงหน้านี้', 'error'); return; }
+
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('act'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('act');
+
+  const titles = {
+    dashboard:'Dashboard', dispatch:'จัดรถ (Dispatch)', tracking:'ติดตามรถ',
+    payment:'ค่าเที่ยว', fuel:'น้ำมัน', drivers:'คนขับ', vehicles:'รถ (Fleet)', repair:'แจ้งซ่อมรถ', costcalc:'คำนวณต้นทุนน้ำมัน',
+    vehdocs:'ทะเบียนเอกสารรถ', trailers:'หางรถเทลเลอร์', pairing:'วิเคราะห์การจับคู่'
+  };
+  const subs = {
+    dashboard:'ภาพรวมระบบรถขนส่ง', dispatch:'สร้างงาน & จัดรถให้คนขับ', tracking:'ตำแหน่งและสถานะรถทุกคัน',
+    payment:'คำนวณค่าเที่ยวและจ่ายเงิน', fuel:'บันทึกน้ำมันและเรทราคา', drivers:'โปรไฟล์และ KPI คนขับ',
+    vehicles:'ทะเบียนรถ เอกสาร และบำรุงรักษา', repair:'แจ้งซ่อมและติดตามงานซ่อม', costcalc:'เครื่องมือวิเคราะห์ต้นทุนน้ำมันต้นทุน',
+    vehdocs:'การจัดการใบอนุญาตและเอกสารเทคนิคของตัวรถ', trailers:'การจัดการสถานะและเอกสารของหางพ่วง', pairing:'วิเคราะห์ประสิทธิภาพการทำงานร่วมกันระหว่างรถหัวลากและหาง'
+  };
+  document.getElementById('page-title').textContent = titles[name] || name;
+  document.getElementById('page-sub').textContent = subs[name] || '';
+}
+
+// ===== INIT =====
+function initPage() {
+  document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('th-TH', {year:'numeric',month:'long',day:'numeric'});
+  renderJobTable();
+  renderTrackingList();
+  renderPayroll();
+  renderFuelTable();
+  renderFuelEff();
+  renderDriverCards();
+  renderVehicleTable();
+  renderRepairTable();
+  renderDashboardRepairs();
+  renderDashboardFuelChart();
+  runCostCalc();
+  renderVehDocsTable();
+  renderTrailerTable();
+  renderPairingAnalysis();
+
+  // fuel calculator
+  document.getElementById('fuel-liters').addEventListener('input', calcFuelTotal);
+  document.getElementById('fuel-date').value = new Date().toISOString().split('T')[0];
+}
+
+// ===== DISPATCH =====
+function renderJobTable(filter = '') {
+  const tb = document.getElementById('job-tbody');
+  if (!tb) return;
+  const data = filter ? jobs.filter(j => j.status === filter) : jobs;
+  tb.innerHTML = data.map(j => {
+    const statusMap = { running:'s-run', wait:'s-wait', done:'s-done' };
+    const statusLbl = { running:'วิ่งอยู่', wait:'รอจัดรถ', done:'เสร็จแล้ว' };
+    const truckInfo = j.truck ? `<div class="font-semibold text-xs">${j.truck}</div><div class="text-xs text-slate-400">${j.driver}</div>` : '<span class="text-slate-400 text-xs">ยังไม่ได้จัด</span>';
+    const btn = j.status === 'wait' ? `<button onclick="openAssign('${j.id}')" class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 font-semibold">จัดรถ</button>` : '<span class="text-slate-300 text-xs">—</span>';
+    return `<tr class="border-t">
+      <td class="p-3 font-bold text-blue-700">${j.id}<div class="text-xs text-slate-400 font-normal">${j.booking}</div></td>
+      <td class="p-3 text-xs">${j.origin}<br><span class="text-slate-400">→ ${j.dest}</span><br><span class="text-slate-400">${j.km} km</span></td>
+      <td class="p-3 text-xs">${j.container}<br><span class="text-slate-400">${j.type}</span></td>
+      <td class="p-3">${truckInfo}</td>
+      <td class="p-3"><span class="badge ${statusMap[j.status]}">${statusLbl[j.status]}</span></td>
+      <td class="p-3 text-center">${btn}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterJobs(val) { renderJobTable(val); }
+
+function openAssign(jobId) {
+  selectedJobId = jobId;
+  document.getElementById('assign-jobid').textContent = jobId;
+  document.getElementById('modal-assign').classList.remove('hidden');
+}
+function confirmAssign() {
+  const truck = document.getElementById('assign-truck').value;
+  const drv = document.getElementById('assign-driver').value;
+  const j = jobs.find(x => x.id === selectedJobId);
+  if (j) { j.truck = truck.split(' (')[0]; j.driver = drv; j.status = 'running'; }
+  closeModal('modal-assign');
+  renderJobTable();
+  renderTrackingList();
+  showToast(`จัดรถ ${truck} → ${selectedJobId} เรียบร้อย`, 'success');
+}
+
+function createJob() {
+  const bk = document.getElementById('dsp-booking').value;
+  const org = document.getElementById('dsp-origin').value;
+  const dst = document.getElementById('dsp-dest').value;
+  const km = document.getElementById('dsp-km').value;
+  const ctype = document.getElementById('dsp-ctype').value;
+  const cont = document.getElementById('dsp-container').value;
+  const rate = document.getElementById('dsp-rate').value || 28;
+  if (!bk || !org || !dst || !km) { showToast('กรุณากรอกข้อมูลให้ครบ', 'error'); return; }
+  const id = 'JOB-' + (jobs.length + 240 + 1);
+  jobs.unshift({ id, booking:bk, origin:org, dest:dst, km:parseInt(km), container:cont||'—', type:ctype, truck:null, driver:null, status:'wait', depart: document.getElementById('dsp-date').value||'—', rate:parseInt(rate), bonus:0 });
+  renderJobTable();
+  showToast(`สร้างงาน ${id} สำเร็จ`, 'success');
+  ['dsp-booking','dsp-origin','dsp-dest','dsp-km','dsp-container','dsp-rate'].forEach(id => document.getElementById(id).value = '');
+}
+
+function runAI() {
+  const ctype = document.getElementById('dsp-ctype').value;
+  const km = document.getElementById('dsp-km').value;
+  const available = trucks.filter(t => t.status === 'idle');
+  const match = available.find(t => t.type.startsWith(ctype.split('(')[0].trim())) || available[0];
+  const box = document.getElementById('ai-box');
+  const res = document.getElementById('ai-result');
+  box.classList.remove('hidden');
+  if (match) {
+    const d = drivers.find(dr => dr.truck === match.plate);
+    // Provide a clearer, step-by-step reasoning + quick action
+    res.innerHTML = `
+      <div class="bg-blue-50 rounded-lg p-3 mb-2">
+        <div class="font-bold text-blue-800">🏆 แนะนำ: ${match.plate} (${match.type})</div>
+        <div class="text-slate-600 text-xs mt-1">คนขับ: ${d ? d.name : '—'} | OTP: ${d ? d.otp+'%' : '—'} | Safety: ${d ? d.safety+'%' : '—'}</div>
+        <div class="text-slate-600 text-xs mt-2"><strong>เหตุผล:</strong></div>
+        <ul class="text-slate-600 text-xs" style="margin-top:.25rem;margin-left:1rem;line-height:1.4;">
+          <li>• ประเภทตู้ (${ctype}) ตรงกับ ${match.type}</li>
+          <li>• คนขับมี OTP / Safety สูง (${d ? d.otp + '% / ' + d.safety + '%' : 'ข้อมูลไม่ครบ'})</li>
+          <li>• รถสถานะว่าง (idle) และอยู่ใกล้ต้นทางตามข้อมูลตัวอย่าง</li>
+        </ul>
+        <div style="margin-top:.5rem;">
+          <button onclick="selectTruck('${match.plate.replace("'","\\'")}', '${d ? d.name.replace("'","\\'") : ''}')" class="text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">เลือกคันนี้</button>
+        </div>
+      </div>
+      ${available.length > 1 ? '<div class="text-xs text-slate-500">รถสำรอง: ' + available.filter(t=>t!==match).map(t=>t.plate).join(', ') + '</div>' : ''}`;
+  } else {
+    res.innerHTML = '<div class="text-red-600 font-semibold">ไม่มีรถว่างที่ตรงกับประเภทตู้ที่เลือก</div>';
+  }
+}
+
+function selectTruck(plate, drv) {
+  showToast(`เลือกรถ ${plate} (${drv}) แล้ว — กดสร้างงานเพื่อบันทึก`, 'info');
+}
+
+// ===== TRACKING =====
+function renderTrackingList() {
+  const el = document.getElementById('tracking-list');
+  if (!el) return;
+  const active = jobs.filter(j => j.status === 'running');
+  el.innerHTML = active.map(j => `
+    <div class="p-5 hover:bg-slate-50">
+      <div class="flex justify-between items-start">
+        <div>
+          <span class="font-bold text-blue-700">${j.id}</span>
+          <span class="text-xs text-slate-400 ml-2">${j.booking}</span>
+          <div class="mt-1 text-sm text-slate-700">${j.origin} <i class="fas fa-long-arrow-alt-right mx-1 text-slate-400"></i> ${j.dest}</div>
+          <div class="text-xs text-slate-500 mt-1"><i class="fas fa-truck mr-1"></i>${j.truck||'—'} &nbsp;|&nbsp; <i class="fas fa-user mr-1"></i>${j.driver||'—'} &nbsp;|&nbsp; ${j.km} km</div>
+        </div>
+        <div class="text-right">
+          <span class="badge s-run">วิ่งอยู่</span>
+          <div class="text-xs text-slate-400 mt-1">ETA: ${j.depart ? new Date(new Date(j.depart).getTime() + j.km*90000).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : '—'}</div>
+        </div>
+      </div>
+      <div class="mt-3 flex gap-2">
+        <button onclick="updateStatus('${j.id}','done')" class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200 font-semibold">✓ ส่งของแล้ว</button>
+        <button onclick="showContact('${j.driver}')" class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded hover:bg-slate-200 font-semibold"><i class="fas fa-phone mr-1"></i>ติดต่อ</button>
+      </div>
+    </div>
+  `).join('') || '<div class="p-6 text-center text-slate-400">ไม่มีรถวิ่งอยู่ตอนนี้</div>';
+
+  // contacts
+  const dc = document.getElementById('driver-contacts');
+  if (dc) {
+    dc.innerHTML = active.map(j => {
+      const d = drivers.find(dr => dr.name === j.driver);
+      return d ? `<div class="bg-slate-50 rounded-lg p-3 text-sm">
+        <div class="font-semibold text-slate-700">${d.name}</div>
+        <div class="text-slate-500 text-xs">${j.id} — ${j.truck}</div>
+        <div class="flex gap-2 mt-2">
+          <a href="tel:${d.phone}" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded"><i class="fas fa-phone mr-1"></i>${d.phone}</a>
+          <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded"><i class="fab fa-line mr-1"></i>${d.line}</span>
+        </div>
+      </div>` : '';
+    }).join('');
+  }
+}
+
+function updateStatus(jobId, status) {
+  const j = jobs.find(x => x.id === jobId);
+  if (j) j.status = status;
+  renderTrackingList();
+  renderJobTable();
+  showToast(`${jobId} อัพเดทสถานะ: ${status === 'done' ? 'เสร็จแล้ว' : status}`, 'success');
+}
+
+function showContact(name) {
+  const d = drivers.find(dr => dr.name === name);
+  if (d) showToast(`📞 ${d.name}: ${d.phone} | Line: ${d.line}`, 'info');
+}
+
+// ===== PAYMENT =====
+function renderPayroll() {
+  const tb = document.getElementById('payroll-tbody');
+  if (!tb) return;
+  tb.innerHTML = payrollData.map(p => `
+    <tr class="border-t">
+      <td class="p-3 font-semibold">${p.name}</td>
+      <td class="p-3 text-right">${p.trips}</td>
+      <td class="p-3 text-right">${p.km.toLocaleString()}</td>
+      <td class="p-3 text-right">฿ ${p.base.toLocaleString()}</td>
+      <td class="p-3 text-right text-green-600">฿ ${p.bonus.toLocaleString()}</td>
+      <td class="p-3 text-right text-red-500">฿ 0</td>
+      <td class="p-3 text-right font-bold text-green-700">฿ ${p.net.toLocaleString()}</td>
+      <td class="p-3 text-center"><span class="badge ${p.paid ? 's-run' : 's-wait'}">${p.paid ? 'จ่ายแล้ว' : 'รอจ่าย'}</span></td>
+      <td class="p-3 text-center">${!p.paid ? `<button onclick="markPaid('${p.name}')" class="text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 font-semibold">จ่ายเงิน</button>` : '—'}</td>
+    </tr>`).join('');
+}
+
+function markPaid(name) {
+  const p = payrollData.find(x => x.name === name);
+  if (p) p.paid = true;
+  renderPayroll();
+  showToast(`จ่ายค่าเที่ยวให้ ${name} แล้ว`, 'success');
+}
+function saveRates() { showToast('บันทึกเรทค่าเที่ยวสำเร็จ', 'success'); }
+function exportPayroll() { showToast('Export ตารางค่าเที่ยว... (Demo)', 'info'); }
+
+// ===== FUEL =====
+let fuelData = [...fuelRecords];
+
+function renderFuelTable() {
+  const tb = document.getElementById('fuel-tbody');
+  if (!tb) return;
+  tb.innerHTML = fuelData.map(f => `
+    <tr class="border-t">
+      <td class="p-3 text-xs">${f.date}</td>
+      <td class="p-3 font-semibold text-xs">${f.truck}</td>
+      <td class="p-3 text-right">${f.liters}</td>
+      <td class="p-3 text-right">฿ ${f.total.toLocaleString()}</td>
+      <td class="p-3 text-right font-bold ${f.eff >= 3.0 ? 'text-green-600' : 'text-red-600'}">${f.eff.toFixed(2)}</td>
+    </tr>`).join('');
+}
+
+function renderFuelEff() {
+  const el = document.getElementById('fuel-eff-list');
+  if (!el) return;
+  const effByTruck = trucks.map(t => {
+    const records = fuelData.filter(f => f.truck === t.plate);
+    const avgEff = records.length ? records.reduce((s,r) => s + r.eff, 0) / records.length : 3.0;
+    return { plate:t.plate, type:t.type, eff:avgEff };
+  }).sort((a,b) => b.eff - a.eff);
+
+  el.innerHTML = effByTruck.map(t => {
+    const pct = Math.min(100, (t.eff / 4.0) * 100);
+    const color = t.eff >= 3.1 ? 'bg-green-500' : t.eff >= 2.9 ? 'bg-yellow-500' : 'bg-red-500';
+    return `<div>
+      <div class="flex justify-between text-sm mb-1">
+        <span class="font-semibold">${t.plate} <span class="text-xs text-slate-400">${t.type}</span></span>
+        <span class="font-bold ${t.eff >= 3.0 ? 'text-green-600' : 'text-red-600'}">${t.eff.toFixed(2)} km/L</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill ${color}" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderDashboardRepairs() {
+  const card = document.getElementById('dash-repair-card');
+  const list = document.getElementById('dash-repair-list');
+  if (!card || !list || !currentUser) return;
+
+  const canApprove = ['Boss', 'Administrator', 'Fleet Manager'].includes(currentUser.role);
+  const pending = repairRequests.filter(r => r.status === 'pending');
+
+  if (canApprove && pending.length > 0) {
+    card.classList.remove('hidden');
+    list.innerHTML = pending.map(r => `
+      <div class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-100 hover:bg-white transition-colors">
+        <div>
+          <div class="font-bold text-slate-800 text-sm">${r.truck}</div>
+          <div class="text-[11px] text-slate-500 truncate max-w-[150px]">${r.issue}</div>
+        </div>
+        <button onclick="approveRepair('${r.id}')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-blue-700 shadow-sm transition">อนุมัติ</button>
+      </div>`).join('');
+  } else { card.classList.add('hidden'); }
+}
+
+function updateFuelRate() {
+  const val = parseFloat(document.getElementById('fuel-rate-input').value);
+  if (!val || val < 20 || val > 60) { showToast('เรทน้ำมันไม่ถูกต้อง (20-60 บาท)', 'error'); return; }
+  fuelRate = val;
+  document.getElementById('fuel-rate-display').textContent = val.toFixed(2);
+  document.getElementById('fuel-cost-calc').textContent = val.toFixed(2) + ' บาท/ลิตร';
+  document.getElementById('fuel-rate-input').value = '';
+  calcFuelTotal();
+  showToast(`อัพเดทเรทน้ำมัน: ${val.toFixed(2)} บาท/ลิตร`, 'success');
+}
+
+function renderDashboardFuelChart() {
+  const el = document.getElementById('dashboard-fuel-chart');
+  if (!el) return;
+  const stats = trucks.map(t => {
+    const records = fuelData.filter(f => f.truck === t.plate);
+    const avgEff = records.length ? records.reduce((s, r) => s + r.eff, 0) / records.length : 3.0;
+    return { plate: t.plate, eff: avgEff };
+  }).sort((a, b) => a.eff - b.eff); // เรียงจากน้อยไปมากเพื่อเน้นคันที่กินน้ำมันผิดปกติไว้ด้านบน
+
+  el.innerHTML = stats.map(s => {
+    const pct = Math.min(100, (s.eff / 4.0) * 100);
+    const color = s.eff < 2.8 ? 'bg-red-500' : s.eff < 3.0 ? 'bg-yellow-500' : 'bg-green-500';
+    const costPerKm = fuelRate / s.eff;
+    return `
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span class="font-bold text-slate-700">${s.plate}</span>
+          <span class="font-bold ${s.eff < 2.8 ? 'text-red-600' : 'text-slate-600'}">${s.eff.toFixed(2)} km/L <span class="font-normal text-slate-400 ml-1">(฿${costPerKm.toFixed(2)}/km)</span></span>
+        </div>
+        <div class="prog-bar bg-slate-100"><div class="prog-fill ${color}" style="width:${pct}%"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function renderPairingAnalysis() {
+  const tb = document.getElementById('pairing-tbody');
+  if (!tb) return;
+  
+  // Mock pairing analytics data
+  const pairings = [
+    { truck:'70-0981 มห.', trailer:'TLR-001', type:'40HC + Skeleton', trips:42, avg_eff:3.45, status:'optimal' },
+    { truck:'กข-1234 กทม.', trailer:'TLR-002', type:'20GP + Flatbed',  trips:28, avg_eff:3.22, status:'normal' },
+    { truck:'คร-3456 สค.',  trailer:'TLR-004', type:'20GP + Skeleton', trips:15, avg_eff:3.38, status:'optimal' },
+    { truck:'นข-9012 กทม.', trailer:'TLR-003', type:'40RH + Reefer',   trips:12, avg_eff:2.65, status:'warning' },
+    { truck:'ฮภ-5678 ขก.',  trailer:'TLR-001', type:'40HC + Skeleton', trips:5,  avg_eff:2.85, status:'low' },
+  ];
+
+  tb.innerHTML = `
+    <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+      <tr>
+        <th class="p-4 text-left">คู่หัวลาก + หาง</th>
+        <th class="p-4 text-left">ประเภทงาน</th>
+        <th class="p-4 text-center">จำนวนเที่ยววิ่ง</th>
+        <th class="p-4 text-right">ประสิทธิภาพ (km/L)</th>
+        <th class="p-4 text-center">การประเมิน</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y">
+    ${pairings.map(p => {
+      const st = {
+        optimal: '<span class="text-green-600 font-bold">⭐ ดีเยี่ยม</span>',
+        normal:  '<span class="text-blue-600">ปกติ</span>',
+        low:     '<span class="text-yellow-600">ต่ำกว่าเกณฑ์</span>',
+        warning: '<span class="text-red-600 font-bold">⚠️ ตรวจสอบหาง</span>'
+      }[p.status];
+      return `
+        <tr>
+          <td class="p-4"><div class="font-bold text-slate-800">${p.truck}</div><div class="text-xs text-blue-600">${p.trailer}</div></td>
+          <td class="p-4 text-xs text-slate-500">${p.type}</td>
+          <td class="p-4 text-center font-semibold">${p.trips}</td>
+          <td class="p-4 text-right font-mono font-bold ${p.avg_eff > 3.3 ? 'text-green-600' : p.avg_eff < 2.8 ? 'text-red-600' : ''}">${p.avg_eff.toFixed(2)}</td>
+          <td class="p-4 text-center text-xs">${st}</td>
+        </tr>`;
+    }).join('')}</tbody>`;
+}
+
+const mockVehDocs = [
+  { truck:'70-0981 มห.', type:'ใบรับรอง GPS', no:'GPS-6900123', issue:'2025-05-10', expiry:'2026-05-10', status:'expiring' },
+  { truck:'กข-1234 กทม.', type:'ตรวจควันดำ', no:'EM-26-0045', issue:'2026-01-15', expiry:'2026-07-15', status:'active' },
+  { truck:'ฮภ-5678 ขก.', type:'ใบอนุญาตขนส่ง (วอ.8)', no:'HAZ-4492', issue:'2024-12-01', expiry:'2025-12-01', status:'active' },
+  { truck:'นข-9012 กทม.', type:'ตรวจสภาพประจำปี', no:'INSP-26-99', issue:'2026-03-20', expiry:'2027-03-20', status:'active' },
+];
+
+function renderVehDocsTable() {
+  const tb = document.getElementById('vehdocs-tbody');
+  if (!tb) return;
+  const today = new Date();
+  tb.innerHTML = mockVehDocs.map(d => {
+    const expDate = new Date(d.expiry);
+    const daysLeft = Math.round((expDate - today) / 86400000);
+    const statusTag = daysLeft < 30 ? '<span class="badge s-repair">ใกล้หมดอายุ</span>' : '<span class="badge s-run">ปกติ</span>';
+    return `<tr class="border-t">
+      <td class="p-4 font-bold text-slate-700">${d.truck}</td>
+      <td class="p-4">${d.type}</td>
+      <td class="p-4 font-mono text-xs">${d.no}</td>
+      <td class="p-4 text-xs">${d.issue}</td>
+      <td class="p-4 text-xs ${daysLeft < 30 ? 'text-red-600 font-bold' : ''}">${d.expiry}</td>
+      <td class="p-4 text-center">${statusTag}</td>
+      <td class="p-4 text-center"><button class="text-blue-500 hover:text-blue-700"><i class="fas fa-file-pdf"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+const mockTrailers = [
+  { id:'TLR-001', plate:'82-1111 ชป.', type:'Skeleton 40\'', status:'running', truck:'70-0981 มห.', tax:'2026-09-12', ins:'2026-05-25' },
+  { id:'TLR-002', plate:'82-2222 ชป.', type:'Flatbed 40\'',  status:'idle',    truck:'—',          tax:'2026-10-01', ins:'2026-10-01' },
+  { id:'TLR-003', plate:'82-3333 ชป.', type:'Reefer 40\'',    status:'repair',  truck:'—',          tax:'2026-06-15', ins:'2026-06-15' },
+  { id:'TLR-004', plate:'82-4444 ชป.', type:'Skeleton 20\'', status:'idle',    truck:'—',          tax:'2026-11-20', ins:'2026-11-20' },
+];
+
+function renderTrailerTable() {
+  const tb = document.getElementById('trailers-tbody');
+  const cards = document.getElementById('trailer-cards');
+  if (!tb || !cards) return;
+  
+  const statusMap = { running:'s-run', idle:'s-idle', repair:'s-repair' };
+  const statusLbl = { running:'ใช้งานอยู่', idle:'ว่าง', repair:'ชำรุด/ซ่อม' };
+
+  tb.innerHTML = mockTrailers.map(t => `
+    <tr class="border-t">
+      <td class="p-4 font-bold text-blue-700">${t.id}</td>
+      <td class="p-4">${t.plate}</td>
+      <td class="p-4 text-xs">${t.type}</td>
+      <td class="p-4"><span class="badge ${statusMap[t.status]}">${statusLbl[t.status]}</span></td>
+      <td class="p-4 text-xs">${t.truck}</td>
+      <td class="p-4 text-xs">${t.tax}</td>
+      <td class="p-4 text-xs">${t.ins}</td>
+      <td class="p-4 text-center"><button class="text-blue-600 hover:underline text-xs">แก้ไข</button></td>
+    </tr>`).join('');
+
+  cards.innerHTML = mockTrailers.map(t => `
+    <div class="card p-5 border-t-4 ${t.status==='repair'?'border-red-500':'border-slate-800'}">
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <div class="font-bold text-lg text-slate-800">${t.id}</div>
+          <div class="text-xs text-slate-400">${t.plate} | ${t.type}</div>
+        </div>
+        <span class="badge ${statusMap[t.status]}">${statusLbl[t.status]}</span>
+      </div>
+      <div class="space-y-2 mb-4 text-xs">
+        <div class="flex justify-between"><span>พ่วงกับ:</span><span class="font-bold">${t.truck}</span></div>
+        <div class="flex justify-between"><span>ภาษีหาง:</span><span class="${new Date(t.tax)<new Date()?'text-red-600':''}">${t.tax}</span></div>
+        <div class="flex justify-between"><span>ประกันหาง:</span><span class="${new Date(t.ins)<new Date()?'text-red-600':''}">${t.ins}</span></div>
+      </div>
+      <div class="flex gap-2">
+        <button class="flex-1 text-xs bg-slate-100 py-1.5 rounded font-bold hover:bg-slate-200">ประวัติการซ่อม</button>
+        <button class="flex-1 text-xs bg-blue-50 text-blue-700 py-1.5 rounded font-bold hover:bg-blue-100">ดูเอกสาร</button>
+      </div>
+    </div>`).join('');
+}
+
+function runCostCalc() {
+  const price = parseFloat(document.getElementById('calc-fuel-price').value) || 0;
+  const cons  = parseFloat(document.getElementById('calc-consumption').value) || 1;
+  const dist  = parseFloat(document.getElementById('calc-distance').value) || 0;
+  
+  const totalCost = (dist / cons) * price;
+  const costPerKm = price / cons;
+  
+  document.getElementById('res-total-cost').textContent = '฿ ' + totalCost.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('res-cost-per-km').textContent = '฿ ' + costPerKm.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' / km';
+  document.getElementById('rec-cost').textContent = costPerKm.toFixed(2);
+}
+
+function calcFuelTotal() {
+  const liters = parseFloat(document.getElementById('fuel-liters').value) || 0;
+  const total = liters * fuelRate;
+  document.getElementById('fuel-total-calc').textContent = liters > 0 ? '฿ ' + total.toLocaleString('th-TH', {minimumFractionDigits:2}) : '—';
+}
+
+function addFuelRecord() {
+  const truck = document.getElementById('fuel-truck').value;
+  const date = document.getElementById('fuel-date').value;
+  const liters = parseFloat(document.getElementById('fuel-liters').value);
+  const odo = parseInt(document.getElementById('fuel-odo').value);
+  if (!date || !liters || !odo) { showToast('กรุณากรอกข้อมูลให้ครบ', 'error'); return; }
+  const prev = fuelData.find(f => f.truck === truck);
+  const km = prev ? Math.abs(odo - prev.odo) : 800;
+  const eff = km > 0 ? km / liters : 3.0;
+  fuelData.unshift({ date, truck, liters, odo, km, cost_per_l:fuelRate, total:Math.round(liters*fuelRate), eff:parseFloat(eff.toFixed(2)) });
+  renderFuelTable();
+  renderFuelEff();
+  ['fuel-liters','fuel-odo'].forEach(id => document.getElementById(id).value = '');
+  showToast(`บันทึกการเติมน้ำมัน ${truck} สำเร็จ`, 'success');
+}
+
+// ===== DRIVERS =====
+function renderDriverCards() {
+  const el = document.getElementById('driver-cards');
+  if (!el) return;
+  el.innerHTML = drivers.map(d => {
+    const statusMap = { running:'s-run', idle:'s-idle', leave:'s-leave' };
+    const statusLbl = { running:'วิ่งอยู่', idle:'ว่าง', leave:'ลา/หยุด' };
+    const scoreColor = avg => avg >= 95 ? 'text-green-600' : avg >= 85 ? 'text-yellow-600' : 'text-red-600';
+    const avg = Math.round((d.otp + d.accept + d.safety) / 3);
+    return `<div class="card p-5 hover:shadow-md transition cursor-pointer" onclick="viewDriver('${d.id}')">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <div class="font-bold text-slate-800">${d.name}</div>
+          <div class="text-xs text-slate-400">${d.id} | ${d.truck}</div>
+        </div>
+        <span class="badge ${statusMap[d.status]}">${statusLbl[d.status]}</span>
+      </div>
+      <div class="grid grid-cols-3 gap-2 text-center text-xs mb-3">
+        <div class="bg-slate-50 rounded p-2"><div class="font-bold text-blue-600">${d.otp}%</div><div class="text-slate-400">OTP</div></div>
+        <div class="bg-slate-50 rounded p-2"><div class="font-bold text-purple-600">${d.accept}%</div><div class="text-slate-400">รับงาน</div></div>
+        <div class="bg-slate-50 rounded p-2"><div class="font-bold text-green-600">${d.safety}%</div><div class="text-slate-400">Safety</div></div>
+      </div>
+      <div class="flex justify-between items-center text-sm">
+        <span class="text-slate-500">คะแนนรวม</span>
+        <span class="font-bold text-lg ${scoreColor(avg)}">${avg}</span>
+      </div>
+      <div class="prog-bar mt-1"><div class="prog-fill ${avg>=95?'bg-green-500':avg>=85?'bg-yellow-500':'bg-red-500'}" style="width:${avg}%"></div></div>
+      <div class="flex justify-between text-xs text-slate-400 mt-2">
+        <span>${d.trips} เที่ยวเดือนนี้</span>
+        <span>${d.km_month.toLocaleString()} km</span>
+        <span>★ ${d.rating}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function viewDriver(id) {
+  const d = drivers.find(x => x.id === id);
+  if (!d) return;
+  const el = document.getElementById('modal-driver-content');
+  el.innerHTML = `
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div><div class="text-xs text-slate-400 uppercase font-bold">ชื่อ</div><div class="font-bold">${d.name}</div></div>
+      <div><div class="text-xs text-slate-400 uppercase font-bold">รหัส</div><div>${d.id}</div></div>
+      <div><div class="text-xs text-slate-400 uppercase font-bold">เบอร์โทร</div><div><a href="tel:${d.phone}" class="text-blue-600">${d.phone}</a></div></div>
+      <div><div class="text-xs text-slate-400 uppercase font-bold">Line ID</div><div class="text-green-600">${d.line}</div></div>
+      <div><div class="text-xs text-slate-400 uppercase font-bold">รถที่รับผิดชอบ</div><div>${d.truck}</div></div>
+      <div><div class="text-xs text-slate-400 uppercase font-bold">Rating</div><div class="text-yellow-500 font-bold">★ ${d.rating}</div></div>
+    </div>
+    <h4 class="font-bold text-slate-700 mb-2">KPI เดือนนี้</h4>
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="bg-blue-50 rounded-lg p-3 text-center"><div class="text-xl font-bold text-blue-700">${d.otp}%</div><div class="text-xs text-blue-500">OTP</div></div>
+      <div class="bg-purple-50 rounded-lg p-3 text-center"><div class="text-xl font-bold text-purple-700">${d.accept}%</div><div class="text-xs text-purple-500">รับงาน</div></div>
+      <div class="bg-green-50 rounded-lg p-3 text-center"><div class="text-xl font-bold text-green-700">${d.safety}%</div><div class="text-xs text-green-500">Safety</div></div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 text-sm">
+      <div class="bg-slate-50 rounded p-3 text-center"><div class="font-bold text-xl">${d.trips}</div><div class="text-slate-400 text-xs">เที่ยวเดือนนี้</div></div>
+      <div class="bg-slate-50 rounded p-3 text-center"><div class="font-bold text-xl">${d.km_month.toLocaleString()}</div><div class="text-slate-400 text-xs">km เดือนนี้</div></div>
+    </div>
+    <button onclick="closeModal('modal-driver')" class="w-full mt-4 border rounded-lg py-2 text-sm text-slate-600 hover:bg-slate-50">ปิด</button>`;
+  document.getElementById('modal-driver').classList.remove('hidden');
+}
+
+function addDriver() {
+  closeModal('modal-add-driver');
+  showToast('เพิ่มคนขับใหม่สำเร็จ', 'success');
+}
+
+// ===== VEHICLES =====
+function renderVehicleTable(filter = '') {
+  const tb = document.getElementById('vehicle-tbody');
+  if (!tb) return;
+  const data = filter ? trucks.filter(t => t.status === filter) : trucks;
+  const today = new Date();
+  tb.innerHTML = data.map(t => {
+    const statusMap = { running:'s-run', idle:'s-idle', repair:'s-repair' };
+    const statusLbl = { running:'วิ่งอยู่', idle:'ว่าง', repair:'ซ่อม' };
+    const d = drivers.find(dr => dr.truck === t.plate);
+    const taxDate = new Date(t.tax);
+    const daysToTax = Math.round((taxDate - today) / 86400000);
+    const taxClass = daysToTax < 30 ? 'text-red-600 font-bold' : daysToTax < 60 ? 'text-yellow-600 font-bold' : 'text-slate-600';
+    return `<tr class="border-t">
+      <td class="p-4 font-bold text-slate-800">${t.plate}</td>
+      <td class="p-4"><span class="badge s-idle text-xs">${t.type}</span></td>
+      <td class="p-4"><span class="badge ${statusMap[t.status]}">${statusLbl[t.status]}</span></td>
+      <td class="p-4 text-xs">${d ? d.name : '—'}</td>
+      <td class="p-4 text-xs ${taxClass}">${t.tax} ${daysToTax < 30 ? '⚠️' : ''}</td>
+      <td class="p-4 text-xs">${t.ins}</td>
+      <td class="p-4 text-xs">${t.prb}</td>
+      <td class="p-4 text-right text-xs">${t.km.toLocaleString()} km</td>
+      <td class="p-4 text-center">
+        <button onclick="viewVehicle('${t.id}')" class="text-xs text-blue-600 hover:underline mr-2">ดูข้อมูล</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterVehicles(val) { renderVehicleTable(val); }
+
+function viewVehicle(id) {
+  const t = trucks.find(x => x.id === id);
+  if (!t) return;
+  const d = drivers.find(dr => dr.truck === t.plate);
+  const el = document.getElementById('modal-vehicle-content');
+  el.innerHTML = `
+    <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+      <div><div class="text-xs text-slate-400 uppercase font-bold mb-0.5">ทะเบียน</div><div class="font-bold text-lg">${t.plate}</div></div>
+      <div><div class="text-xs text-slate-400 uppercase font-bold mb-0.5">ประเภท</div><div>${t.type}</div></div>
+      <div><div class="text-xs text-slate-400 uppercase font-bold mb-0.5">คนขับ</div><div>${d ? d.name : '—'}</div></div>
+      <div><div class="text-xs text-slate-400 uppercase font-bold mb-0.5">เลขไมล์</div><div>${t.km.toLocaleString()} km</div></div>
+    </div>
+    <h4 class="font-bold text-slate-700 mb-2">เอกสารรถ</h4>
+    <div class="space-y-2 text-sm mb-4">
+      <div class="flex justify-between bg-slate-50 rounded p-2"><span>ภาษีรถยนต์</span><span class="font-semibold">${t.tax}</span></div>
+      <div class="flex justify-between bg-slate-50 rounded p-2"><span>ประกันภัย</span><span class="font-semibold">${t.ins}</span></div>
+      <div class="flex justify-between bg-slate-50 rounded p-2"><span>พรบ.</span><span class="font-semibold">${t.prb}</span></div>
+    </div>
+    <button onclick="closeModal('modal-vehicle')" class="w-full border rounded-lg py-2 text-sm text-slate-600 hover:bg-slate-50">ปิด</button>`;
+  document.getElementById('modal-vehicle').classList.remove('hidden');
+}
+
+// ===== REPAIR =====
+function renderRepairTable() {
+  const tb = document.getElementById('repair-tbody');
+  if (!tb) return;
+  tb.innerHTML = repairRequests.map(r => {
+    const sevMap = { low:'🟢 ต่ำ', medium:'🟡 กลาง', high:'🔴 สูง' };
+    const stMap = { pending:'s-wait', repairing:'s-idle', done:'s-done' };
+    const stLbl = { pending:'รออนุมัติ', repairing:'กำลังซ่อม', done:'เสร็จแล้ว' };
+    const btn = r.status === 'pending'
+      ? `<button onclick="approveRepair('${r.id}')" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 font-semibold mr-1">อนุมัติ</button><button onclick="rejectRepair('${r.id}')" class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 font-semibold">ปฏิเสธ</button>`
+      : r.status === 'repairing'
+      ? `<button onclick="doneRepair('${r.id}')" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 font-semibold">ซ่อมเสร็จ</button>` : '—';
+    return `<tr class="border-t">
+      <td class="p-3 font-bold text-slate-700">${r.id}</td>
+      <td class="p-3 text-xs font-semibold">${r.truck}</td>
+      <td class="p-3 text-xs max-w-xs">${r.issue}</td>
+      <td class="p-3 text-xs">${sevMap[r.sev]}</td>
+      <td class="p-3 text-xs">${r.reporter}</td>
+      <td class="p-3 text-xs">${r.date}</td>
+      <td class="p-3"><span class="badge ${stMap[r.status]}">${stLbl[r.status]}</span></td>
+      <td class="p-3 text-xs text-right">${r.cost > 0 ? '฿ '+r.cost.toLocaleString() : '—'}</td>
+      <td class="p-3 text-center">${btn}</td>
+    </tr>`;
+  }).join('');
+}
+
+function approveRepair(id) {
+  const r = repairRequests.find(x => x.id === id);
+  if (r) r.status = 'repairing';
+  renderRepairTable();
+  renderDashboardRepairs();
+  showToast(`อนุมัติ ${id} แล้ว — ส่งให้ช่างดำเนินการ`, 'success');
+}
+function rejectRepair(id) {
+  repairRequests.splice(repairRequests.findIndex(x => x.id === id), 1);
+  renderRepairTable();
+  showToast(`ปฏิเสธ ${id}`, 'error');
+}
+function doneRepair(id) {
+  const r = repairRequests.find(x => x.id === id);
+  if (r) {
+    r.status = 'done';
+    r.cost = Math.round(Math.random() * 8000 + 2000);
+    const t = trucks.find(x => x.plate === r.truck);
+    if (t && t.status === 'repair') t.status = 'idle';
+  }
+  renderRepairTable();
+  renderVehicleTable();
+  renderDashboardRepairs();
+  showToast(`${id} ซ่อมเสร็จ รถพร้อมใช้งาน`, 'success');
+}
+
+function submitRepair() {
+  const truck = document.getElementById('rep-truck').value;
+  const issue = document.getElementById('rep-issue').value;
+  const sev = document.getElementById('rep-sev').value;
+  const reporter = document.getElementById('rep-reporter').value;
+  if (!issue || !reporter) { showToast('กรุณากรอกข้อมูลให้ครบ', 'error'); return; }
+  const id = 'VR-' + String(repairRequests.length + 1).padStart(3, '0');
+  repairRequests.unshift({ id, truck, issue, sev, reporter, date: new Date().toLocaleString('th-TH'), status:'pending', cost:0 });
+  closeModal('modal-repair');
+  renderRepairTable();
+  renderDashboardRepairs();
+  showToast(`ส่งใบแจ้งซ่อม ${id} สำเร็จ`, 'success');
+  document.getElementById('rep-issue').value = '';
+  document.getElementById('rep-reporter').value = '';
+}
+
+// ===== UTILS =====
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  const colors = { success:'#16a34a', error:'#dc2626', info:'#2563eb' };
+  t.style.background = colors[type] || colors.success;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===== BOOT =====
+window.addEventListener('DOMContentLoaded', () => {
+  // 1. ตรวจสอบว่าล็อกอินจากหน้า Portal (index.html) หรือยัง
+  const portalSession = sessionStorage.getItem('mck_user');
+  if (portalSession) {
+    currentUser = JSON.parse(portalSession);
+    document.getElementById('login-overlay').style.display = 'none';
+    applyRole(currentUser.role);
+    const tabs = ROLE_CONFIG[currentUser.role]?.tabs || ['all'];
+    showTab(tabs[0] === 'all' ? 'dashboard' : tabs[0]);
+    initPage();
+    return;
+  }
+
+  // 2. ถ้าไม่มี Session ให้เช็ค LocalStorage เดิม
+  const saved = localStorage.getItem('fleet_user');
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      document.getElementById('login-overlay').style.display = 'none';
+      applyRole(currentUser.role);
+      const tabs = (ROLE_CONFIG[currentUser.role] || ROLE_CONFIG['Administrator']).tabs;
+      showTab(tabs[0]);
+      initPage();
+    } catch(e) { localStorage.removeItem('fleet_user'); }
+  }
+});
+</script>
+</body>
+</html>
+ำหนด

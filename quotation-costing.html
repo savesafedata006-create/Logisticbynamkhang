@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quotation & Costing — MCK Logistics</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Kanit:wght@500;600&display=swap');
+body{font-family:'Sarabun',sans-serif;background:#f8fafc;}
+.kanit{font-family:'Kanit',sans-serif;}
+input:focus, select:focus { outline:none; border-color:#2563eb; ring: 2px #dbeafe; }
+</style>
+</head>
+<body class="p-4 md:p-8">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800 kanit">💰 Quotation & Costing</h1>
+        <p class="text-slate-500 text-sm">ระบบคำนวณต้นทุนเที่ยววิ่งและประมาณการราคาเสนอขาย</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 text-sm hidden md:block text-right">
+          <span class="text-slate-400 font-bold uppercase text-[10px] block leading-tight">บัญชีผู้ใช้</span>
+      <div class="flex items-center gap-3" style="background:white; padding:0.5rem 1rem; border-radius:12px; border:1px solid #e2e8f0;">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" 
+             id="user-avatar-display" style="background:#2563eb;">-</div>
+        <div class="text-sm hidden md:block text-right">
+          <span class="text-slate-400 font-bold uppercase text-[10px] block leading-tight">ผู้ใช้งาน</span>
+          <span class="font-bold text-slate-700" id="user-info-display">—</span>
+        </div>
+        <button onclick="window.history.back()" class="bg-white border border-slate-300 px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition">
+          <i class="fas fa-arrow-left mr-1"></i> ย้อนกลับ
+        </button>
+        <a href="index.html" id="home-btn-qc" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition flex items-center gap-2 shadow-md">
+          <i class="fas fa-home"></i> หน้าแรก
+        </a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Step 1: Fleet Costing (Inputs) -->
+      <div class="lg:col-span-1 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+            <i class="fas fa-truck text-blue-500"></i>ข้อมูลต้นทุน (Fleet)
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ระยะทางไป-กลับ (km)</label>
+              <input type="number" id="dist" value="970" class="w-full border rounded-lg px-3 py-2 text-sm" oninput="calculate()">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ราคาน้ำมัน/ลิตร</label>
+                <input type="number" id="f_price" value="34.50" class="w-full border rounded-lg px-3 py-2 text-sm" oninput="calculate()">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">กินน้ำมัน (km/L)</label>
+                <input type="number" id="f_cons" value="3.0" class="w-full border rounded-lg px-3 py-2 text-sm" oninput="calculate()">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ค่าเที่ยวคนขับ (บาท)</label>
+              <input type="number" id="d_fee" value="3500" class="w-full border rounded-lg px-3 py-2 text-sm" oninput="calculate()">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ค่าผ่านทาง/อื่นๆ (บาท)</label>
+              <input type="number" id="o_fee" value="1200" class="w-full border rounded-lg px-3 py-2 text-sm" oninput="calculate()">
+            </div>
+
+            <!-- Generator Section -->
+            <div class="mt-6 pt-6 border-t border-dashed">
+              <h4 class="font-bold text-slate-700 mb-3 text-xs uppercase flex items-center gap-2">
+                <i class="fas fa-bolt text-yellow-500"></i>บริการเครื่องปั่นไฟ (Generator)
+              </h4>
+              <div class="mb-3">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">ประเภทงานปั่นไฟ</label>
+                <select id="gen_type" class="w-full border rounded-lg px-3 py-2 text-sm" onchange="calculate()">
+                  <option value="ปั่นไฟให้ตู้คอนเทนเนอร์ (Reefer Supply)">ปั่นไฟให้ตู้คอนเทนเนอร์ (Reefer Supply)</option>
+                  <option value="ปั่นไฟให้ล้ง (Warehouse Power)">ปั่นไฟให้ล้ง (Warehouse Power)</option>
+                </select>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">เวลาใช้งาน (ชม.)</label>
+                  <input type="number" id="gen_hours" value="0" min="0" class="w-full border rounded-lg px-3 py-2 text-sm" oninput="calculate()">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">กินน้ำมัน (L/hr)</label>
+                  <input type="number" id="gen_cons" value="3.5" step="0.1" class="w-full border rounded-lg px-3 py-2 text-sm" oninput="calculate()">
+                </div>
+              </div>
+              <div class="mt-3">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">ค่าบริการเสริม (Fixed Fee)</label>
+                <input type="number" id="gen_fee" value="0" min="0" class="w-full border rounded-lg px-3 py-2 text-sm" oninput="calculate()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: CS Pricing (Margin) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+            <i class="fas fa-hand-holding-usd text-green-500"></i>การตั้งราคา (CS)
+          </h3>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Margin / กำไรที่ต้องการ (%)</label>
+            <div class="flex items-center gap-3">
+              <input type="range" id="margin_range" min="5" max="100" value="40" class="flex-1" oninput="document.getElementById('margin_val').value=this.value; calculate()">
+              <input type="number" id="margin_val" value="40" class="w-16 border rounded text-center text-sm py-1" oninput="document.getElementById('margin_range').value=this.value; calculate()">
+              <span class="text-sm font-bold text-slate-600">%</span>
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-4 leading-relaxed">
+            * ราคาเสนอขายคำนวณจาก ต้นทุนรวม + % Margin เพื่อครอบคลุมค่าบริหารจัดการและกำไรสุทธิ
+          </p>
+        </div>
+      </div>
+
+      <!-- Results Display -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-8 opacity-10 text-9xl"><i class="fas fa-file-invoice-dollar"></i></div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+            <div>
+              <p class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-2">สรุปต้นทุนเที่ยววิ่ง (Fleet Cost)</p>
+              <div class="text-4xl font-bold kanit" id="res_total_cost">฿ 0.00</div>
+              <div class="mt-4 space-y-2 text-sm text-slate-400">
+                <div class="flex justify-between"><span>ค่าน้ำมัน:</span><span id="res_fuel_cost" class="text-white">—</span></div>
+                <div class="flex justify-between"><span>ค่าคนขับ + จิปาถะ:</span><span id="res_driver_total" class="text-white">—</span></div>
+                <div class="flex justify-between"><span>เครื่องปั่นไฟ:</span><span id="res_gen_cost" class="text-white">—</span></div>
+                <div class="flex justify-between border-t border-slate-700 pt-2"><span>ต้นทุนเฉลี่ย/กม:</span><span id="res_cost_km" class="text-blue-300 font-bold">—</span></div>
+              </div>
+            </div>
+            <div class="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+              <p class="text-green-400 text-xs font-bold uppercase tracking-wider mb-2">ราคาเสนอขายแนะนำ (Selling Price)</p>
+              <div class="text-5xl font-bold kanit text-green-400" id="res_sell_price">฿ 0.00</div>
+              <div class="mt-4 space-y-2 text-sm text-slate-300">
+                <div class="flex justify-between"><span>กำไรคาดการณ์:</span><span id="res_profit" class="text-green-300 font-bold">—</span></div>
+                <div class="flex justify-between border-t border-white/10 pt-2"><span>เรทเสนอขาย/กม:</span><span id="res_sell_km" class="text-white font-bold">—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quotation Preview Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="px-6 py-4 border-b flex justify-between items-center">
+            <h3 class="font-bold text-slate-700">Preview รายการในใบเสนอราคา</h3>
+            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow-md">
+              <i class="fas fa-file-pdf mr-2"></i>สร้างใบเสนอราคา (PDF)
+            </button>
+          </div>
+          <div class="p-6">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-slate-400 border-b">
+                  <th class="text-left pb-3 uppercase text-[10px]">รายละเอียดรายการ</th>
+                  <th class="text-right pb-3 uppercase text-[10px]">ระยะทาง</th>
+                  <th class="text-right pb-3 uppercase text-[10px]">หน่วย</th>
+                  <th class="text-right pb-3 uppercase text-[10px]">ราคาต่อหน่วย</th>
+                  <th class="text-right pb-3 uppercase text-[10px]">จำนวนเงิน</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y border-b text-slate-600">
+                <tr>
+                  <td class="py-4">
+                    <div class="font-bold text-slate-800" id="tab_truck_title">ค่าขนส่งทางบก (Truck Freight Service)</div>
+                    <div class="text-xs text-slate-400">เส้นทาง: ตลาดไท → ด่านหนองคาย (ตู้ 40' HC)</div>
+                  </td>
+                  <td class="text-right" id="tab_dist">970</td>
+                  <td class="text-right">km</td>
+                  <td class="text-right" id="tab_rate">0.00</td>
+                  <td class="text-right font-bold text-slate-800" id="tab_total">0.00</td>
+                </tr>
+                <tr id="tab_gen_row" class="hidden">
+                  <td class="py-4">
+                    <div class="font-bold text-slate-800" id="tab_gen_desc">บริการเครื่องปั่นไฟ</div>
+                    <div class="text-xs text-slate-400">คิดตามชั่วโมงการทำงานจริง</div>
+                  </td>
+                  <td class="text-right" id="tab_gen_hours">0</td>
+                  <td class="text-right">hr</td>
+                  <td class="text-right">—</td>
+                  <td class="text-right font-bold text-slate-800" id="tab_gen_total">0.00</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="font-bold text-lg">
+                  <td colspan="4" class="text-right py-4">ยอดรวมสุทธิ (Grand Total)</td>
+                  <td class="text-right py-4 text-blue-700" id="tab_grand">฿ 0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+            <div class="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-700 flex gap-3">
+              <i class="fas fa-info-circle text-lg opacity-50"></i>
+              <p>ราคาที่แสดงเป็นเพียงราคาประมาณการเบื้องต้น (Estimated Price) ทีม CS ควรตรวจสอบราคาน้ำมันหน้าปั๊มและค่าใช้จ่ายแฝงอื่นๆ หน้าด่านก่อนออกใบเสนอราคาจริงทุกครั้ง</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generator Ranking Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="px-6 py-4 border-b bg-slate-50 flex justify-between items-center">
+            <h3 class="font-bold text-slate-700">🏆 อันดับเครื่องปั่นไฟแนะนำ (Worthiness Ranking)</h3>
+            <span class="text-[10px] font-bold text-slate-400 uppercase">อ้างอิงตามประวัติการใช้งานจริง</span>
+          </div>
+          <div class="p-6">
+            <div id="gen-ranking-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- JS Rendered -->
+            </div>
+            <p class="text-[10px] text-slate-400 mt-4 italic">* คะแนนความคุ้มค่าคำนวณจาก อัตราส่วนชั่วโมงทำงานต่อความถี่ในการซ่อมบำรุง (Maintenance Rate)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function calculate() {
+      const user = JSON.parse(sessionStorage.getItem('mck_user'));
+      if (user) {
+        document.getElementById('user-info-display').textContent = `${user.name} (${user.role})`;
+        document.getElementById('user-avatar-display').textContent = user.name.charAt(0).toUpperCase();
+        if (user.role === 'Driver') document.getElementById('home-btn-qc').href = 'driver-portal.html';
+      }
+
+      const dist = parseFloat(document.getElementById('dist').value) || 0;
+      const fPrice = parseFloat(document.getElementById('f_price').value) || 0;
+      const fCons = parseFloat(document.getElementById('f_cons').value) || 1;
+      const dFee = parseFloat(document.getElementById('d_fee').value) || 0;
+      const oFee = parseFloat(document.getElementById('o_fee').value) || 0;
+      const margin = parseFloat(document.getElementById('margin_val').value) || 0;
+
+      // Generator Cost
+      const gHours = parseFloat(document.getElementById('gen_hours').value) || 0;
+      const gCons = parseFloat(document.getElementById('gen_cons').value) || 0;
+      const gFee = parseFloat(document.getElementById('gen_fee').value) || 0;
+      const genFuelCost = gHours * gCons * fPrice;
+      const totalGenCost = genFuelCost + gFee;
+
+      // Fleet Cost
+      const truckFuelCost = (dist / fCons) * fPrice;
+      const totalTruckCost = truckFuelCost + dFee + oFee;
+      const totalCost = totalTruckCost + totalGenCost;
+      const costPerKm = dist > 0 ? totalTruckCost / dist : 0;
+
+      // CS Pricing
+      const profit = totalCost * (margin / 100);
+      const sellPrice = totalCost + profit;
+      const sellRate = dist > 0 ? sellPrice / dist : 0;
+
+      // Update Dashboard
+      document.getElementById('res_total_cost').innerText = '฿ ' + totalCost.toLocaleString(undefined, {minimumFractionDigits:2});
+      document.getElementById('res_fuel_cost').innerText = '฿ ' + truckFuelCost.toLocaleString(undefined, {minimumFractionDigits:2});
+      document.getElementById('res_driver_total').innerText = '฿ ' + (dFee + oFee).toLocaleString(undefined, {minimumFractionDigits:2});
+      document.getElementById('res_gen_cost').innerText = '฿ ' + totalGenCost.toLocaleString(undefined, {minimumFractionDigits:2});
+      document.getElementById('res_cost_km').innerText = '฿ ' + costPerKm.toFixed(2) + ' / km';
+
+      document.getElementById('res_sell_price').innerText = '฿ ' + sellPrice.toLocaleString(undefined, {minimumFractionDigits:2});
+      document.getElementById('res_profit').innerText = '฿ ' + profit.toLocaleString(undefined, {minimumFractionDigits:2});
+      document.getElementById('res_sell_km').innerText = '฿ ' + sellRate.toFixed(2) + ' / km';
+
+      // Update Table
+      const truckSellPrice = totalTruckCost * (1 + margin / 100);
+      const truckSellRate = dist > 0 ? truckSellPrice / dist : 0;
+      
+      document.getElementById('tab_dist').innerText = dist;
+      document.getElementById('tab_rate').innerText = truckSellRate.toFixed(2);
+      document.getElementById('tab_total').innerText = truckSellPrice.toLocaleString(undefined, {minimumFractionDigits:2});
+      
+      if (gHours > 0) {
+        document.getElementById('tab_gen_row').classList.remove('hidden');
+        const genSellPrice = totalGenCost * (1 + margin / 100);
+        document.getElementById('tab_gen_desc').innerText = document.getElementById('gen_type').value;
+        document.getElementById('tab_gen_hours').innerText = gHours;
+        document.getElementById('tab_gen_total').innerText = genSellPrice.toLocaleString(undefined, {minimumFractionDigits:2});
+      } else {
+        document.getElementById('tab_gen_row').classList.add('hidden');
+      }
+
+      document.getElementById('tab_grand').innerText = '฿ ' + sellPrice.toLocaleString(undefined, {minimumFractionDigits:2});
+    }
+
+    window.onload = calculate;
+
+    function exportToExcel() {
+      const dist = parseFloat(document.getElementById('dist').value) || 0;
+      const fPrice = parseFloat(document.getElementById('f_price').value) || 0;
+      const fCons = parseFloat(document.getElementById('f_cons').value) || 1;
+      const dFee = parseFloat(document.getElementById('d_fee').value) || 0;
+      const oFee = parseFloat(document.getElementById('o_fee').value) || 0;
+      const margin = parseFloat(document.getElementById('margin_val').value) || 0;
+      
+      const gHours = parseFloat(document.getElementById('gen_hours').value) || 0;
+      const gCons = parseFloat(document.getElementById('gen_cons').value) || 0;
+      const gFee = parseFloat(document.getElementById('gen_fee').value) || 0;
+
+      const truckFuelCost = (dist / fCons) * fPrice;
+      const genFuelCost = gHours * gCons * fPrice;
+      const totalTruckCost = truckFuelCost + dFee + oFee;
+      const totalGenCost = genFuelCost + gFee;
+      const totalCost = totalTruckCost + totalGenCost;
+      
+      const costPerKm = dist > 0 ? totalTruckCost / dist : 0;
+      const profit = totalCost * (margin / 100);
+      const sellPrice = totalCost + profit;
+      const sellRate = dist > 0 ? sellPrice / dist : 0;
+
+      let csvContent = "รายการ,ค่า,หน่วย\n";
+      csvContent += `ระยะทางไป-กลับ,${dist},km\n`;
+      csvContent += `ราคาน้ำมัน/ลิตร,${fPrice},บาท/ลิตร\n`;
+      csvContent += `กินน้ำมันรถ,${fCons},km/L\n`;
+      csvContent += `ค่าเที่ยวคนขับ,${dFee},บาท\n`;
+      csvContent += `ค่าผ่านทาง/อื่นๆ,${oFee},บาท\n`;
+      csvContent += `ใช้งานปั่นไฟ,${gHours},ชั่วโมง\n`;
+      csvContent += `กินน้ำมันปั่นไฟ,${gCons},L/hr\n`;
+      csvContent += `---,,---\n`;
+      csvContent += `ต้นทุนน้ำมันรถรวม,${truckFuelCost.toFixed(2)},บาท\n`;
+      csvContent += `ต้นทุนปั่นไฟรวม,${totalGenCost.toFixed(2)},บาท\n`;
+      csvContent += `ต้นทุนรวมต่อทริป,${totalCost.toFixed(2)},บาท\n`;
+      csvContent += `ต้นทุนเฉลี่ย/กม,${costPerKm.toFixed(2)},บาท/km\n`;
+      csvContent += `---,,---\n`;
+      csvContent += `Margin ที่ต้องการ,${margin},%\n`;
+      csvContent += `กำไรคาดการณ์,${profit.toFixed(2)},บาท\n`;
+      csvContent += `ราคาเสนอขายแนะนำ,${sellPrice.toFixed(2)},บาท\n`;
+      csvContent += `เรทเสนอขาย/กม,${sellRate.toFixed(2)},บาท/km\n`;
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      const today = new Date().toISOString().slice(0, 10);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Quotation_Costing_${today}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>

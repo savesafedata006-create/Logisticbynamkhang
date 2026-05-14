@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทีมเอกสาร - MCK International Trading</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --success: #10b981;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #f1f5f9;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #f0f4f8;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.25rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .header-logo {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.1rem; font-family: 'Kanit', sans-serif;
+        }
+        .header h1 { font-family: 'Kanit', sans-serif; font-size: 1.3rem; }
+        .header h1 small { font-size: 0.75rem; opacity: 0.8; display: block; font-weight: 400; }
+        .back-btn {
+            padding: 0.5rem 1.2rem;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white; border-radius: 8px; cursor: pointer;
+            font-family: 'Sarabun', sans-serif; font-size: 0.9rem;
+            text-decoration: none; transition: all 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* ===== MAIN LAYOUT ===== */
+        .container { max-width: 1300px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+        /* ===== NAV TABS ===== */
+        .nav-tabs {
+            display: flex; gap: 0.25rem; margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto; padding-bottom: 0;
+        }
+        .nav-tab {
+            padding: 0.875rem 1.25rem; background: none; border: none;
+            cursor: pointer; font-family: 'Sarabun', sans-serif; font-size: 0.95rem;
+            font-weight: 500; color: var(--gray);
+            border-bottom: 3px solid transparent; transition: all 0.2s;
+            white-space: nowrap; margin-bottom: -2px;
+        }
+        .nav-tab:hover { color: var(--primary); }
+        .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+
+        .tab-content { display: none; animation: fadeIn 0.25s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: white; border-radius: 12px; padding: 1.5rem;
+            margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+        .card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--light-gray);
+        }
+        .card-header h2 { font-family: 'Kanit', sans-serif; font-size: 1.15rem; color: var(--dark); }
+        .card-header-sub { font-size: 0.85rem; color: var(--gray); margin-top: 2px; }
+
+        /* ===== DASHBOARD GRID ===== */
+        .doc-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .doc-card {
+            background: white; border-radius: 10px; padding: 1.25rem;
+            border: 2px solid var(--border); cursor: pointer; transition: all 0.2s;
+            text-align: center;
+        }
+        .doc-card:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(37,99,235,0.15); transform: translateY(-2px); }
+        .doc-card.required { border-left: 4px solid var(--danger); }
+        .doc-card.optional { border-left: 4px solid var(--warning); }
+        .doc-card.cert { border-left: 4px solid var(--success); }
+        .doc-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .doc-title { font-weight: 700; font-size: 0.9rem; color: var(--dark); margin-bottom: 0.25rem; }
+        .doc-sub { font-size: 0.78rem; color: var(--gray); }
+        .doc-badge {
+            display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 600; margin-top: 0.5rem;
+        }
+        .badge-required { background: #fee2e2; color: var(--danger); }
+        .badge-optional { background: #fef3c7; color: #92400e; }
+        .badge-cert { background: #d1fae5; color: #065f46; }
+
+        /* ===== CHECKLIST ===== */
+        .checklist { list-style: none; }
+        .checklist li {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem 0; border-bottom: 1px solid var(--light-gray);
+            font-size: 0.95rem;
+        }
+        .checklist li:last-child { border-bottom: none; }
+        .check-icon { font-size: 1.2rem; flex-shrink: 0; }
+        .check-label { flex: 1; }
+        .check-label strong { display: block; }
+        .check-label small { color: var(--gray); font-size: 0.82rem; }
+        .check-status {
+            padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+        }
+        .status-required { background: #fee2e2; color: var(--danger); }
+        .status-optional { background: #fef3c7; color: #92400e; }
+        .status-cert { background: #d1fae5; color: #065f46; }
+
+        /* ===== FORM ===== */
+        .form-section { margin-bottom: 2rem; }
+        .form-section-title {
+            font-family: 'Kanit', sans-serif; font-size: 1rem; font-weight: 600;
+            color: var(--primary); margin-bottom: 1rem; padding-bottom: 0.5rem;
+            border-bottom: 2px solid #dbeafe;
+        }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .form-row-3 { grid-template-columns: repeat(3, 1fr); }
+        .form-row-2 { grid-template-columns: repeat(2, 1fr); }
+        .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+        .form-group label { font-weight: 600; font-size: 0.88rem; color: var(--dark); }
+        .form-group label .req { color: var(--danger); }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.65rem 0.85rem; border: 1.5px solid var(--border); border-radius: 7px;
+            font-family: 'Sarabun', sans-serif; font-size: 0.95rem; transition: all 0.2s;
+            background: #fafafa;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: white;
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        /* ===== TABLE ===== */
+        .table-wrap { overflow-x: auto; margin: 1rem 0; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th {
+            background: #1e40af; color: white; padding: 0.75rem 1rem;
+            text-align: left; font-weight: 600; white-space: nowrap;
+        }
+        td { padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) td { background: #f8fafc; }
+        .table-input {
+            width: 100%; border: 1px solid var(--border); border-radius: 5px;
+            padding: 0.4rem 0.6rem; font-family: 'Sarabun', sans-serif; font-size: 0.88rem;
+            background: transparent;
+        }
+        .table-input:focus { outline: none; border-color: var(--primary); background: white; }
+
+        /* ===== BUTTONS ===== */
+        .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+        .btn {
+            padding: 0.7rem 1.4rem; border: none; border-radius: 8px;
+            font-family: 'Sarabun', sans-serif; font-size: 0.95rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-secondary { background: var(--light-gray); color: var(--dark); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover { background: #eff6ff; }
+        .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
+
+        /* ===== PRINT PREVIEW ===== */
+        .print-area {
+            background: white; border: 2px dashed var(--border); border-radius: 10px;
+            padding: 2rem; margin-top: 1.5rem; font-family: 'Sarabun', sans-serif;
+        }
+        .print-header { text-align: center; margin-bottom: 1.5rem; }
+        .print-company { font-family: 'Kanit', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--dark); }
+        .print-address { font-size: 0.88rem; color: var(--gray); margin-top: 0.25rem; }
+        .print-title { font-size: 1.1rem; font-weight: 700; text-decoration: underline; margin: 1rem 0; }
+        .print-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 2rem; margin: 1rem 0; font-size: 0.88rem; }
+        .print-info-row { display: flex; gap: 0.5rem; }
+        .print-info-label { font-weight: 600; white-space: nowrap; }
+        .print-signature { display: flex; justify-content: flex-end; margin-top: 3rem; }
+        .print-sig-box { text-align: center; min-width: 200px; }
+        .print-sig-line { border-top: 1px solid var(--dark); margin-top: 3rem; padding-top: 0.5rem; font-size: 0.88rem; }
+
+        /* ===== STEP INDICATOR ===== */
+        .steps {
+            display: flex; gap: 0; margin-bottom: 2rem; overflow-x: auto;
+        }
+        .step {
+            display: flex; flex-direction: column; align-items: center;
+            flex: 1; padding: 1rem 0.5rem; background: white;
+            border-top: 3px solid var(--border); font-size: 0.82rem; text-align: center;
+            color: var(--gray); position: relative;
+        }
+        .step:not(:last-child)::after {
+            content: '→'; position: absolute; right: -8px; top: 50%; transform: translateY(-50%);
+            color: var(--gray); font-size: 1rem; z-index: 1;
+        }
+        .step.active { border-top-color: var(--primary); color: var(--primary); }
+        .step.done { border-top-color: var(--success); color: var(--success); }
+        .step-num {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--border); color: var(--gray);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.85rem; margin-bottom: 0.4rem;
+        }
+        .step.active .step-num { background: var(--primary); color: white; }
+        .step.done .step-num { background: var(--success); color: white; }
+
+        /* ===== ALERT ===== */
+        .alert {
+            padding: 0.875rem 1.25rem; border-radius: 8px; margin-bottom: 1rem;
+            font-size: 0.9rem; display: flex; align-items: flex-start; gap: 0.5rem;
+        }
+        .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+        .alert-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+        .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #065f46; }
+
+        /* ===== SUMMARY BOX ===== */
+        .summary-box {
+            background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;
+            padding: 1rem 1.25rem; margin: 1rem 0;
+        }
+        .summary-row {
+            display: flex; justify-content: space-between; padding: 0.35rem 0;
+            border-bottom: 1px dashed var(--border); font-size: 0.9rem;
+        }
+        .summary-row:last-child { border-bottom: none; font-weight: 700; font-size: 1rem; }
+        .summary-row label { color: var(--gray); }
+
+        /* ===== A4 INLINE DOCUMENT ===== */
+        .doc-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1rem; padding: 0.875rem 1.25rem;
+            background: white; border-radius: 10px; border: 1px solid var(--border);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            flex-wrap: wrap; gap: 0.75rem;
+        }
+        .doc-controls-left { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+        .doc-controls label { font-weight: 600; font-size: 0.9rem; color: var(--dark); white-space: nowrap; }
+        .doc-controls select {
+            padding: 0.45rem 0.85rem; border: 1.5px solid var(--border); border-radius: 7px;
+            font-family: 'Sarabun', sans-serif; font-size: 0.9rem; background: #fafafa; cursor: pointer;
+        }
+        .doc-a4 {
+            background: white; max-width: 21cm; min-height: 26cm;
+            margin: 0 auto 2rem; padding: 1.2cm 1.8cm;
+            box-shadow: 0 4px 28px rgba(0,0,0,0.14); border: 1px solid #ccc;
+        }
+        .doc-letterhead {
+            text-align: center; margin-bottom: 1.2rem;
+            padding-bottom: 0.75rem; border-bottom: 3px double var(--dark);
+        }
+        .doc-lh-company { font-family: 'Kanit', sans-serif; font-size: 1.3rem; font-weight: 700; }
+        .doc-lh-addr { font-size: 0.82rem; color: var(--gray); margin-top: 0.1rem; }
+        .doc-lh-title { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.1em; text-decoration: underline; margin-top: 0.5rem; }
+        .doc-f {
+            border: none; border-bottom: 1px solid #555;
+            background: transparent; font-family: inherit; font-size: inherit;
+            padding: 0 3px 1px; outline: none; color: var(--dark); display: inline-block;
+        }
+        .doc-f:focus { border-bottom-color: var(--primary); background: #eff6ff; border-radius: 3px 3px 0 0; }
+        .doc-f::placeholder { color: #aaa; font-style: italic; font-size: 0.88em; }
+        textarea.doc-f { border: 1px solid #999; border-radius: 3px; padding: 4px 6px; vertical-align: top; }
+        .doc-header-grid {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 0.75rem; font-size: 0.9rem;
+        }
+        .doc-info-lines { font-size: 0.9rem; margin-bottom: 0.75rem; }
+        .doc-info-lines .doc-row { display: flex; align-items: center; gap: 0.35rem; line-height: 2.2; }
+        .doc-info-lines .doc-lbl { font-weight: 700; white-space: nowrap; min-width: 205px; }
+        .doc-tbl { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 0.75rem 0; }
+        .doc-tbl th {
+            background: #1a2f5e; color: white; padding: 0.45rem 0.5rem;
+            text-align: center; font-size: 0.78rem; line-height: 1.3;
+        }
+        .doc-tbl td { padding: 0.35rem 0.45rem; border: 1px solid #bbb; vertical-align: middle; }
+        .doc-tbl tfoot td { background: #eef2f7; font-weight: 700; }
+        .tf {
+            border: none; background: transparent; font-family: inherit; font-size: inherit;
+            padding: 1px 3px; outline: none; width: 100%; text-align: right; display: block;
+        }
+        .tf:focus { background: #eff6ff; outline: 1px solid var(--primary); border-radius: 2px; }
+        .tf-desc { text-align: left !important; }
+        .doc-tbl td.num { text-align: right; }
+        .doc-footer { margin-top: 0.75rem; font-size: 0.88rem; line-height: 1.9; }
+        .doc-sig-area { display: flex; justify-content: flex-end; margin-top: 2rem; }
+        .doc-sig-block { text-align: center; min-width: 220px; font-size: 0.88rem; }
+        .doc-sig-line { border-top: 1px solid #333; margin-top: 2.5rem; padding-top: 0.4rem; font-weight: 600; }
+        .doc-parties { font-size: 0.9rem; margin-bottom: 0.75rem; line-height: 2.2; }
+        .doc-parties .party-label { font-weight: 700; min-width: 120px; display: inline-block; }
+        .doc-terms .term-row { display: flex; align-items: center; gap: 0.35rem; line-height: 2.2; }
+        .doc-terms .term-label { font-weight: 700; min-width: 175px; white-space: nowrap; }
+        .doc-sig-area-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 3rem; }
+        .doc-sig-block-2 { text-align: center; font-size: 0.88rem; }
+        .doc-sig-line-2 { border-top: 1px solid #333; margin-top: 2.5rem; padding-top: 0.4rem; }
+
+        @media print {
+            .header, .nav-tabs, .btn-row, .no-print, .doc-controls { display: none !important; }
+            .print-area { border: none; padding: 0; }
+            .doc-a4 { box-shadow: none; border: none; padding: 0.5cm 1.2cm; margin: 0; max-width: none; min-height: auto; }
+            .doc-f { border-bottom-color: transparent !important; background: transparent !important; }
+            body { background: white; }
+            .container { padding: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .form-row-3, .form-row-2 { grid-template-columns: 1fr; }
+            .doc-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-left">
+        <div class="header-logo">MCK</div>
+        <div>
+            <h1>ทีมเอกสาร <small>MCK International Trading Co., Ltd.</small></h1>
+        </div>
+    </div>
+    <div style="display:flex;gap:.5rem;align-items:center">
+        <a href="datacenter.html" class="back-btn" style="background:rgba(255,255,255,0.1)">🗄️ Datacenter</a>
+        <a href="index.html" class="back-btn">← หน้าหลัก</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- NAV TABS -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('dashboard')">📋 ภาพรวมเอกสาร</button>
+        <button class="nav-tab" onclick="showTab('invoice')">📄 Invoice / Packing List</button>
+        <button class="nav-tab" onclick="showTab('contract')">📝 Sales Contract</button>
+        <button class="nav-tab" onclick="showTab('pc')">🌿 Phytosanitary Cert.</button>
+        <button class="nav-tab" onclick="showTab('co')">🏷️ CO Form E</button>
+        <button class="nav-tab" onclick="showTab('lab')">🔬 Lab Test Report</button>
+        <button class="nav-tab" onclick="showTab('carriage')">🚛 Carriage Agreement</button>
+    </div>
+
+    <!-- ===== TAB 1: DASHBOARD ===== -->
+    <div id="tab-dashboard" class="tab-content active">
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>📦 รายการเอกสารสำหรับการส่งออกทุเรียน</h2>
+                    <div class="card-header-sub">บริษัท เอ็มซีเค อินเตอร์เนชั่นแนล เทรดดิ้ง จำกัด | ส่งออกไปจีนผ่านด่านมิตรภาพ</div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                ℹ️ <span>เอกสารแบ่งเป็น 3 ประเภท: <strong>จำเป็น (ต้องมีทุกครั้ง)</strong> · <strong>ทางเลือก (ขึ้นกับผู้ซื้อ)</strong> · <strong>ใบรับรอง (อ้างอิง/แนบ)</strong></span>
+            </div>
+
+            <!-- Document Cards -->
+            <div class="doc-grid">
+                <div class="doc-card required" onclick="showTab('invoice')">
+                    <div class="doc-icon">📄</div>
+                    <div class="doc-title">Invoice / Packing List</div>
+                    <div class="doc-sub">ใบแจ้งหนี้ + ใบตราส่งสินค้า</div>
+                    <span class="doc-badge badge-required">จำเป็น</span>
+                </div>
+                <div class="doc-card required" onclick="showTab('contract')">
+                    <div class="doc-icon">📝</div>
+                    <div class="doc-title">Sales Contract</div>
+                    <div class="doc-sub">สัญญาซื้อขายระหว่างประเทศ</div>
+                    <span class="doc-badge badge-required">จำเป็น</span>
+                </div>
+                <div class="doc-card required" onclick="showTab('pc')">
+                    <div class="doc-icon">🌿</div>
+                    <div class="doc-title">Phytosanitary Certificate</div>
+                    <div class="doc-sub">ใบรับรองสุขอนามัยพืช (PC)</div>
+                    <span class="doc-badge badge-required">จำเป็น</span>
+                </div>
+                <div class="doc-card required" onclick="showTab('co')">
+                    <div class="doc-icon">🏷️</div>
+                    <div class="doc-title">CO Form E</div>
+                    <div class="doc-sub">ใบรับรองแหล่งกำเนิดสินค้า ACFTA</div>
+                    <span class="doc-badge badge-required">จำเป็น</span>
+                </div>
+                <div class="doc-card required" onclick="showTab('lab')">
+                    <div class="doc-icon">🔬</div>
+                    <div class="doc-title">Lab Test Report</div>
+                    <div class="doc-sub">ผลทดสอบ Cd + Auramine O</div>
+                    <span class="doc-badge badge-required">จำเป็น</span>
+                </div>
+                <div class="doc-card optional" onclick="showTab('carriage')">
+                    <div class="doc-icon">🚛</div>
+                    <div class="doc-title">Carriage Agreement</div>
+                    <div class="doc-sub">สัญญาขนส่ง (国际承运协议)</div>
+                    <span class="doc-badge badge-optional">เอกสารขนส่ง</span>
+                </div>
+                <div class="doc-card cert">
+                    <div class="doc-icon">🏅</div>
+                    <div class="doc-title">GMP Certificate</div>
+                    <div class="doc-sub">TAS 9047 + TAS 9070 (UIC)</div>
+                    <span class="doc-badge badge-cert">ใบรับรองโรงงาน</span>
+                </div>
+                <div class="doc-card cert">
+                    <div class="doc-icon">📋</div>
+                    <div class="doc-title">DOA Registration</div>
+                    <div class="doc-sub">กรมวิชาการเกษตร DOA 59000</div>
+                    <span class="doc-badge badge-cert">ทะเบียนโรงงาน</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist per Shipment -->
+        <div class="card">
+            <div class="card-header">
+                <h2>✅ Checklist ต่อตู้ Container</h2>
+                <div style="font-size:0.85rem;color:var(--gray)">เรียงตามลำดับการจัดเตรียม</div>
+            </div>
+            <ul class="checklist">
+                <li>
+                    <span class="check-icon">1️⃣</span>
+                    <div class="check-label">
+                        <strong>Sales Contract</strong>
+                        <small>ทำก่อน — กำหนดราคา ปริมาณ เงื่อนไขการชำระ</small>
+                    </div>
+                    <span class="check-status status-required">จำเป็น</span>
+                </li>
+                <li>
+                    <span class="check-icon">2️⃣</span>
+                    <div class="check-label">
+                        <strong>Invoice / Packing List (USD FOB หรือ CNY CNF)</strong>
+                        <small>ออกเลข Invoice NO. เช่น M-PGIT25N128 หรือ M-SAC25N004</small>
+                    </div>
+                    <span class="check-status status-required">จำเป็น</span>
+                </li>
+                <li>
+                    <span class="check-icon">3️⃣</span>
+                    <div class="check-label">
+                        <strong>Lab Test Report — Cadmium (Cd)</strong>
+                        <small>ผลทดสอบแคดเมียม &lt; 0.05 mg/kg ส่ง AMARC หรือห้องแล็บที่รับรอง</small>
+                    </div>
+                    <span class="check-status status-required">จำเป็น</span>
+                </li>
+                <li>
+                    <span class="check-icon">4️⃣</span>
+                    <div class="check-label">
+                        <strong>Lab Test Report — Auramine O (Basic Yellow 2)</strong>
+                        <small>ผลทดสอบสีเหลือง — Not Detected ในเนื้อและเปลือกทุเรียน</small>
+                    </div>
+                    <span class="check-status status-required">จำเป็น</span>
+                </li>
+                <li>
+                    <span class="check-icon">5️⃣</span>
+                    <div class="check-label">
+                        <strong>Phytosanitary Certificate (PC) — Form P.Q. 7-1</strong>
+                        <small>ขอที่สถานีกักกันพืช ด่านนครพนม วันตรวจ = ก่อนออกเดินทาง</small>
+                    </div>
+                    <span class="check-status status-required">จำเป็น</span>
+                </li>
+                <li>
+                    <span class="check-icon">6️⃣</span>
+                    <div class="check-label">
+                        <strong>Certificate of Origin Form E (CO Form E)</strong>
+                        <small>ขอที่กรมการค้าต่างประเทศ ลดภาษีนำเข้าจีน ACFTA</small>
+                    </div>
+                    <span class="check-status status-required">จำเป็น</span>
+                </li>
+                <li>
+                    <span class="check-icon">7️⃣</span>
+                    <div class="check-label">
+                        <strong>International Carriage Agreement (国际承运协议)</strong>
+                        <small>สัญญากับผู้รับ — เส้นทางขนส่ง ไทย → ลาว → เวียดนาม → จีน</small>
+                    </div>
+                    <span class="check-status status-optional">ขนส่ง</span>
+                </li>
+                <li>
+                    <span class="check-icon">📎</span>
+                    <div class="check-label">
+                        <strong>แนบ: GMP Certificate (TAS 9047 + TAS 9070)</strong>
+                        <small>หมดอายุ 4 ธ.ค. 2570 — UIC Certification Services, Reg. UT242707R0 / UT242708R0</small>
+                    </div>
+                    <span class="check-status status-cert">ใบรับรอง</span>
+                </li>
+                <li>
+                    <span class="check-icon">📎</span>
+                    <div class="check-label">
+                        <strong>แนบ: DOA Registration (กรมวิชาการเกษตร)</strong>
+                        <small>DOA 59000 10 013565 | หมดอายุ 19 ธ.ค. 2569</small>
+                    </div>
+                    <span class="check-status status-cert">ทะเบียน</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Key Reference -->
+        <div class="card">
+            <div class="card-header"><h2>🔑 ข้อมูลอ้างอิงหลักบริษัท</h2></div>
+            <div class="form-row form-row-3">
+                <div class="summary-box">
+                    <div class="summary-row"><label>ชื่อบริษัท (TH)</label><span>บ. เอ็มซีเค อินเตอร์เนชั่นแนล เทรดดิ้ง จก.</span></div>
+                    <div class="summary-row"><label>ชื่อบริษัท (EN)</label><span>MCK International Trading Co., Ltd.</span></div>
+                    <div class="summary-row"><label>ที่อยู่</label><span>71/2 Moo 7, Na Kha, Lang Suan, Chumphon 86110</span></div>
+                    <div class="summary-row"><label>Tax ID</label><span>0865562000931</span></div>
+                    <div class="summary-row"><label>Tel</label><span>0621955365</span></div>
+                    <div class="summary-row"><label>Email</label><span>jingyikoyii@gmail.com</span></div>
+                </div>
+                <div class="summary-box">
+                    <div class="summary-row"><label>DOA Packing House</label><span>DOA 59000 10 013565</span></div>
+                    <div class="summary-row"><label>GMP TAS 9047</label><span>UT242707R0 (หมดอายุ 4/12/2570)</span></div>
+                    <div class="summary-row"><label>GMP TAS 9070</label><span>UT242708R0 (หมดอายุ 4/12/2570)</span></div>
+                    <div class="summary-row"><label>GAP No.</label><span>AC 03-9001-86-111-002670</span></div>
+                    <div class="summary-row"><label>HS Code ทุเรียน</label><span>0810.60</span></div>
+                    <div class="summary-row"><label>Botanical Name</label><span>Durio Zibethinus</span></div>
+                </div>
+                <div class="summary-box">
+                    <div class="summary-row"><label>ด่านส่งออก</label><span>นครพนม (NAKHON PHANOM)</span></div>
+                    <div class="summary-row"><label>เส้นทาง</label><span>ชุมพร → นครพนม → ท่าแขก → จีน</span></div>
+                    <div class="summary-row"><label>ด่านนำเข้าจีน</label><span>YOUYIGUAN, CHINA</span></div>
+                    <div class="summary-row"><label>ประเภทตู้</label><span>1×40RF (ตู้เย็น)</span></div>
+                    <div class="summary-row"><label>ผู้เซ็น</label><span>MISS PHAKTHINAN THANASOPHONPAISIT</span></div>
+                    <div class="summary-row"><label>สกุลเงิน</label><span>USD (FOB) หรือ CNY (CNF)</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB 2: INVOICE / PACKING LIST ===== -->
+    <div id="tab-invoice" class="tab-content">
+
+        <!-- Control Bar -->
+        <div class="doc-controls no-print">
+            <div class="doc-controls-left">
+                <label>ประเภท:</label>
+                <select id="inv-type" onchange="updateInvType()">
+                    <option value="fob">FOB — USD (ราคา ณ ท่าต้นทาง)</option>
+                    <option value="cnf">CNF — CNY (รวมค่าขนส่งถึงด่าน)</option>
+                </select>
+                <button class="btn btn-outline btn-sm" onclick="resetInvoice()">🔄 ล้างข้อมูล</button>
+                <button class="btn btn-outline btn-sm" onclick="addInvRow()">+ เพิ่มรายการ</button>
+            </div>
+            <div>
+                <button class="btn btn-success" onclick="window.print()">🖨️ พิมพ์เอกสาร</button>
+            </div>
+        </div>
+
+        <!-- A4 Invoice Document -->
+        <div class="doc-a4">
+            <!-- Letterhead -->
+            <div class="doc-letterhead">
+                <div class="doc-lh-company">MCK INTERNATIONAL TRADING CO.,LTD.</div>
+                <div class="doc-lh-addr">71/2 MOO 7 NA KHA, LANG SUAN, CHUMPHON 86110 THAILAND</div>
+                <div class="doc-lh-addr">TEL: 0621955365 &nbsp;|&nbsp; EMAIL: jingyikoyii@gmail.com &nbsp;|&nbsp; TAX ID: 0865562000931</div>
+                <div class="doc-lh-title">INVOICE / PACKING LIST</div>
+            </div>
+
+            <!-- Top: Blank left + ref info right -->
+            <div class="doc-header-grid">
+                <div></div>
+                <div style="font-size:0.88rem;line-height:2.3;text-align:right;">
+                    <div><strong>INVOICE NO.:</strong>&nbsp;<input class="doc-f" id="inv-no" style="width:185px" placeholder="M-___25N___"></div>
+                    <div><strong>DATE:</strong>&nbsp;<input class="doc-f" id="inv-date" type="date" style="width:165px"></div>
+                    <div><strong>CONTAINER NO.:</strong>&nbsp;<input class="doc-f" id="inv-container" style="width:165px" placeholder="YMLU_______"></div>
+                </div>
+            </div>
+
+            <!-- Consignee Block -->
+            <div class="doc-info-lines">
+                <div class="doc-row">
+                    <span class="doc-lbl">CONSIGNEE:</span>
+                    <input class="doc-f" id="inv-consignee" style="flex:1" placeholder="ชื่อบริษัทผู้ซื้อ...">
+                </div>
+                <div class="doc-row">
+                    <span class="doc-lbl">ADD:</span>
+                    <input class="doc-f" id="inv-consignee-addr" style="flex:1" placeholder="ที่อยู่ผู้ซื้อ...">
+                </div>
+                <div class="doc-row">
+                    <span class="doc-lbl">DESTINATION:</span>
+                    <input class="doc-f" id="inv-destination" style="flex:1" placeholder="YOUYIGUAN, CHINA">
+                </div>
+                <div class="doc-row">
+                    <span class="doc-lbl">COUNTRY OF ORIGIN:</span>
+                    <input class="doc-f" id="inv-origin" value="THAILAND" style="width:150px">
+                </div>
+            </div>
+
+            <!-- Items Table (A4 inline) -->
+            <table class="doc-tbl">
+                <thead>
+                    <tr>
+                        <th style="width:38px">ITEM</th>
+                        <th>DESCRIPTION OF GOODS</th>
+                        <th style="width:88px">NET WEIGHT<br>(KGM.)</th>
+                        <th style="width:92px">GROSS WEIGHT<br>(KGM.)</th>
+                        <th style="width:80px">PACKAGE<br>(CTN.)</th>
+                        <th style="width:95px">UNIT PRICE<br>(<span id="inv-currency-hdr">USD</span>/KGM.)</th>
+                        <th style="width:90px"><span id="inv-terms-hdr">USD (FOB)</span></th>
+                        <th class="no-print" style="width:34px"></th>
+                    </tr>
+                </thead>
+                <tbody id="inv-items-body">
+                    <tr>
+                        <td class="num">1</td>
+                        <td><input class="tf tf-desc" placeholder="FRESH DURIAN MONTHONG(AB)"></td>
+                        <td><input class="tf" type="number" step="0.01" min="0" placeholder="0.00" oninput="calcInv()"></td>
+                        <td><input class="tf" type="number" step="0.01" min="0" placeholder="0.00" oninput="calcInv()"></td>
+                        <td><input class="tf" type="number" min="0" placeholder="0" oninput="calcInv()"></td>
+                        <td><input class="tf" type="number" step="0.0001" min="0" placeholder="0.0000" oninput="calcInv()"></td>
+                        <td class="num inv-amount" style="font-weight:600">0.00</td>
+                        <td class="no-print" style="text-align:center"><button class="btn btn-danger btn-sm" onclick="removeInvRow(this)">✕</button></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="num" colspan="2" style="font-weight:700">TOTAL</td>
+                        <td class="num" id="inv-total-nw">0.00</td>
+                        <td class="num" id="inv-total-gw">0.00</td>
+                        <td class="num" id="inv-total-cartons">0</td>
+                        <td></td>
+                        <td class="num" id="inv-total-amount" style="font-weight:700">0.00</td>
+                        <td class="no-print"></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <!-- Footer Summary -->
+            <div class="doc-footer">
+                <div><strong>SHIPPING MARKS:</strong> NO SHIPPING MARKS</div>
+                <div>
+                    <strong><span id="inv-terms-footer">FOB</span> /</strong>
+                    <input class="doc-f" id="inv-port" style="width:230px" placeholder="NAKHON PHANOM, THAILAND">
+                </div>
+                <div><strong>TOTAL QUANTITY</strong> <span id="inv-sum-cartons">0</span> CARTONS</div>
+                <div><strong>NET WEIGHT</strong> <span id="inv-sum-nw">0.00</span> KGM.</div>
+                <div><strong>GROSS WEIGHT</strong> <span id="inv-sum-gw">0.00</span> KGM.</div>
+            </div>
+
+            <!-- Signature -->
+            <div class="doc-sig-area">
+                <div class="doc-sig-block">
+                    <div class="doc-sig-line">CONSIGNOR</div>
+                    <div style="font-size:0.82rem;margin-top:0.3rem;">MISS PHAKTHINAN THANASOPHONPAISIT</div>
+                    <div style="font-size:0.82rem;">MCK INTERNATIONAL TRADING CO.,LTD.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB 3: SALES CONTRACT ===== -->
+    <div id="tab-contract" class="tab-content">
+
+        <!-- Control Bar -->
+        <div class="doc-controls no-print">
+            <div class="doc-controls-left">
+                <button class="btn btn-outline btn-sm" onclick="resetContract()">🔄 ล้างข้อมูล</button>
+                <button class="btn btn-outline btn-sm" onclick="addCtRow()">+ เพิ่มรายการ</button>
+            </div>
+            <div>
+                <button class="btn btn-success" onclick="window.print()">🖨️ พิมพ์เอกสาร</button>
+            </div>
+        </div>
+
+        <!-- A4 Sales Contract Document -->
+        <div class="doc-a4">
+            <!-- Letterhead -->
+            <div class="doc-letterhead">
+                <div class="doc-lh-company">MCK INTERNATIONAL TRADING CO.,LTD.</div>
+                <div class="doc-lh-addr">71/2 MOO 7 NA KHA, LANG SUAN, CHUMPHON 86110 THAILAND</div>
+                <div class="doc-lh-title">SALES CONTRACT</div>
+            </div>
+
+            <!-- Contract Header Info -->
+            <div style="font-size:0.9rem;line-height:2.4;margin-bottom:0.5rem;">
+                <strong>CONTRACT NO.:</strong>&nbsp;<input class="doc-f" id="ct-no" style="width:175px" placeholder="M-SAC25-___">
+                &nbsp;&nbsp;&nbsp;
+                <strong>DATE:</strong>&nbsp;<input class="doc-f" id="ct-date" type="date" style="width:160px">
+                &nbsp;&nbsp;&nbsp;
+                <strong>CONTAINER NO.:</strong>&nbsp;<input class="doc-f" id="ct-container" style="width:160px" placeholder="YMLU_______">
+            </div>
+
+            <!-- Parties -->
+            <div class="doc-parties">
+                <div>
+                    <span class="party-label">THE SELLER:</span>
+                    MCK INTERNATIONAL TRADING CO.,LTD. — 71/2 MOO 7 NA KHA, LANG SUAN, CHUMPHON 86110 THAILAND
+                </div>
+                <div style="display:flex;align-items:center;gap:0.35rem;flex-wrap:wrap;">
+                    <span class="party-label">THE BUYER:</span>
+                    <input class="doc-f" id="ct-buyer" style="width:260px" placeholder="ชื่อบริษัทผู้ซื้อ...">
+                    &nbsp;—&nbsp;
+                    <input class="doc-f" id="ct-buyer-addr" style="flex:1;min-width:180px" placeholder="ที่อยู่ผู้ซื้อ...">
+                </div>
+            </div>
+
+            <div style="font-size:0.9rem;margin-bottom:0.5rem;font-weight:600;">Hereby agree on the following terms and conditions:</div>
+
+            <!-- Items Table -->
+            <table class="doc-tbl">
+                <thead>
+                    <tr>
+                        <th>DESCRIPTION</th>
+                        <th style="width:75px">CARTONS</th>
+                        <th style="width:95px">KGS NET</th>
+                        <th style="width:125px">UNIT PRICE (CNY/KG)</th>
+                        <th style="width:105px">AMOUNT (CNY)</th>
+                        <th class="no-print" style="width:34px"></th>
+                    </tr>
+                </thead>
+                <tbody id="ct-items-body">
+                    <tr>
+                        <td><input class="tf tf-desc" placeholder="FRESH DURIAN MONTHONG(AB)"></td>
+                        <td><input class="tf" type="number" min="0" placeholder="0" oninput="calcContract()"></td>
+                        <td><input class="tf" type="number" step="0.01" min="0" placeholder="0.00" oninput="calcContract()"></td>
+                        <td><input class="tf" type="number" step="0.0001" min="0" placeholder="0.00" oninput="calcContract()"></td>
+                        <td class="num ct-amount" style="font-weight:600">0.00</td>
+                        <td class="no-print" style="text-align:center"><button class="btn btn-danger btn-sm" onclick="removeCtRow(this)">✕</button></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td style="font-weight:700">TOTAL</td>
+                        <td class="num" id="ct-total-cartons">0</td>
+                        <td class="num" id="ct-total-kgs">0.00</td>
+                        <td></td>
+                        <td class="num" id="ct-total-amount" style="font-weight:700">0.00</td>
+                        <td class="no-print"></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <!-- Terms -->
+            <div class="doc-terms">
+                <div class="term-row">
+                    <span class="term-label">LOAD PORT / DESTINATION:</span>
+                    <input class="doc-f" id="ct-route" style="flex:1" value="FROM NAKHON PHANOM, THAILAND TO YOUYIGUAN, CHINA">
+                </div>
+                <div class="term-row">
+                    <span class="term-label">COMMODITY:</span>
+                    <input class="doc-f" id="ct-commodity" style="width:250px" value="FRESH DURIAN">
+                </div>
+                <div class="term-row">
+                    <span class="term-label">PACKING:</span>
+                    <input class="doc-f" id="ct-packing" style="width:200px" value="CARTONS">
+                </div>
+                <div class="term-row">
+                    <span class="term-label">DELIVER:</span>
+                    <input class="doc-f" id="ct-deliver" style="flex:1" value="BY TRUCK TO YOUYIGUAN, CHINA">
+                </div>
+                <div class="term-row">
+                    <span class="term-label">PAYMENT TERMS:</span>
+                    <input class="doc-f" id="ct-payment" style="flex:1" placeholder="PAYMENT IN PARTIAL ACCEPTABLE BEFORE END OF DECEMBER 2025">
+                </div>
+                <div class="term-row" style="align-items:flex-start;margin-top:0.25rem;">
+                    <span class="term-label" style="line-height:2.2;">TERMS &amp; CONDITIONS:</span>
+                    <textarea class="doc-f" id="ct-terms" style="flex:1;resize:vertical;min-height:56px;font-size:0.88rem;">The buyer agrees to accept the goods if the decayed/rotten rate is within 5% of the goods total value, shall not claim from the seller.</textarea>
+                </div>
+            </div>
+
+            <!-- Signature Block -->
+            <div class="doc-sig-area-2">
+                <div class="doc-sig-block-2">
+                    <div class="doc-sig-line-2">ACCEPTED BY BUYER</div>
+                </div>
+                <div class="doc-sig-block-2">
+                    <div class="doc-sig-line-2">CONFIRMED BY SUPPLIER<br><strong>MCK INTERNATIONAL TRADING CO.,LTD.</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB 4: PHYTOSANITARY CERTIFICATE ===== -->
+    <div id="tab-pc" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>🌿 Phytosanitary Certificate (PC)</h2>
+                    <div class="card-header-sub">ใบรับรองสุขอนามัยพืช | กรมวิชาการเกษตร Form P.Q. 7-1</div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                ⚠️ <span><strong>สำคัญ:</strong> PC ออกโดยสถานีกักกันพืช ด่านนครพนม (NAKHON PHANOM PLANT QUARANTINE STATION) เท่านั้น — แบบฟอร์มนี้ใช้เตรียมข้อมูลเพื่อยื่นขอ PC จริง</span>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">ข้อมูลหลัก</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label>PC No. (กรอกเมื่อได้รับ)</label>
+                        <input type="text" id="pc-no" placeholder="เช่น TH6809027709">
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่ตรวจสอบ (Date of Inspection)</label>
+                        <input type="date" id="pc-inspect-date">
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่ออก (Date of Issue)</label>
+                        <input type="date" id="pc-issue-date">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">ผู้ส่งออก / ผู้รับ</div>
+                <div class="form-row form-row-2">
+                    <div class="form-group">
+                        <label>1. ผู้ส่งออก (Exporter)</label>
+                        <textarea id="pc-exporter">MCK INTERNATIONAL TRADING CO.,LTD.
+71/2 MOO 7 NA KHA, LANG SUAN, CHUMPHON 86110 THAILAND
+TEL: 0621955365 EMAIL: jingyikoyii@gmail.com
+TAX ID: 0865562000931</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>2. ผู้รับ (Consignee)</label>
+                        <textarea id="pc-consignee" placeholder="ชื่อ และที่อยู่ผู้รับสินค้าในจีน..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">รายละเอียดสินค้า</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label>3. จำนวนกล่อง (No. of Packages)</label>
+                        <input type="text" id="pc-packages" placeholder="เช่น 1,662 CARTON(S)">
+                    </div>
+                    <div class="form-group">
+                        <label>4. Distinguishing Marks</label>
+                        <input type="text" id="pc-marks" placeholder="เช่น NO MARK / YMLU2333371 TH-DOA 1-33985">
+                    </div>
+                    <div class="form-group">
+                        <label>8. สินค้าและปริมาณ</label>
+                        <input type="text" id="pc-goods" placeholder="เช่น DURIAN 14,924.0000 KG(S)">
+                    </div>
+                    <div class="form-group">
+                        <label>9. Botanical Name</label>
+                        <input type="text" id="pc-botanical" value="DURIO ZIBETHINUS">
+                    </div>
+                    <div class="form-group">
+                        <label>5. Place of Origin</label>
+                        <input type="text" id="pc-origin" value="THAILAND">
+                    </div>
+                    <div class="form-group">
+                        <label>6. Means of Conveyance</label>
+                        <input type="text" id="pc-conveyance" value="ROAD TRANSPORT, BY TRUCK">
+                    </div>
+                    <div class="form-group">
+                        <label>7. Point of Entry</label>
+                        <input type="text" id="pc-entry" value="YOUYIGUAN, CHINA (SEE THE ATTACHMENT)">
+                    </div>
+                    <div class="form-group">
+                        <label>Container No.</label>
+                        <input type="text" id="pc-container" placeholder="เช่น YMLU2333371">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Additional Declaration (แนบ Form P.Q. 7-2)</div>
+                <div class="form-group">
+                    <label>ข้อความ Additional Declaration</label>
+                    <textarea id="pc-decl" style="min-height:120px;">DURIO ZIBETHINUS
+THIS FRUIT IS IN COMPLIANCE WITH THE PROTOCOL ON INSPECTION AND QUARANTINE CONDITIONS OF TROPICAL FRUITS TO BE EXPORTED FROM THAILAND TO CHINA AND THE PROTOCOL ON THE INSPECTION AND QUARANTINE REQUIREMENTS FOR EXPORTATION AND IMPORTATION OF FRUITS BETWEEN THAILAND AND CHINA THROUGH TERRITORIES OF THE THIRD COUNTRIES.
+DURIAN WAS PACKED AT THE PACKING HOUSE APPROVE BY DEPARTMENT OF AGRICULTURE THAILAND, REGISTRATION NO.: DOA 59000 10 013565</textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">รายละเอียดสินค้าใน Attachment (Form P.Q. 7-2)</div>
+                <div class="alert alert-info">ℹ️ กรอกรายการแยกย่อยตามล็อต เช่น ล็อต 1 = 23 cartons, NW 207 KGS, GW 241.5 KGS</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Description</th><th>CARTONS</th><th>N.W. (KGS)</th><th>G.W. (KGS)</th><th></th></tr>
+                        </thead>
+                        <tbody id="pc-lots-body">
+                            <tr>
+                                <td>1</td>
+                                <td><input class="table-input" value="FRESH DURIAN"></td>
+                                <td><input class="table-input" type="number" placeholder="0"></td>
+                                <td><input class="table-input" type="number" placeholder="0.00"></td>
+                                <td><input class="table-input" type="number" placeholder="0.00"></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">✕</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="addPCLot()">+ เพิ่มล็อต</button>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="generatePCPreview()">👁️ ดูข้อมูลสรุป</button>
+                <button class="btn btn-success" onclick="window.print()">🖨️ พิมพ์</button>
+            </div>
+        </div>
+
+        <div class="card" id="pc-preview" style="display:none;">
+            <div class="card-header"><h2>👁️ ข้อมูลสรุป — Phytosanitary Certificate</h2></div>
+            <div class="print-area" id="pc-print-content"></div>
+        </div>
+    </div>
+
+    <!-- ===== TAB 5: CO FORM E ===== -->
+    <div id="tab-co" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>🏷️ Certificate of Origin — Form E (ACFTA)</h2>
+                    <div class="card-header-sub">ใบรับรองแหล่งกำเนิดสินค้า ASEAN-China Free Trade Area</div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                ⚠️ <span><strong>สำคัญ:</strong> CO Form E ออกโดย <strong>กรมการค้าต่างประเทศ</strong> (Department of Foreign Trade) เท่านั้น — แบบฟอร์มนี้ใช้เตรียมข้อมูล</span>
+            </div>
+
+            <div class="form-section">
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label>Reference No. (กรอกเมื่อได้รับ)</label>
+                        <input type="text" id="co-refno" placeholder="เช่น E2025-98A-004943776">
+                    </div>
+                    <div class="form-group">
+                        <label>Form E No.</label>
+                        <input type="text" id="co-formno" placeholder="เช่น 0814232">
+                    </div>
+                    <div class="form-group">
+                        <label>วันออกเดินทาง (Departure Date)</label>
+                        <input type="date" id="co-dep-date">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">1. ผู้ส่งออก — Products Consigned From</div>
+                <div class="form-group">
+                    <textarea id="co-exporter">MCK INTERNATIONAL TRADING CO.,LTD.
+71/2 MOO 7 NA KHA, LANG SUAN, CHUMPHON 86110 THAILAND
+TEL: 0621955365  Email: jingyikoyii@gmail.com  TAX ID: 0865562000931</textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">2. ผู้รับสินค้า — Products Consigned To</div>
+                <div class="form-group">
+                    <textarea id="co-consignee" placeholder="ชื่อและที่อยู่ผู้รับในจีน..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">3. การขนส่ง</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label>Means of Transport</label>
+                        <input type="text" id="co-transport" value="BY TRUCK">
+                    </div>
+                    <div class="form-group">
+                        <label>Port of Discharge</label>
+                        <input type="text" id="co-port" value="YOUYIGUAN, PEOPLE'S REPUBLIC OF CHINA">
+                    </div>
+                    <div class="form-group">
+                        <label>Invoice No. อ้างอิง</label>
+                        <input type="text" id="co-inv-ref" placeholder="เช่น M-SAC25N004">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">5-10. รายการสินค้า</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Marks & No.</th>
+                                <th>Description / HS Code</th>
+                                <th>Origin Criteria</th>
+                                <th>Gross Weight (KGM)</th>
+                                <th>CARTONS</th>
+                                <th>Amount (USD)</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="co-items-body">
+                            <tr>
+                                <td>1</td>
+                                <td><input class="table-input" value="N/M"></td>
+                                <td><input class="table-input" placeholder="HS.CODE 0810.60 FRESH DURIAN..."></td>
+                                <td><input class="table-input" value="WO" style="width:60px"></td>
+                                <td><input class="table-input" type="number" placeholder="0.00"></td>
+                                <td><input class="table-input" type="number" placeholder="0"></td>
+                                <td><input class="table-input" type="number" placeholder="0.00"></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">✕</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="addCoRow()">+ เพิ่มรายการ</button>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">11. Declaration / 12. Certification</div>
+                <div class="form-row form-row-2">
+                    <div class="form-group">
+                        <label>สถานที่และวันที่ลงนาม Exporter</label>
+                        <input type="text" id="co-place-exp" placeholder="เช่น CHUMPHON 86110 29/09/2025">
+                    </div>
+                    <div class="form-group">
+                        <label>สถานที่และวันที่ Certifying Authority</label>
+                        <input type="text" id="co-place-cert" placeholder="เช่น NAKHON PHANOM 29/09/2025">
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary">👁️ ดูตัวอย่าง</button>
+                <button class="btn btn-success" onclick="window.print()">🖨️ พิมพ์</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB 6: LAB TEST ===== -->
+    <div id="tab-lab" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>🔬 Lab Test Report — ผลการวิเคราะห์</h2>
+                    <div class="card-header-sub">AMARC หรือห้องปฏิบัติการที่รับรอง ISO/IEC 17025</div>
+                </div>
+            </div>
+
+            <div class="alert alert-danger">
+                🚨 <span><strong>เงื่อนไขจีน:</strong> ต้องทดสอบ <strong>2 รายการ</strong> ทุกตู้: (1) Cadmium (Cd) &lt; 0.05 mg/kg และ (2) Auramine O (Basic Yellow 2) = Not Detected ทั้งเนื้อและเปลือก</span>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">ข้อมูลการส่งตัวอย่าง</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label>ชื่อผู้ส่งตรวจ (Client)</label>
+                        <input type="text" id="lab-client" value="MCK INTERNATIONAL TRADING CO.,LTD.">
+                    </div>
+                    <div class="form-group">
+                        <label>Sample Code</label>
+                        <input type="text" id="lab-code" placeholder="เช่น 25-77904-001">
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่เก็บตัวอย่าง (Sampling Date)</label>
+                        <input type="date" id="lab-sample-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Packing House</label>
+                        <input type="text" id="lab-ph" value="DOA 59000 10 013565">
+                    </div>
+                    <div class="form-group">
+                        <label>Container No.</label>
+                        <input type="text" id="lab-container" placeholder="เช่น YMLU2333371">
+                    </div>
+                    <div class="form-group">
+                        <label>GAP No.</label>
+                        <input type="text" id="lab-gap" value="AC 03-9001-86-111-002670">
+                    </div>
+                    <div class="form-group">
+                        <label>P.Q. 7 No.</label>
+                        <input type="text" id="lab-pq7" placeholder="เช่น NP 680 925 984">
+                    </div>
+                    <div class="form-group">
+                        <label>Sample Condition</label>
+                        <input type="text" id="lab-condition" value="Sample is contained in paper box.">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">ผลทดสอบ 1 — Cadmium (Cd)</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label>Report No.</label>
+                        <input type="text" id="lab-cd-rptno" placeholder="เช่น 25-177346">
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่ออก Report</label>
+                        <input type="date" id="lab-cd-date">
+                    </div>
+                    <div class="form-group">
+                        <label>ผลทดสอบ (Result)</label>
+                        <select id="lab-cd-result">
+                            <option value="pass">&lt; 0.0100 mg/kg — PASS ✅</option>
+                            <option value="fail">เกินเกณฑ์ — FAIL ❌</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">ผลทดสอบ 2 — Auramine O / Basic Yellow 2</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label>Report No.</label>
+                        <input type="text" id="lab-au-rptno" placeholder="เช่น 25-177437">
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่ออก Report</label>
+                        <input type="date" id="lab-au-date">
+                    </div>
+                    <div class="form-group">
+                        <label>ผลทดสอบ Durian Shell</label>
+                        <select id="lab-au-shell">
+                            <option value="nd">Not Detected — PASS ✅</option>
+                            <option value="det">Detected — FAIL ❌</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ผลทดสอบ Durian Pulp</label>
+                        <select id="lab-au-pulp">
+                            <option value="nd">Not Detected — PASS ✅</option>
+                            <option value="det">Detected — FAIL ❌</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="summary-box">
+                <div class="summary-row"><label>Cadmium (Cd)</label><span id="lab-sum-cd" style="color:var(--success);font-weight:700">ยังไม่กรอกข้อมูล</span></div>
+                <div class="summary-row"><label>Auramine O — Shell</label><span id="lab-sum-shell" style="color:var(--success);font-weight:700">ยังไม่กรอกข้อมูล</span></div>
+                <div class="summary-row"><label>Auramine O — Pulp</label><span id="lab-sum-pulp" style="color:var(--success);font-weight:700">ยังไม่กรอกข้อมูล</span></div>
+                <div class="summary-row"><label>สถานะโดยรวม</label><span id="lab-sum-overall" style="font-weight:700">—</span></div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="updateLabSummary()">🔄 อัปเดตสรุปผล</button>
+                <button class="btn btn-success" onclick="window.print()">🖨️ พิมพ์บันทึก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB 7: CARRIAGE AGREEMENT ===== -->
+    <div id="tab-carriage" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>🚛 International Carriage Agreement — 国际承运协议</h2>
+                    <div class="card-header-sub">สัญญาขนส่งระหว่างประเทศ | ผู้ขนส่ง ↔ ผู้รับ</div>
+                </div>
+                <button class="btn btn-success btn-sm" onclick="generateCarriagePreview()">👁️ Preview</button>
+            </div>
+
+            <div class="form-section">
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label>Agreement No. (协议编号) <span class="req">*</span></label>
+                        <input type="text" id="ca-no" placeholder="เช่น M-SAC25-004">
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่ (签订日期) <span class="req">*</span></label>
+                        <input type="date" id="ca-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Container No. (集装箱号)</label>
+                        <input type="text" id="ca-container" placeholder="เช่น YMLU2333371">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">ผู้รับ (收货方 / Consignee)</div>
+                <div class="form-row form-row-2">
+                    <div class="form-group">
+                        <label>ชื่อผู้รับ</label>
+                        <input type="text" id="ca-consignee" placeholder="ชื่อบริษัท">
+                    </div>
+                    <div class="form-group">
+                        <label>ที่อยู่ผู้รับ</label>
+                        <textarea id="ca-consignee-addr" placeholder="ที่อยู่เต็ม..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">เส้นทางขนส่ง (运输路线)</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label>จุดรับสินค้า (Place of Receipt)</label>
+                        <input type="text" id="ca-receipt" value="CHUMPHON, THAILAND">
+                    </div>
+                    <div class="form-group">
+                        <label>ท่าส่งออก (Port of Loading)</label>
+                        <input type="text" id="ca-load" value="NAKHON PHANOM, THAILAND">
+                    </div>
+                    <div class="form-group">
+                        <label>ท่าปลายทาง (Port of Destination)</label>
+                        <input type="text" id="ca-dest" value="YOUYIGUAN, CHINA">
+                    </div>
+                    <div class="form-group">
+                        <label>ประเภทการขนส่ง</label>
+                        <input type="text" id="ca-type" value="公路运输 ROAD TRANSPORT">
+                    </div>
+                    <div class="form-group">
+                        <label>ทางผ่าน (Stopover)</label>
+                        <input type="text" id="ca-via" value="THAKHEK, LAOS / QUANG BINH, VIETNAM">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>เส้นทางเต็ม (Transportation Route)</label>
+                    <textarea id="ca-route">CHUMPHON, THAILAND - NAKHON PHANOM (THAILAND) - THAKHEK, LAOS - CHALO - HA TINH - THANH HOA - HA NOI - LANG SON (VIETNAM) - YOUYIGUAN, CHINA</textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">ข้อมูลสินค้า (商品信息)</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Marks (唛头)</th><th>Description (商品名称)</th><th>CARTONS (件数)</th><th>N.W. KGS (净重)</th><th>G.W. KGS (毛重)</th><th></th></tr>
+                        </thead>
+                        <tbody id="ca-items-body">
+                            <tr>
+                                <td><input class="table-input" value="N/M"></td>
+                                <td><input class="table-input" value="鲜榴莲 FRESH DURIAN"></td>
+                                <td><input class="table-input" type="number" placeholder="0"></td>
+                                <td><input class="table-input" type="number" placeholder="0.00"></td>
+                                <td><input class="table-input" type="number" placeholder="0.00"></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">✕</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="addCaRow()">+ เพิ่มรายการ</button>
+            </div>
+
+            <div class="form-section">
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label>วันออก (Date of Issuance)</label>
+                        <input type="date" id="ca-issue">
+                    </div>
+                    <div class="form-group">
+                        <label>วันประมาณถึง (Estimated Arrival)</label>
+                        <input type="date" id="ca-arrive">
+                    </div>
+                    <div class="form-group">
+                        <label>ค่าขนส่ง (Total Freight)</label>
+                        <input type="text" id="ca-freight" value="运输费用已包含在货物成交价格里面">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>หมายเหตุ (其他备注事项)</label>
+                <textarea id="ca-remarks">《中国和泰国进出口水果过境第三国检验检疫要求》(海关总署公告2021年第89号) 相关要求, 本批水果 (鲜榴莲) 已按要求封识挂锁, 且在过境老挝、越南运输期间, 未打开集装箱或更换集装箱。</textarea>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="generateCarriagePreview()">👁️ ดูตัวอย่าง</button>
+                <button class="btn btn-success" onclick="window.print()">🖨️ พิมพ์</button>
+            </div>
+        </div>
+
+        <div class="card" id="carriage-preview" style="display:none;">
+            <div class="card-header"><h2>👁️ Preview — Carriage Agreement</h2></div>
+            <div class="print-area" id="carriage-print-content"></div>
+        </div>
+    </div>
+
+</div><!-- /container -->
+
+<script>
+// ===== TAB NAVIGATION =====
+function showTab(name) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== INVOICE HELPERS =====
+function addInvRow() {
+    const tbody = document.getElementById('inv-items-body');
+    const n = tbody.rows.length + 1;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td class="num">${n}</td>
+        <td><input class="tf tf-desc" placeholder="FRESH DURIAN MONTHONG(AB)"></td>
+        <td><input class="tf" type="number" step="0.01" min="0" placeholder="0.00" oninput="calcInv()"></td>
+        <td><input class="tf" type="number" step="0.01" min="0" placeholder="0.00" oninput="calcInv()"></td>
+        <td><input class="tf" type="number" min="0" placeholder="0" oninput="calcInv()"></td>
+        <td><input class="tf" type="number" step="0.0001" min="0" placeholder="0.0000" oninput="calcInv()"></td>
+        <td class="num inv-amount" style="font-weight:600">0.00</td>
+        <td class="no-print" style="text-align:center"><button class="btn btn-danger btn-sm" onclick="removeInvRow(this)">✕</button></td>`;
+    tbody.appendChild(tr);
+}
+
+function removeInvRow(btn) {
+    btn.closest('tr').remove();
+    calcInv();
+}
+
+function calcInv() {
+    let tc = 0, tnw = 0, tgw = 0, tamt = 0;
+    document.querySelectorAll('#inv-items-body tr').forEach(row => {
+        const nums = row.querySelectorAll('input[type=number]');
+        const nw  = parseFloat(nums[0]?.value) || 0;
+        const gw  = parseFloat(nums[1]?.value) || 0;
+        const cartons = parseFloat(nums[2]?.value) || 0;
+        const up  = parseFloat(nums[3]?.value) || 0;
+        const amt = nw * up;
+        const amtCell = row.querySelector('.inv-amount');
+        if (amtCell) amtCell.textContent = amt.toFixed(2);
+        tc += cartons; tnw += nw; tgw += gw; tamt += amt;
+    });
+    document.getElementById('inv-total-cartons').textContent = tc;
+    document.getElementById('inv-total-nw').textContent = tnw.toFixed(2);
+    document.getElementById('inv-total-gw').textContent = tgw.toFixed(2);
+    document.getElementById('inv-total-amount').textContent = tamt.toFixed(2);
+    document.getElementById('inv-sum-cartons').textContent = tc;
+    document.getElementById('inv-sum-nw').textContent = tnw.toFixed(2);
+    document.getElementById('inv-sum-gw').textContent = tgw.toFixed(2);
+}
+
+function updateInvType() {
+    const type = document.getElementById('inv-type').value;
+    const currency = type === 'fob' ? 'USD' : 'CNY';
+    const terms   = type === 'fob' ? 'FOB' : 'CNF';
+    document.getElementById('inv-currency-hdr').textContent = currency;
+    document.getElementById('inv-terms-hdr').textContent = `${currency} (${terms})`;
+    document.getElementById('inv-terms-footer').textContent = terms;
+}
+
+function resetInvoice() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('inv-no').value = '';
+    document.getElementById('inv-date').value = today;
+    document.getElementById('inv-container').value = '';
+    document.getElementById('inv-port').value = '';
+    document.getElementById('inv-consignee').value = '';
+    document.getElementById('inv-consignee-addr').value = '';
+    document.getElementById('inv-destination').value = '';
+    document.getElementById('inv-origin').value = 'THAILAND';
+    document.getElementById('inv-type').selectedIndex = 0;
+    updateInvType();
+    const tbody = document.getElementById('inv-items-body');
+    tbody.innerHTML = `<tr>
+        <td class="num">1</td>
+        <td><input class="tf tf-desc" placeholder="FRESH DURIAN MONTHONG(AB)"></td>
+        <td><input class="tf" type="number" step="0.01" min="0" placeholder="0.00" oninput="calcInv()"></td>
+        <td><input class="tf" type="number" step="0.01" min="0" placeholder="0.00" oninput="calcInv()"></td>
+        <td><input class="tf" type="number" min="0" placeholder="0" oninput="calcInv()"></td>
+        <td><input class="tf" type="number" step="0.0001" min="0" placeholder="0.0000" oninput="calcInv()"></td>
+        <td class="num inv-amount" style="font-weight:600">0.00</td>
+        <td class="no-print" style="text-align:center"><button class="btn btn-danger btn-sm" onclick="removeInvRow(this)">✕</button></td>
+    </tr>`;
+    calcInv();
+}
+
+// ===== CONTRACT HELPERS =====
+function addCtRow() {
+    const tbody = document.getElementById('ct-items-body');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td><input class="tf tf-desc" placeholder="FRESH DURIAN MONTHONG(AB)"></td>
+        <td><input class="tf" type="number" min="0" placeholder="0" oninput="calcContract()"></td>
+        <td><input class="tf" type="number" step="0.01" min="0" placeholder="0.00" oninput="calcContract()"></td>
+        <td><input class="tf" type="number" step="0.0001" min="0" placeholder="0.00" oninput="calcContract()"></td>
+        <td class="num ct-amount" style="font-weight:600">0.00</td>
+        <td class="no-print" style="text-align:center"><button class="btn btn-danger btn-sm" onclick="removeCtRow(this)">✕</button></td>`;
+    tbody.appendChild(tr);
+}
+
+function removeCtRow(btn) { btn.closest('tr').remove(); calcContract(); }
+
+function calcContract() {
+    let tc = 0, tkgs = 0, tamt = 0;
+    document.querySelectorAll('#ct-items-body tr').forEach(row => {
+        const nums = row.querySelectorAll('input[type=number]');
+        const cartons = parseFloat(nums[0]?.value) || 0;
+        const kgs = parseFloat(nums[1]?.value) || 0;
+        const up  = parseFloat(nums[2]?.value) || 0;
+        const amt = kgs * up;
+        const amtCell = row.querySelector('.ct-amount');
+        if (amtCell) amtCell.textContent = amt.toFixed(2);
+        tc += cartons; tkgs += kgs; tamt += amt;
+    });
+    document.getElementById('ct-total-cartons').textContent = tc;
+    document.getElementById('ct-total-kgs').textContent = tkgs.toFixed(2);
+    document.getElementById('ct-total-amount').textContent = tamt.toFixed(2);
+}
+
+function resetContract() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('ct-no').value = '';
+    document.getElementById('ct-date').value = today;
+    document.getElementById('ct-container').value = '';
+    document.getElementById('ct-buyer').value = '';
+    document.getElementById('ct-buyer-addr').value = '';
+    document.getElementById('ct-payment').value = '';
+    const tbody = document.getElementById('ct-items-body');
+    tbody.innerHTML = `<tr>
+        <td><input class="tf tf-desc" placeholder="FRESH DURIAN MONTHONG(AB)"></td>
+        <td><input class="tf" type="number" min="0" placeholder="0" oninput="calcContract()"></td>
+        <td><input class="tf" type="number" step="0.01" min="0" placeholder="0.00" oninput="calcContract()"></td>
+        <td><input class="tf" type="number" step="0.0001" min="0" placeholder="0.00" oninput="calcContract()"></td>
+        <td class="num ct-amount" style="font-weight:600">0.00</td>
+        <td class="no-print" style="text-align:center"><button class="btn btn-danger btn-sm" onclick="removeCtRow(this)">✕</button></td>
+    </tr>`;
+    calcContract();
+}
+
+// ===== PC HELPERS =====
+function addPCLot() {
+    const tbody = document.getElementById('pc-lots-body');
+    const n = tbody.rows.length + 1;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td>${n}</td>
+        <td><input class="table-input" value="FRESH DURIAN"></td>
+        <td><input class="table-input" type="number" placeholder="0"></td>
+        <td><input class="table-input" type="number" placeholder="0.00"></td>
+        <td><input class="table-input" type="number" placeholder="0.00"></td>
+        <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">✕</button></td>`;
+    tbody.appendChild(tr);
+}
+
+function generatePCPreview() {
+    const pcNo = document.getElementById('pc-no').value || '____________';
+    const inspDate = document.getElementById('pc-inspect-date').value || '____________';
+    const issueDate = document.getElementById('pc-issue-date').value || '____________';
+    document.getElementById('pc-print-content').innerHTML = `
+        <div class="print-header">
+            <div class="print-company">Phytosanitary Certificate</div>
+            <div class="print-address">Department of Agriculture | Ministry of Agriculture and Cooperatives | Form P.Q. 7-1</div>
+        </div>
+        <div class="print-info-grid" style="font-size:0.88rem;">
+            <div><strong>PC No.:</strong> ${pcNo}</div>
+            <div><strong>Date of Inspection:</strong> ${inspDate}</div>
+            <div><strong>Date of Issue:</strong> ${issueDate}</div>
+            <div><strong>Exporter:</strong> ${document.getElementById('pc-exporter').value}</div>
+            <div><strong>Consignee:</strong> ${document.getElementById('pc-consignee').value||'—'}</div>
+            <div><strong>Goods:</strong> ${document.getElementById('pc-goods').value||'—'}</div>
+            <div><strong>Packages:</strong> ${document.getElementById('pc-packages').value||'—'}</div>
+            <div><strong>Container:</strong> ${document.getElementById('pc-container').value||'—'}</div>
+            <div><strong>Botanical:</strong> ${document.getElementById('pc-botanical').value}</div>
+            <div><strong>Point of Entry:</strong> ${document.getElementById('pc-entry').value}</div>
+        </div>
+        <div style="margin-top:1rem;font-size:0.85rem;background:#f0fdf4;padding:1rem;border-radius:6px;">
+            <strong>Additional Declaration:</strong><br>
+            <pre style="white-space:pre-wrap;font-family:inherit;">${document.getElementById('pc-decl').value}</pre>
+        </div>`;
+    document.getElementById('pc-preview').style.display = 'block';
+    document.getElementById('pc-preview').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== CO HELPERS =====
+function addCoRow() {
+    const tbody = document.getElementById('co-items-body');
+    const n = tbody.rows.length + 1;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td>${n}</td>
+        <td><input class="table-input" value="N/M"></td>
+        <td><input class="table-input" placeholder="HS.CODE 0810.60 FRESH DURIAN..."></td>
+        <td><input class="table-input" value="WO" style="width:60px"></td>
+        <td><input class="table-input" type="number" placeholder="0.00"></td>
+        <td><input class="table-input" type="number" placeholder="0"></td>
+        <td><input class="table-input" type="number" placeholder="0.00"></td>
+        <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">✕</button></td>`;
+    tbody.appendChild(tr);
+}
+
+// ===== CARRIAGE HELPERS =====
+function addCaRow() {
+    const tbody = document.getElementById('ca-items-body');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td><input class="table-input" value="N/M"></td>
+        <td><input class="table-input" value="鲜榴莲 FRESH DURIAN"></td>
+        <td><input class="table-input" type="number" placeholder="0"></td>
+        <td><input class="table-input" type="number" placeholder="0.00"></td>
+        <td><input class="table-input" type="number" placeholder="0.00"></td>
+        <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">✕</button></td>`;
+    tbody.appendChild(tr);
+}
+
+function generateCarriagePreview() {
+    const caNo = document.getElementById('ca-no').value || '____________';
+    const date = document.getElementById('ca-date').value || '____________';
+    const container = document.getElementById('ca-container').value || '____________';
+    const consignee = document.getElementById('ca-consignee').value || '____________';
+    const receipt = document.getElementById('ca-receipt').value;
+    const load = document.getElementById('ca-load').value;
+    const dest = document.getElementById('ca-dest').value;
+    const via = document.getElementById('ca-via').value;
+    const route = document.getElementById('ca-route').value;
+    const type = document.getElementById('ca-type').value;
+    const issue = document.getElementById('ca-issue').value || '____________';
+    const arrive = document.getElementById('ca-arrive').value || '____________';
+    const freight = document.getElementById('ca-freight').value;
+    const remarks = document.getElementById('ca-remarks').value;
+
+    let rows = '';
+    document.querySelectorAll('#ca-items-body tr').forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        rows += `<tr>
+            <td style="padding:5px 8px;">${inputs[0]?.value||''}</td>
+            <td style="padding:5px 8px;">${inputs[1]?.value||''}</td>
+            <td style="padding:5px 8px;">${inputs[2]?.value||''}</td>
+            <td style="padding:5px 8px;">${inputs[3]?.value||''}</td>
+            <td style="padding:5px 8px;">${inputs[4]?.value||''}</td>
+        </tr>`;
+    });
+
+    document.getElementById('carriage-print-content').innerHTML = `
+        <div class="print-header">
+            <div class="print-company" style="font-size:1.5rem;">国际承运协议</div>
+            <div class="print-address">International Carriage Agreement</div>
+        </div>
+        <div style="font-size:0.88rem;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
+            <div><strong>承运方 (Carrier):</strong> MCK INTERNATIONAL TRADING CO.,LTD.</div>
+            <div><strong>协议编号:</strong> ${caNo}</div>
+            <div><strong>收货方 (Consignee):</strong> ${consignee}</div>
+            <div><strong>签订日期:</strong> ${date}</div>
+            <div><strong>集装箱号 (Container):</strong> ${container}</div>
+            <div><strong>运输方式:</strong> ${type}</div>
+            <div><strong>收货地:</strong> ${receipt}</div>
+            <div><strong>起运港:</strong> ${load}</div>
+            <div><strong>经停:</strong> ${via}</div>
+            <div><strong>目的港:</strong> ${dest}</div>
+        </div>
+        <div style="font-size:0.85rem;margin-bottom:1rem;background:#f8fafc;padding:0.75rem;border-radius:6px;">
+            <strong>运输路线:</strong> ${route}
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:1rem;">
+            <thead>
+                <tr style="background:#1e40af;color:white;">
+                    <th style="padding:6px 8px;">唛头</th>
+                    <th style="padding:6px 8px;">商品名称</th>
+                    <th style="padding:6px 8px;">件数</th>
+                    <th style="padding:6px 8px;">净重(KGS)</th>
+                    <th style="padding:6px 8px;">毛重(KGS)</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <div style="font-size:0.85rem;margin-bottom:1rem;">
+            <strong>发货日期:</strong> ${issue} &nbsp;|&nbsp;
+            <strong>预计到达:</strong> ${arrive} &nbsp;|&nbsp;
+            <strong>运输费用:</strong> ${freight}
+        </div>
+        <div style="font-size:0.82rem;color:#555;margin-bottom:2rem;background:#fffbeb;padding:0.75rem;border-radius:6px;">
+            <strong>其他备注事项:</strong><br>${remarks}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem;font-size:0.85rem;text-align:center;">
+            <div><div style="border-top:1px solid #000;padding-top:0.5rem;margin-top:3rem;">承运方 (Carrier)</div></div>
+            <div><div style="border-top:1px solid #000;padding-top:0.5rem;margin-top:3rem;">收货方 (Consignee)</div></div>
+        </div>`;
+    document.getElementById('carriage-preview').style.display = 'block';
+    document.getElementById('carriage-preview').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== LAB SUMMARY =====
+function updateLabSummary() {
+    const cdVal = document.getElementById('lab-cd-result').value;
+    const shellVal = document.getElementById('lab-au-shell').value;
+    const pulpVal = document.getElementById('lab-au-pulp').value;
+    const cdEl = document.getElementById('lab-sum-cd');
+    const shellEl = document.getElementById('lab-sum-shell');
+    const pulpEl = document.getElementById('lab-sum-pulp');
+    const overEl = document.getElementById('lab-sum-overall');
+    cdEl.textContent = cdVal === 'pass' ? '< 0.0100 mg/kg — PASS ✅' : 'เกินเกณฑ์ — FAIL ❌';
+    cdEl.style.color = cdVal === 'pass' ? 'var(--success)' : 'var(--danger)';
+    shellEl.textContent = shellVal === 'nd' ? 'Not Detected — PASS ✅' : 'Detected — FAIL ❌';
+    shellEl.style.color = shellVal === 'nd' ? 'var(--success)' : 'var(--danger)';
+    pulpEl.textContent = pulpVal === 'nd' ? 'Not Detected — PASS ✅' : 'Detected — FAIL ❌';
+    pulpEl.style.color = pulpVal === 'nd' ? 'var(--success)' : 'var(--danger)';
+    const allPass = cdVal === 'pass' && shellVal === 'nd' && pulpVal === 'nd';
+    overEl.textContent = allPass ? 'ผ่านทุกรายการ — พร้อมส่งออก ✅' : 'ไม่ผ่าน — ต้องตรวจสอบ ❌';
+    overEl.style.color = allPass ? 'var(--success)' : 'var(--danger)';
+}
+
+// Set today as default for date fields
+document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type=date]').forEach(el => el.value = today);
+    updateLabSummary();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Overview — MCK Logistics</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
+body{font-family:'Sarabun',sans-serif;background:#fff1f2;color:#1e293b;}
+.kanit{font-family:'Kanit',sans-serif;}
+.security-card { background: white; border-radius: 20px; border: 2px solid #fecaca; }
+.chart-bar { background: linear-gradient(to top, #ef4444, #f87171); border-radius: 4px 4px 0 0; min-height: 2px; transition: height 0.6s ease-out; }
+</style>
+</head>
+<body class="p-4 md:p-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-red-800 kanit flex items-center gap-3">
+          <i class="fas fa-shield-virus"></i> Security Overview
+        </h1>
+        <p class="text-red-600 font-semibold text-sm uppercase tracking-wider">สำหรับบอสและผู้ดูแลความปลอดภัยเท่านั้น</p>
+      </div>
+      <a href="index.html" class="bg-white border-2 border-red-200 px-5 py-2.5 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 transition">
+        <i class="fas fa-arrow-left mr-2"></i>กลับหน้าหลัก
+      </a>
+      <div class="flex items-center gap-3" style="background:white; padding:0.5rem 1rem; border-radius:12px; border:1px solid #e2e8f0;">
+      <div class="flex items-center gap-3" style="background:white; padding:0.5rem 1rem; border-radius:12px; border:1px solid #fecaca;">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" 
+             id="user-avatar-display" style="background:#ef4444;">-</div>
+        <div class="text-sm hidden md:block text-right">
+          <span class="text-slate-400 font-bold uppercase text-[10px] block leading-tight">ผู้ใช้งาน</span>
+          <span class="font-bold text-slate-700" id="user-identity">—</span>
+        </div>
+        <button onclick="window.history.back()" class="bg-white border border-red-200 px-4 py-2 rounded-lg text-sm font-bold text-red-600 hover:bg-red-50 transition">
+          <i class="fas fa-arrow-left mr-1"></i> ย้อนกลับ
+        </button>
+        <a href="index.html" id="home-link-security" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700 transition flex items-center gap-2 shadow-md">
+          <i class="fas fa-home"></i> หน้าแรก
+        </a>
+      </div>
+    </div>
+
+    <!-- Weekly Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="security-card p-6 shadow-sm">
+        <p class="text-xs font-bold text-slate-400 uppercase">ใส่รหัสผิด (Login Failed)</p>
+        <h3 class="text-4xl font-bold mt-1 text-red-600 kanit" id="count-failed">0</h3>
+        <p class="text-xs text-slate-400 mt-2 italic">สถิติรวม 7 วันล่าสุด</p>
+      </div>
+      <div class="security-card p-6 shadow-sm">
+        <p class="text-xs font-bold text-slate-400 uppercase">เข้าดูรหัสผ่าน (Secret View)</p>
+        <h3 class="text-4xl font-bold mt-1 text-orange-600 kanit" id="count-secret">0</h3>
+        <p class="text-xs text-slate-400 mt-2 italic">รายการที่ต้องการการตรวจสอบ</p>
+      </div>
+      <div class="security-card p-6 shadow-sm">
+        <p class="text-xs font-bold text-slate-400 uppercase">บัญชีที่ถูกระงับ (Suspended)</p>
+        <h3 class="text-4xl font-bold mt-1 text-slate-800 kanit" id="count-suspended">0</h3>
+        <p class="text-xs text-slate-400 mt-2 italic">สถานะปัจจุบันในระบบ HR</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Activity Chart -->
+      <div class="security-card p-8 shadow-md">
+        <h3 class="text-lg font-bold text-slate-800 mb-6 kanit flex items-center gap-2">
+          <i class="fas fa-chart-area text-red-500"></i> ความเสี่ยงรายวัน (Failed Logins)
+        </h3>
+        <div class="flex items-end gap-3 h-48 border-b-2 border-slate-100 pb-2" id="risk-chart">
+          <!-- JS Rendered Bars -->
+        </div>
+        <div class="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase">
+          <span>6 วันที่แล้ว</span>
+          <span>วันนี้</span>
+        </div>
+      </div>
+
+      <!-- Critical Logs -->
+      <div class="security-card p-8 shadow-md">
+        <h3 class="text-lg font-bold text-slate-800 mb-6 kanit flex items-center gap-2">
+          <i class="fas fa-user-shield text-red-500"></i> รายการเฝ้าระวังสูงสุด
+        </h3>
+        <div id="security-events" class="space-y-4">
+          <!-- JS Rendered -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function loadLogs() {
+      return JSON.parse(localStorage.getItem('mck_audit_logs') || '[]');
+    }
+
+    function renderSecurityOverview() {
+      const logs = loadLogs();
+      const user = JSON.parse(sessionStorage.getItem('mck_user'));
+      if (user) {
+        document.getElementById('user-identity').textContent = `${user.name} (${user.role})`;
+        document.getElementById('user-avatar-display').textContent = user.name.charAt(0).toUpperCase();
+      }
+      const now = Date.now();
+      const oneWeek = 7 * 24 * 60 * 60 * 1000;
+      
+      // 1. Stats Calculation
+      const failedLogins = logs.filter(l => l.action === 'Login Fail' && (now - (l.timestamp || 0)) < oneWeek);
+      const secretViews = logs.filter(l => l.action.includes('ดูรหัสผ่าน') && (now - (l.timestamp || 0)) < oneWeek);
+      
+      const savedUsers = JSON.parse(localStorage.getItem('mck_users') || '{}');
+      const suspendedCount = Object.values(savedUsers).filter(u => u.status === 'suspended').length;
+
+      document.getElementById('count-failed').textContent = failedLogins.length;
+      document.getElementById('count-secret').textContent = secretViews.length;
+      document.getElementById('count-suspended').textContent = suspendedCount;
+
+      // 2. Daily Chart (Last 7 Days)
+      const chartContainer = document.getElementById('risk-chart');
+      const dailyCounts = new Array(7).fill(0);
+      
+      failedLogins.forEach(l => {
+        const dayDiff = Math.floor((now - (l.timestamp || 0)) / (24 * 60 * 60 * 1000));
+        if (dayDiff >= 0 && dayDiff < 7) {
+          dailyCounts[6 - dayDiff]++;
+        }
+      });
+
+      const max = Math.max(...dailyCounts, 5);
+      chartContainer.innerHTML = dailyCounts.map(count => {
+        const height = (count / max) * 100;
+        return `
+          <div class="flex-1 flex flex-col items-center group relative">
+            <div class="chart-bar w-full" style="height: ${height}%"></div>
+            ${count > 0 ? `<span class="absolute -top-6 text-[10px] font-bold text-red-600">${count}</span>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      // 3. Security Events List
+      const eventContainer = document.getElementById('security-events');
+      const criticalActions = ['Login Fail', '👀 ดูรหัสผ่าน', '👀 ดูรหัสผ่าน (Boss View)', 'Account Suspended', '🗑️ ล้างประวัติ'];
+      const criticalLogs = logs.filter(l => criticalActions.includes(l.action)).slice(0, 6);
+
+      if (criticalLogs.length === 0) {
+        eventContainer.innerHTML = '<div class="text-center py-10 text-slate-400 italic">ไม่พบเหตุการณ์ผิดปกติ</div>';
+        return;
+      }
+
+      eventContainer.innerHTML = criticalLogs.map(l => {
+        let icon = 'fa-info-circle';
+        let color = 'text-blue-500';
+        let bg = 'bg-blue-50';
+
+        if (l.action === 'Login Fail') { icon = 'fa-user-lock'; color = 'text-red-500'; bg = 'bg-red-50'; }
+        if (l.action.includes('ดูรหัสผ่าน')) { icon = 'fa-eye'; color = 'text-orange-500'; bg = 'bg-orange-50'; }
+        if (l.action === '🗑️ ล้างประวัติ') { icon = 'fa-trash-alt'; color = 'text-purple-500'; bg = 'bg-purple-50'; }
+
+        return `
+          <div class="flex items-start gap-4 p-4 rounded-xl ${bg} border border-white">
+            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center ${color} shadow-sm">
+              <i class="fas ${icon}"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex justify-between items-center mb-1">
+                <strong class="text-sm font-bold text-slate-800">${l.action}</strong>
+                <span class="text-[10px] font-bold text-slate-400 uppercase">${l.time.split(' ')[1]}</span>
+              </div>
+              <p class="text-xs text-slate-600">${l.user} — ${l.details}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.onload = () => {
+      const user = JSON.parse(sessionStorage.getItem('mck_user'));
+      if (!user || user.role !== 'Boss') {
+        alert('⚠️ เฉพาะสิทธิ์ Boss เท่านั้นที่สามารถดูหน้านี้ได้');
+        location.href = 'index.html';
+        return;
+      }
+      renderSecurityOverview();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📄 Invoice Management System - ระบบจัดการเอกสารใบแจ้งหนี้</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --success: #10b981;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #f1f5f9;
+            --border: #e2e8f0;
+            --text-light: #94a3b8;
+        }
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #f0f4f8;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        /* Header & Navigation */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Sarabun', sans-serif;
+            transition: all 0.2s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+        }
+        
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .nav-tab:hover {
+            color: var(--primary);
+        }
+        
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Section Card */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .card-header h2 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.25rem;
+            color: var(--dark);
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .stat-card.success { border-left-color: var(--success); }
+        .stat-card.warning { border-left-color: var(--warning); }
+        .stat-card.danger { border-left-color: var(--danger); }
+        .stat-card.info { border-left-color: var(--info); }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        
+        thead {
+            background: var(--light-gray);
+            border-bottom: 2px solid var(--border);
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        tbody tr:hover {
+            background: var(--light-gray);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge-info {
+            background: #cffafe;
+            color: #164e63;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-family: 'Kanit', sans-serif;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+        
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+        
+        .alert-info {
+            background: #cffafe;
+            color: #164e63;
+            border: 1px solid #67e8f9;
+        }
+        
+        .alert-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+        
+        /* Invoice Template */
+        .invoice-template {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+        }
+        
+        .invoice-header h1 {
+            font-family: 'Kanit', sans-serif;
+            margin-bottom: 0.5rem;
+        }
+        
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .invoice-detail-group {
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 6px;
+        }
+        
+        .invoice-detail-label {
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+        
+        .invoice-detail-value {
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+        
+        .invoice-items-table {
+            margin-bottom: 2rem;
+        }
+        
+        .invoice-footer {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            border-top: 2px solid var(--border);
+            padding-top: 1rem;
+        }
+        
+        .invoice-notes {
+            border-left: 2px solid var(--border);
+            padding-left: 1rem;
+        }
+        
+        .invoice-totals {
+            text-align: right;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+        
+        .total-row.grand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            border-top: 2px solid var(--border);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        
+        /* Search & Filter */
+        .search-filter {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--gray);
+        }
+        
+        .no-data-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .invoice-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .invoice-footer {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+            }
+            
+            table {
+                font-size: 0.85rem;
+            }
+            
+            th, td {
+                padding: 0.75rem;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .header, .nav-tabs, .search-filter, .btn, .table-actions {
+                display: none;
+            }
+            
+            .container {
+                padding: 0;
+            }
+            
+            .invoice-template {
+                border: none;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1>📄 Invoice Management System</h1>
+            <div class="header-actions">
+                <div class="user-info" style="background: rgba(255,255,255,0.1); padding: 0.4rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);">
+                    <div class="user-avatar" id="userAvatar" style="background: var(--warning); color: var(--dark); font-weight: 800;">?</div>
+                    <div style="text-align: left;">
+                        <div style="font-weight: 700; font-size: 0.9rem; line-height: 1.2;" id="userName">User</div>
+                        <div style="font-size: 0.7rem; opacity: 0.8; font-weight: 600;" id="userRoleDisplay">Role</div>
+                    </div>
+                </div>
+                <button class="logout-btn" style="background: white; color: var(--primary); font-weight: 700;" onclick="window.history.back()">⬅ ย้อนกลับ</button>
+                <button class="logout-btn" style="background: var(--success); border: none; font-weight: 700;" id="home-link-inv" onclick="location.href='index.html'">🏠 หน้าแรก</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="switchTab('create-invoice')">✏️ สร้างใบแจ้งหนี้</button>
+            <button class="nav-tab" onclick="switchTab('customer')">👥 จัดการลูกค้า</button>
+            <button class="nav-tab" onclick="switchTab('product')">📦 จัดการสินค้า</button>
+            <button class="nav-tab" onclick="switchTab('invoices')">📋 รายการใบแจ้งหนี้</button>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="stat-card success">
+                    <div class="stat-label">ใบแจ้งหนี้ทั้งหมด</div>
+                    <div class="stat-value" id="totalInvoices">0</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-label">ลูกค้า</div>
+                    <div class="stat-value" id="totalCustomers">0</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-label">สินค้า</div>
+                    <div class="stat-value" id="totalProducts">0</div>
+                </div>
+                <div class="stat-card primary" style="border-left-color: var(--primary);">
+                    <div class="stat-label">ยอดรวมทั้งหมด</div>
+                    <div class="stat-value" id="totalAmount">0</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2>ใบแจ้งหนี้ล่าสุด</h2>
+                    <button class="btn btn-primary" onclick="switchTab('invoices')">ดูทั้งหมด →</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ลำดับเอกสาร</th>
+                                <th>ลูกค้า</th>
+                                <th>ประเภท</th>
+                                <th>ยอด</th>
+                                <th>สถานะ</th>
+                                <th>วันที่</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentInvoicesList">
+                            <tr>
+                                <td colspan="6" class="no-data">ยังไม่มีข้อมูล</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Create Invoice Tab -->
+        <div id="create-invoice" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>สร้างใบแจ้งหนี้ใหม่</h2>
+                </div>
+                
+                <div id="validationErrors" style="display: none; background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;"></div>
+                
+                <form onsubmit="saveInvoice(event)">
+                    <!-- Header Section -->
+                    <h3 style="margin: 1.5rem 0 1rem; color: var(--primary); font-family: 'Kanit', sans-serif;">ข้อมูลหัวเอกสาร</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ประเภท Invoice *</label>
+                            <select id="invoiceType" required onchange="updateInvoiceTemplate()">
+                                <option value="">เลือกประเภท</option>
+                                <option value="NK">NK (ปกติ)</option>
+                                <option value="TRAIN-CN">รถไฟจีน</option>
+                                <option value="TRAIN-LAO">รถไฟลาว</option>
+                                <option value="THB">THB (บาท)</option>
+                                <option value="CNY">CNY (หยวน)</option>
+                                <option value="USD">USD (ดอลลาร์)</option>
+                                <option value="MUK">MUK (มุกดาหาร)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>ลำดับเอกสาร *</label>
+                            <input type="text" id="invoiceNo" placeholder="INV-2024-001" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>วันที่ *</label>
+                            <input type="date" id="invoiceDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ลูกค้า *</label>
+                            <select id="customerId" required>
+                                <option value="">เลือกลูกค้า</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ประเภทการขนส่ง</label>
+                            <select id="transportType">
+                                <option value="">เลือก</option>
+                                <option value="ocean">ขนส่งทางทะเล</option>
+                                <option value="air">ขนส่งทางอากาศ</option>
+                                <option value="land">ขนส่งทางบก</option>
+                                <option value="train">ขนส่งทางรถไฟ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>สกุลเงิน *</label>
+                            <select id="currency" required>
+                                <option value="THB">THB (บาท)</option>
+                                <option value="CNY">CNY (หยวน)</option>
+                                <option value="USD">USD (ดอลลาร์)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Items Section -->
+                    <h3 style="margin: 1.5rem 0 1rem; color: var(--primary); font-family: 'Kanit', sans-serif;">สินค้า</h3>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addInvoiceItem()">+ เพิ่มสินค้า</button>
+                    </div>
+                    
+                    <div class="table-responsive" style="margin-bottom: 1.5rem;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>สินค้า</th>
+                                    <th>HS Code</th>
+                                    <th>จำนวน</th>
+                                    <th>หน่วย</th>
+                                    <th>น้ำหนัก (kg)</th>
+                                    <th>ราคาต่อหน่วย</th>
+                                    <th>รวม</th>
+                                    <th>การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoiceItemsList">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Totals Section -->
+                    <h3 style="margin: 1.5rem 0 1rem; color: var(--primary); font-family: 'Kanit', sans-serif;">สรุป</h3>
+                    
+                    <div style="background: var(--light-gray); padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+                        <div class="total-row">
+                            <span>น้ำหนักรวม (kg):</span>
+                            <span id="totalWeight">0</span>
+                        </div>
+                        <div class="total-row">
+                            <span>ยอดรวม:</span>
+                            <span id="itemsTotal">0</span>
+                        </div>
+                        <div class="total-row grand">
+                            <span>รวมทั้งสิ้น:</span>
+                            <span id="grandTotal">0 <span id="currencyDisplay">THB</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="invoiceNotes" placeholder="หมายเหตุเพิ่มเติม"></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="btn btn-primary btn-block">💾 บันทึกใบแจ้งหนี้</button>
+                        <button type="button" class="btn btn-warning btn-block" onclick="previewInvoice()">👁️ ดูตัวอย่าง</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Customer Tab -->
+        <div id="customer" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>จัดการข้อมูลลูกค้า</h2>
+                    <button class="btn btn-primary" onclick="openCustomerModal()">+ เพิ่มลูกค้า</button>
+                </div>
+                
+                <div class="search-filter">
+                    <input type="text" id="customerSearch" placeholder="ค้นหาลูกค้า" onkeyup="filterCustomers()">
+                </div>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ชื่อลูกค้า</th>
+                                <th>ประเทศ</th>
+                                <th>ที่อยู่</th>
+                                <th>ผู้รับสินค้า</th>
+                                <th>สกุลเงิน</th>
+                                <th>การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerList">
+                            <tr>
+                                <td colspan="6" class="no-data">ยังไม่มีข้อมูล</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Product Tab -->
+        <div id="product" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>จัดการข้อมูลสินค้า</h2>
+                    <button class="btn btn-primary" onclick="openProductModal()">+ เพิ่มสินค้า</button>
+                </div>
+                
+                <div class="search-filter">
+                    <input type="text" id="productSearch" placeholder="ค้นหาสินค้า" onkeyup="filterProducts()">
+                    <input type="text" id="hsCodeSearch" placeholder="ค้นหา HS Code" onkeyup="filterProducts()">
+                </div>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ชื่อสินค้า</th>
+                                <th>HS Code</th>
+                                <th>หน่วย</th>
+                                <th>น้ำหนัก (kg)</th>
+                                <th>สกุลเงิน</th>
+                                <th>การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productList">
+                            <tr>
+                                <td colspan="6" class="no-data">ยังไม่มีข้อมูล</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Invoices Tab -->
+        <div id="invoices" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>รายการใบแจ้งหนี้</h2>
+                </div>
+                
+                <div class="search-filter">
+                    <input type="text" id="invoiceSearch" placeholder="ค้นหาลำดับเอกสาร" onkeyup="filterInvoices()">
+                    <select id="statusFilter" onchange="filterInvoices()">
+                        <option value="">ทั้งหมด</option>
+                        <option value="draft">แบบร่าง</option>
+                        <option value="completed">เสร็จสิ้น</option>
+                        <option value="exported">ส่งออก</option>
+                    </select>
+                </div>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ลำดับเอกสาร</th>
+                                <th>ลูกค้า</th>
+                                <th>ประเภท</th>
+                                <th>ยอด</th>
+                                <th>สถานะ</th>
+                                <th>วันที่สร้าง</th>
+                                <th>การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoicesList">
+                            <tr>
+                                <td colspan="7" class="no-data">ยังไม่มีข้อมูล</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>เพิ่ม/แก้ไขลูกค้า</h2>
+                <button class="modal-close" onclick="closeModal('customerModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="saveCustomer(event)">
+                    <div class="form-group">
+                        <label>ชื่อลูกค้า *</label>
+                        <input type="text" id="customerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ประเทศ *</label>
+                        <input type="text" id="customerCountry" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ที่อยู่</label>
+                        <textarea id="customerAddress"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>ผู้รับสินค้า</label>
+                        <input type="text" id="customerConsignee">
+                    </div>
+                    <div class="form-group">
+                        <label>สกุลเงิน</label>
+                        <select id="customerCurrency">
+                            <option value="THB">THB (บาท)</option>
+                            <option value="CNY">CNY (หยวน)</option>
+                            <option value="USD">USD (ดอลลาร์)</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('customerModal')">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>เพิ่ม/แก้ไขสินค้า</h2>
+                <button class="modal-close" onclick="closeModal('productModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="saveProduct(event)">
+                    <div class="form-group">
+                        <label>ชื่อสินค้า *</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>HS Code *</label>
+                        <input type="text" id="hsCode" placeholder="เช่น 0901.11.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>หน่วย *</label>
+                        <select id="productUnit" required>
+                            <option value="">เลือก</option>
+                            <option value="kg">kg (กิโลกรัม)</option>
+                            <option value="ton">ton (ตัน)</option>
+                            <option value="pcs">pcs (ชิ้น)</option>
+                            <option value="box">box (กล่อง)</option>
+                            <option value="bag">bag (ถุง)</option>
+                            <option value="carton">carton (การ์ตัน)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>น้ำหนักเริ่มต้น (kg)</label>
+                        <input type="number" id="productWeight" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>สกุลเงิน</label>
+                        <select id="productCurrency">
+                            <option value="THB">THB (บาท)</option>
+                            <option value="CNY">CNY (หยวน)</option>
+                            <option value="USD">USD (ดอลลาร์)</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('productModal')">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Invoice Preview Modal -->
+    <div id="invoicePreviewModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>ตัวอย่างใบแจ้งหนี้</h2>
+                <button class="modal-close" onclick="closeModal('invoicePreviewModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="invoicePreviewContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" onclick="printInvoice()">🖨️ พิมพ์</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('invoicePreviewModal')">ปิด</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ===== DATA STORAGE =====
+        let data = {
+            customers: [], // Will load from datacenter
+            products: [],  // Will load from datacenter
+            invoices: JSON.parse(localStorage.getItem('invoiceInvoices')) || [],
+            exchangeRates: JSON.parse(localStorage.getItem('invoiceExchangeRates')) || {
+                THB: 1,
+                CNY: 4.50,
+                USD: 33.50
+            },
+            currentUser: {
+                id: 1,
+                name: 'Admin',
+                role: 'admin',
+                avatar: 'A'
+            },
+            invoiceItems: [],
+            editingCustomerId: null,
+            editingProductId: null,
+            settings: JSON.parse(localStorage.getItem('invoiceSettings')) || {
+                companyName: 'บริษัท (แก้ไขได้)',
+                address: 'ที่อยู่บริษัท (แก้ไขได้)',
+                phone: '+66-0-0000-0000',
+                email: 'info@example.com',
+                taxId: '0000000000000'
+            }
+        };
+        
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentUser();
+            loadCustomers();
+            loadProducts();
+            loadInvoices();
+            updateDashboard();
+            // Set today's date
+            document.getElementById('invoiceDate').valueAsDate = new Date();
+            
+            // Demo data
+            addDemoData();
+
+            // Add initial item row for invoice creation
+            addInvoiceItem();
+            updateInvoiceCalculations();
+        });
+        
+        function addDemoData() {
+            if (data.customers.length === 0) {
+                const demoCustomers = [
+                    {
+                        id: 1,
+                        name: 'บริษัท ABC Trading Co., Ltd.',
+                        country: 'ไทย',
+                        address: '123 ซอยรัชดา กรุงเทพฯ',
+                        consignee: 'Mr. Somchai',
+                        currency: 'THB', // Default currency for customer
+                        tel: '081-123-4567', email: 'somchai@abc.com',
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: 2,
+                        name: 'Shanghai Import Export Co.',
+                        country: 'จีน',
+                        address: '456 Nanjing Road, Shanghai',
+                        consignee: 'Mr. Wang',
+                        currency: 'CNY', // Default currency for customer
+                        tel: '0086-138-1234-5678', email: 'wang@shanghai.com',
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                // Save demo customers to central storage
+                localStorage.setItem('mck_buyers', JSON.stringify(demoCustomers));
+                data.customers = demoCustomers; // Update local data object
+            }
+            
+            if (data.products.length === 0 || centralProducts.length === 0) {
+                const demoProducts = [
+                    {
+                        id: 1,
+                        name_en: 'ข้าวขาว 100%', // Use name_en for consistency
+                        hs: '1006.30.00', // Use hs for consistency
+                        unit: 'ton',
+                        nw_box: 1000, // Use nw_box for consistency
+                        price_fob: 500, // Example price
+                        price_cnf: 550, // Example price
+                        currency: 'THB',
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: 2,
+                        productName: 'พริกไทยแห้ง',
+                        hsCode: '0904.20.00',
+                        unit: 'kg', // Use unit for consistency
+                        nw_box: 100, // Use nw_box for consistency
+                        price_fob: 10, // Example price
+                        price_cnf: 12, // Example price
+                        currency: 'THB',
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                // Save demo products to central storage
+                localStorage.setItem('mck_products', JSON.stringify(demoProducts));
+                data.products = demoProducts; // Update local data object
+            }
+        }
+        
+        // ===== USER MANAGEMENT =====
+        function loadCurrentUser() {
+            const currentUserSession = JSON.parse(sessionStorage.getItem('mck_user'));
+            if (currentUserSession) {
+                data.currentUser = currentUserSession;
+            }
+            document.getElementById('userName').textContent = data.currentUser.name;
+            document.getElementById('userRoleDisplay').textContent = data.currentUser.role;
+            if (data.currentUser.role === 'Driver') document.getElementById('home-link-inv').onclick = () => location.href='driver-portal.html';
+            document.getElementById('userAvatar').textContent = data.currentUser.avatar;
+        }
+        
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function logout() {
+            if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // ===== TAB SWITCHING =====
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Remove active class from all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+            
+            // Load related data
+            if (tabName === 'customer') {
+                loadCustomers();
+            } else if (tabName === 'product') {
+                loadProducts();
+            } else if (tabName === 'invoices') {
+                loadInvoices();
+            }
+            updateDashboard(); // Always update dashboard when switching tabs
+        }
+        
+        // ===== DASHBOARD =====
+        function updateDashboard() {
+            const totalInvoices = data.invoices.length;
+            const totalCustomers = data.customers.length;
+            const totalProducts = data.products.length;
+            const totalAmount = data.invoices.reduce((sum, inv) => sum + (inv.grandTotal || 0), 0);
+            
+            document.getElementById('totalInvoices').textContent = totalInvoices;
+            document.getElementById('totalCustomers').textContent = totalCustomers;
+            document.getElementById('totalProducts').textContent = totalProducts;
+            document.getElementById('totalAmount').textContent = totalAmount.toLocaleString('th-TH', { style: 'currency', currency: 'THB' });
+            
+            // Load recent invoices
+            const recentInvoices = data.invoices.slice(-5).reverse();
+            const recentList = document.getElementById('recentInvoicesList');
+            
+            if (recentInvoices.length === 0) {
+                recentList.innerHTML = '<tr><td colspan="6" class="no-data">ยังไม่มีข้อมูล</td></tr>';
+            } else { // Use customer.name_en for consistency
+                recentList.innerHTML = recentInvoices.map(inv => {
+                    const customer = data.customers.find(c => c.id === inv.customerId);
+                    return `
+                        <tr>
+                            <td><strong>${inv.invoiceNo}</strong></td>
+                            <td>${customer?.name || '-'}</td>
+                            <td><span class="badge badge-info">${inv.invoiceType || '-'}</span></td>
+                            <td>${inv.grandTotal.toLocaleString('th-TH')} ${inv.currency}</td>
+                            <td><span class="badge badge-success">${inv.status === 'draft' ? 'แบบร่าง' : inv.status === 'completed' ? 'เสร็จสิ้น' : 'ส่งออก'}</span></td>
+                            <td>${new Date(inv.createdAt).toLocaleDateString('th-TH')}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+        
+        // ===== CUSTOMER MANAGEMENT =====
+        function loadCustomers() {
+            // Load customers from central storage (datacenter)
+            data.customers = JSON.parse(localStorage.getItem('mck_buyers') || '[]');
+            // Sort customers alphabetically by name
+            data.customers.sort((a, b) => (a.name_en || a.name).localeCompare(b.name_en || b.name));
+            const customerSelect = document.getElementById('customerId');
+            customerSelect.innerHTML = '<option value="">เลือกลูกค้า</option>' + 
+                data.customers.map(c => `<option value="${c.id}">${c.name_en || c.name}</option>`).join('');
+            displayCustomers();
+        }
+        
+        function displayCustomers() {
+            const list = document.getElementById('customerList');
+            if (data.customers.length === 0) {
+                list.innerHTML = '<tr><td colspan="6" class="no-data">ยังไม่มีข้อมูล</td></tr>';
+                return;
+            }
+            
+            list.innerHTML = data.customers.map(c => `
+                <tr> <!-- Use name_en for consistency -->
+                    <td>${c.name}</td>
+                    <td>${c.country}</td>
+                    <td>${c.address}</td>
+                    <td>${c.consignee}</td>
+                    <td>${c.currency}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="btn btn-sm" style="background: var(--info); color: white;" onclick="editCustomer(${c.id})">✏️</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${c.id})">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function openCustomerModal(customerId = null) {
+            data.editingCustomerId = customerId;
+            if (customerId) {
+                const customer = data.customers.find(c => c.id === customerId); // Use c.id for consistency
+                document.getElementById('customerName').value = customer.name_en || customer.name;
+                document.getElementById('customerCountry').value = customer.country;
+                document.getElementById('customerAddress').value = customer.address;
+                document.getElementById('customerConsignee').value = customer.consignee || customer.contact;
+                document.getElementById('customerCurrency').value = customer.currency;
+            } else {
+                document.querySelector('#customerModal form').reset();
+            }
+            document.getElementById('customerModal').classList.add('active');
+        }
+        
+        function editCustomer(customerId) {
+            openCustomerModal(customerId);
+        }
+        
+        function saveCustomer(event) {
+            event.preventDefault();
+            const name = document.getElementById('customerName').value;
+            const country = document.getElementById('customerCountry').value; // Use country for consistency
+            const address = document.getElementById('customerAddress').value; // Use address for consistency
+            const consignee = document.getElementById('customerConsignee').value; // Use consignee for consistency
+            const currency = document.getElementById('customerCurrency').value; // Use currency for consistency
+            
+            if (data.editingCustomerId) {
+                const customer = data.customers.find(c => c.id === data.editingCustomerId);
+                if (customer) { // Ensure customer exists
+                    customer.name_en = name; // Update name_en for consistency
+                    customer.country = country;
+                    customer.address = address;
+                    customer.consignee = consignee; // Update consignee
+                    customer.currency = currency;
+                }
+            } else {
+                data.customers.push({
+                    id: Date.now(),
+                    name_en: name, // Use name_en for consistency
+                    country,
+                    address,
+                    consignee,
+                    currency,
+                    createdAt: new Date().toISOString()
+                    // Add other fields like tel, email, taxid if needed
+                });
+            }
+            
+            localStorage.setItem('mck_buyers', JSON.stringify(data.customers)); // Save to central storage
+            closeModal('customerModal');
+            loadCustomers();
+            showAlert('บันทึกข้อมูลลูกค้าสำเร็จ', 'success');
+        }
+        
+        function deleteCustomer(customerId) {
+            if (confirm('คุณต้องการลบข้อมูลลูกค้านี้หรือไม่?')) {
+                data.customers = data.customers.filter(c => c.id !== customerId);
+                localStorage.setItem('mck_buyers', JSON.stringify(data.customers)); // Save to central storage
+                loadCustomers();
+                showAlert('ลบข้อมูลลูกค้าสำเร็จ', 'success');
+            }
+        }
+        
+        function filterCustomers() {
+            const search = document.getElementById('customerSearch').value.toLowerCase();
+            const list = document.getElementById('customerList');
+            const filtered = data.customers.filter(c => c.name.toLowerCase().includes(search));
+            
+            if (filtered.length === 0 || data.customers.length === 0) { // Check if filtered is empty or original data is empty
+                list.innerHTML = '<tr><td colspan="6" class="no-data">ไม่พบข้อมูล</td></tr>';
+            } else {
+                list.innerHTML = filtered.map(c => `
+                    <tr>
+                        <td>${c.name}</td>
+                        <td>${c.country}</td>
+                        <td>${c.address}</td>
+                        <td>${c.consignee}</td>
+                        <td>${c.currency}</td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="btn btn-sm" style="background: var(--info); color: white;" onclick="editCustomer(${c.id})">✏️</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${c.id})">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        // ===== PRODUCT MANAGEMENT =====
+        function loadProducts() {
+            // Load products from central storage (datacenter)
+            data.products = JSON.parse(localStorage.getItem('mck_products') || '[]');
+            displayProducts();
+        }
+        
+        function displayProducts() {
+            const list = document.getElementById('productList');
+            if (data.products.length === 0) {
+                list.innerHTML = '<tr><td colspan="6" class="no-data">ยังไม่มีข้อมูล</td></tr>';
+                return;
+            }
+            
+            list.innerHTML = data.products.map(p => `
+                <tr>
+                    <td>${p.productName}</td>
+                    <td><strong>${p.hsCode || p.hs}</strong></td>
+                    <td>${p.unit}</td>
+                    <td>${p.defaultWeight} kg</td>
+                    <td>${p.currency}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="btn btn-sm" style="background: var(--info); color: white;" onclick="editProduct(${p.id})">✏️</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function openProductModal(productId = null) {
+            data.editingProductId = productId;
+            if (productId) {
+                const product = data.products.find(p => p.id === productId);
+                document.getElementById('productName').value = product.productName || product.name_en;
+                document.getElementById('hsCode').value = product.hsCode || product.hs;
+                document.getElementById('productUnit').value = product.unit; // Use unit for consistency
+                document.getElementById('productWeight').value = product.defaultWeight || product.nw_box; // Use nw_box for consistency
+                document.getElementById('productCurrency').value = product.currency;
+            } else {
+                document.querySelector('#productModal form').reset();
+            }
+            document.getElementById('productModal').classList.add('active');
+        }
+        
+        function editProduct(productId) {
+            openProductModal(productId);
+        }
+        
+        function saveProduct(event) {
+            event.preventDefault();
+            const productName = document.getElementById('productName').value;
+            const hsCode = document.getElementById('hsCode').value; // Use hs for consistency
+            const unit = document.getElementById('productUnit').value;
+            const defaultWeight = parseFloat(document.getElementById('productWeight').value) || 0; // Use nw_box for consistency
+            const currency = document.getElementById('productCurrency').value; // Currency of the product
+            
+            // Validation
+            if (!productName || !hsCode || !unit) {
+                showAlert('กรุณากรอกข้อมูลให้ครบถ้วน', 'danger');
+                return;
+            }
+            
+            if (data.editingProductId) {
+                const product = data.products.find(p => p.id === data.editingProductId);
+                if (product) { // Ensure product exists
+                    product.name_en = productName; // Update name_en for consistency
+                    product.hs = hsCode; // Update hs for consistency
+                    product.unit = unit;
+                    product.nw_box = defaultWeight; // Update nw_box for consistency
+                    product.currency = currency;
+                    // Update other fields like price_fob, price_cnf if needed
+                }
+            } else {
+                data.products.push({
+                    id: Date.now(),
+                    name_en: productName, // Use name_en for consistency
+                    hs: hsCode, // Use hs for consistency
+                    unit,
+                    nw_box: defaultWeight, // Use nw_box for consistency
+                    defaultWeight, // Keep for now for INVOICE.html internal logic
+                    currency,
+                    createdAt: new Date().toISOString()
+                });
+            }
+            
+            localStorage.setItem('mck_products', JSON.stringify(data.products)); // Save to central storage
+            closeModal('productModal');
+            loadProducts();
+            showAlert('บันทึกข้อมูลสินค้าสำเร็จ', 'success');
+        }
+        
+        function deleteProduct(productId) {
+            if (confirm('คุณต้องการลบข้อมูลสินค้านี้หรือไม่?')) {
+                data.products = data.products.filter(p => p.id !== productId);
+                localStorage.setItem('mck_products', JSON.stringify(data.products)); // Save to central storage
+                loadProducts();
+                showAlert('ลบข้อมูลสินค้าสำเร็จ', 'success');
+            }
+        }
+        
+        function filterProducts() {
+            const productSearch = document.getElementById('productSearch').value.toLowerCase();
+            const hsCodeSearch = document.getElementById('hsCodeSearch').value.toLowerCase();
+            const list = document.getElementById('productList');
+            
+            const filtered = data.products.filter(p => 
+                p.productName.toLowerCase().includes(productSearch) &&
+                (p.hsCode || p.hs).toLowerCase().includes(hsCodeSearch) // Check both hsCode and hs
+            );
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<tr><td colspan="6" class="no-data">ไม่พบข้อมูล</td></tr>';
+            } else {
+                list.innerHTML = filtered.map(p => `
+                    <tr>
+                        <td>${p.productName}</td>
+                        <td><strong>${p.hsCode || p.hs}</strong></td>
+                        <td>${p.unit}</td>
+                        <td>${p.defaultWeight} kg</td>
+                        <td>${p.currency}</td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="btn btn-sm" style="background: var(--info); color: white;" onclick="editProduct(${p.id})">✏️</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        // ===== INVOICE MANAGEMENT =====
+        function addInvoiceItem() {
+            const itemstbody = document.getElementById('invoiceItemsList');
+            const itemId = 'item_' + Date.now();
+            
+            const row = document.createElement('tr');
+            row.id = itemId;
+            row.innerHTML = `
+                <td>
+                    <select onchange="updateInvoiceCalculations()">
+                        <option value="">เลือกสินค้า</option>
+                        ${data.products.map(p => `<option value="${p.id}" data-hsCode="${p.hsCode}" data-unit="${p.unit}">${p.productName}</option>`).join('')}
+                    </select>
+                </td>
+                <td><input type="text" readonly></td>
+                <td><input type="number" min="1" value="1" onchange="updateInvoiceCalculations()"></td>
+                <td><input type="text" readonly></td>
+                <td><input type="number" step="0.01" min="0" value="0" onchange="updateInvoiceCalculations()"></td>
+                <td><input type="number" step="0.01" min="0" value="0" onchange="updateInvoiceCalculations()"></td>
+                <td><input type="number" step="0.01" readonly value="0"></td>
+                <td><button type="button" class="btn btn-danger btn-sm" onclick="removeInvoiceItem('${itemId}')">ลบ</button></td>
+            `;
+            
+            // Add change event to product select
+            const productSelect = row.querySelector('select');
+            productSelect.addEventListener('change', function() {
+                const product = data.products.find(p => p.id == this.value);
+                if (product) {
+                    row.querySelector('td:nth-child(2) input').value = product.hsCode;
+                    row.querySelector('td:nth-child(4) input').value = product.unit;
+                }
+                updateInvoiceCalculations();
+            });
+            
+            itemstbody.appendChild(row);
+        }
+        
+        function removeInvoiceItem(itemId) {
+            document.getElementById(itemId).remove();
+            updateInvoiceCalculations();
+        }
+        
+        function updateInvoiceCalculations() {
+            const items = document.querySelectorAll('#invoiceItemsList tr');
+            let totalWeight = 0;
+            let itemsTotal = 0;
+            const errors = [];
+            
+            items.forEach((row, index) => {
+                const productId = row.querySelector('select').value;
+                const product = data.products.find(p => p.id == productId);
+                const qty = parseFloat(row.querySelector('td:nth-child(3) input').value) || 1; // Default quantity to 1
+                const weight = parseFloat(row.querySelector('td:nth-child(5) input').value) || 0;
+                const unitPrice = parseFloat(row.querySelector('td:nth-child(6) input').value) || 0;
+                
+                // Validation
+                if (productId && !product?.hsCode) {
+                    errors.push(`รายการที่ ${index + 1}: HS Code ขาดหายไป`);
+                }
+                if (productId && weight === 0) {
+                    errors.push(`รายการที่ ${index + 1}: น้ำหนักไม่ถูกต้อง`);
+                }
+                
+                const total = qty * unitPrice;
+                row.querySelector('td:nth-child(7) input').value = total.toFixed(2);
+                
+                totalWeight += weight * qty;
+                itemsTotal += total;
+            });
+            
+            if (errors.length > 0) {
+                document.getElementById('validationErrors').innerHTML = 
+                    '<strong>⚠️ ข้อผิดพลาดในการตรวจสอบ:</strong><ul style="margin-left: 1rem; margin-top: 0.5rem;">' +
+                    errors.map(e => `<li>${e}</li>`).join('') +
+                    '</ul>';
+                document.getElementById('validationErrors').style.display = 'block';
+            } else {
+                document.getElementById('validationErrors').style.display = 'none';
+            }
+            
+            document.getElementById('totalWeight').textContent = totalWeight.toFixed(2);
+            document.getElementById('itemsTotal').textContent = itemsTotal.toFixed(2);
+            
+            // Calculate FOB, CNF, CIF
+            const rates = JSON.parse(localStorage.getItem('mck_rates') || '{}'); // Load from central storage
+            const currency = document.getElementById('currency').value;
+            const fob = itemsTotal;
+            const cnf = fob * 1.15; // FOB + 15% freight
+            const cif = cnf * 1.10; // CNF + 10% insurance
+            
+            document.getElementById('grandTotal').textContent = fob.toFixed(2) + ' ' + (document.getElementById('currency').value || 'THB');
+            
+            console.log(`FOB: ${fob}, CNF: ${cnf}, CIF: ${cif}`);
+        }
+        
+        function updateInvoiceTemplate() {
+            const invoiceType = document.getElementById('invoiceType').value;
+            // Can be extended to show different template based on invoice type
+        }
+        
+        function saveInvoice(event) {
+            event.preventDefault();
+            
+            // Validation
+            const invoiceNo = document.getElementById('invoiceNo').value;
+            const invoiceType = document.getElementById('invoiceType').value;
+            const customerId = parseInt(document.getElementById('customerId').value);
+            const invoiceDate = document.getElementById('invoiceDate').value;
+            const currency = document.getElementById('currency').value;
+            
+            if (!invoiceNo || !invoiceType || !customerId || !invoiceDate || !currency) {
+                showAlert('กรุณากรอกข้อมูลให้ครบถ้วน', 'danger');
+                return;
+            }
+            
+            const customer = data.customers.find(c => c.id === customerId);
+            if (!customer) {
+                showAlert('ลูกค้าที่เลือกไม่ถูกต้อง', 'danger');
+                return;
+            }
+            
+            const items = document.querySelectorAll('#invoiceItemsList tr');
+            if (items.length === 0) {
+                showAlert('กรุณาเพิ่มสินค้าอย่างน้อย 1 รายการ', 'danger');
+                return;
+            }
+            
+            // Prepare items with validation
+            const invoiceItems = [];
+            let hasError = false;
+            
+            items.forEach(row => {
+                const productId = row.querySelector('select').value;
+                if (productId) {
+                    const product = data.products.find(p => p.id == productId);
+                    const qty = parseFloat(row.querySelector('td:nth-child(3) input').value);
+                    const weight = parseFloat(row.querySelector('td:nth-child(5) input').value);
+                    const unitPrice = parseFloat(row.querySelector('td:nth-child(6) input').value);
+                    
+                    // Validation checks
+                    if (!product?.hsCode && !product?.hs) { // Check both hsCode and hs
+                        showAlert('HS CODE ขาดหายไป สำหรับสินค้า: ' + product?.productName, 'danger');
+                        hasError = true;
+                        return;
+                    }
+                    if (weight === 0) {
+                        showAlert('น้ำหนักไม่ถูกต้องสำหรับ: ' + product?.productName, 'danger');
+                        hasError = true;
+                        return;
+                    }
+                    if (product?.currency !== currency) {
+                        showAlert('สกุลเงินของสินค้าไม่ตรงกับใบแจ้งหนี้', 'warning');
+                    }
+                    
+                    invoiceItems.push({
+                        productId: parseInt(productId),
+                        qty,
+                        weight,
+                        unitPrice,
+                        total: parseFloat((qty * unitPrice).toFixed(2)),
+                        hsCode: product?.hsCode
+                    });
+                }
+            });
+            
+            if (hasError) return;
+            
+            // Check for duplicate products
+            const productIds = invoiceItems.map(i => i.productId);
+            if (new Set(productIds).size !== productIds.length) {
+                showAlert('มีสินค้าที่ซ้ำกันในใบแจ้งหนี้', 'danger');
+                return;
+            }
+            
+            const totalWeight = parseFloat(document.getElementById('totalWeight').textContent);
+            const itemsTotal = parseFloat(document.getElementById('itemsTotal').textContent);
+            const notes = document.getElementById('invoiceNotes').value;
+            
+            const invoice = {
+                id: Date.now(),
+                invoiceNo,
+                invoiceType,
+                customerId,
+                invoiceDate,
+                transportType: document.getElementById('transportType').value,
+                currency,
+                totalWeight,
+                grandTotal: itemsTotal,
+                items: invoiceItems,
+                notes,
+                status: 'draft',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            data.invoices.push(invoice);
+            saveDataToLocalStorage();
+            
+            // Reset form
+            event.target.reset();
+            document.getElementById('invoiceItemsList').innerHTML = '';
+            document.getElementById('totalWeight').textContent = '0';
+            document.getElementById('itemsTotal').textContent = '0';
+            document.getElementById('grandTotal').textContent = '0 THB';
+            document.getElementById('invoiceDate').valueAsDate = new Date();
+            document.getElementById('validationErrors').style.display = 'none';
+            
+            updateDashboard(); // Update dashboard after saving invoice
+            loadInvoices();
+            
+            showAlert('บันทึกใบแจ้งหนี้สำเร็จ ลำดับเอกสาร: ' + invoiceNo, 'success');
+            
+            // Switch to invoices tab
+            setTimeout(() => {
+                switchTab('invoices');
+            }, 500);
+        }
+        
+        function previewInvoice() {
+            const invoiceType = document.getElementById('invoiceType').value;
+            const customerId = parseInt(document.getElementById('customerId').value);
+            const customer = data.customers.find(c => c.id === customerId);
+            
+            if (!customer) {
+                showAlert('กรุณาเลือกลูกค้า', 'danger');
+                return;
+            }
+            
+            const items = document.querySelectorAll('#invoiceItemsList tr');
+            const invoiceItems = [];
+            
+            items.forEach(row => {
+                const productId = row.querySelector('select').value;
+                if (productId) {
+                    const product = data.products.find(p => p.id == productId); // Use p.id for consistency
+                    invoiceItems.push({
+                        productName: product?.productName,
+                        hsCode: row.querySelector('td:nth-child(2) input').value,
+                        qty: parseFloat(row.querySelector('td:nth-child(3) input').value),
+                        unit: row.querySelector('td:nth-child(4) input').value,
+                        weight: parseFloat(row.querySelector('td:nth-child(5) input').value),
+                        unitPrice: parseFloat(row.querySelector('td:nth-child(6) input').value),
+                        total: parseFloat(row.querySelector('td:nth-child(7) input').value)
+                    });
+                }
+            });
+            
+            const totalWeight = parseFloat(document.getElementById('totalWeight').textContent);
+            const itemsTotal = parseFloat(document.getElementById('itemsTotal').textContent);
+            const currency = document.getElementById('currency').value;
+            
+            const invoiceNo = document.getElementById('invoiceNo').value;
+            const invoiceDate = document.getElementById('invoiceDate').value;
+            const notes = document.getElementById('invoiceNotes').value;
+            
+            const html = generateInvoiceHTML({
+                invoiceNo,
+                invoiceType,
+                invoiceDate,
+                customer,
+                items: invoiceItems,
+                totalWeight,
+                grandTotal: itemsTotal,
+                currency,
+                notes,
+                transportType: document.getElementById('transportType').value
+            });
+            
+            document.getElementById('invoicePreviewContent').innerHTML = html;
+            document.getElementById('invoicePreviewModal').classList.add('active');
+        }
+        
+        function generateInvoiceHTML(invoiceData) {
+            const dateObj = new Date(invoiceData.invoiceDate);
+            const thaiDate = dateObj.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            return `
+                <div class="invoice-template">
+                    <div class="invoice-header">
+                        <h1>ใบแจ้งหนี้</h1>
+                        <p style="color: var(--gray);">Invoice No: <strong>${invoiceData.invoiceNo}</strong></p>
+                        <p style="color: var(--gray);">ประเภท: <strong>${invoiceData.invoiceType}</strong></p>
+                    </div>
+                    
+                    <div class="invoice-details">
+                        <div class="invoice-detail-group">
+                            <div class="invoice-detail-label">ข้อมูลลูกค้า</div>
+                            <div class="invoice-detail-value" style="margin-top: 0.5rem;">
+                                <strong>${invoiceData.customer.name}</strong><br>
+                                ประเทศ: ${invoiceData.customer.country}<br>
+                                ที่อยู่: ${invoiceData.customer.address}<br>
+                                ผู้รับสินค้า: ${invoiceData.customer.consignee}
+                            </div>
+                        </div>
+                        <div class="invoice-detail-group">
+                            <div class="invoice-detail-label">ข้อมูลเอกสาร</div>
+                            <div class="invoice-detail-value" style="margin-top: 0.5rem;">
+                                วันที่: ${thaiDate}<br>
+                                สกุลเงิน: ${invoiceData.currency}<br>
+                                ประเภทการขนส่ง: ${invoiceData.transportType || '-'}<br>
+                                สถานะ: แบบร่าง
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-items-table">
+                        <h3 style="color: var(--primary); margin-bottom: 1rem; font-family: 'Kanit', sans-serif;">รายละเอียดสินค้า</h3>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>สินค้า</th>
+                                        <th>HS Code</th>
+                                        <th>จำนวน</th>
+                                        <th>หน่วย</th>
+                                        <th>น้ำหนัก (kg)</th>
+                                        <th>ราคาต่อหน่วย</th>
+                                        <th>รวม</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${invoiceData.items.map(item => `
+                                        <tr>
+                                            <td>${item.productName}</td>
+                                            <td>${item.hsCode || item.hs}</td>
+                                            <td>${item.qty}</td>
+                                            <td>${item.unit}</td>
+                                            <td>${item.weight}</td>
+                                            <td>${item.unitPrice}</td>
+                                            <td>${item.total.toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-footer">
+                        <div class="invoice-notes">
+                            <h4 style="margin-bottom: 0.5rem;">หมายเหตุ</h4>
+                            <p style="font-size: 0.9rem; color: var(--gray);">${invoiceData.notes || '-'}</p>
+                        </div>
+                        <div class="invoice-totals">
+                            <div class="total-row">
+                                <span>น้ำหนักรวม:</span>
+                                <span>${invoiceData.totalWeight.toFixed(2)} kg</span>
+                            </div>
+                            <div class="total-row grand">
+                                <span>รวมทั้งสิ้น:</span>
+                                <span>${invoiceData.grandTotal.toFixed(2)} ${invoiceData.currency}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function printInvoice() {
+            window.print();
+        }
+        
+        function loadInvoices() {
+            displayInvoices();
+        }
+        
+        function displayInvoices() {
+            const list = document.getElementById('invoicesList');
+            if (data.invoices.length === 0) {
+                list.innerHTML = '<tr><td colspan="7" class="no-data">ยังไม่มีข้อมูล</td></tr>';
+                return;
+            }
+            
+            const invoices = data.invoices.slice().reverse();
+            list.innerHTML = invoices.map(inv => {
+                const customer = data.customers.find(c => c.id === inv.customerId);
+                const statusBadge = inv.status === 'draft' ? 'badge-success' : inv.status === 'completed' ? 'badge-warning' : 'badge-info';
+                const statusText = inv.status === 'draft' ? 'แบบร่าง' : inv.status === 'completed' ? 'เสร็จสิ้น' : 'ส่งออก';
+                
+                return `
+                    <tr>
+                        <td><strong>${inv.invoiceNo}</strong></td>
+                        <td>${customer?.name || '-'}</td>
+                        <td><span class="badge badge-info">${inv.invoiceType}</span></td>
+                        <td>${inv.grandTotal.toFixed(2)} ${inv.currency}</td>
+                        <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                        <td>${new Date(inv.createdAt).toLocaleDateString('th-TH')}</td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="btn btn-sm" style="background: var(--info); color: white;" onclick="viewInvoice(${inv.id})">👁️</button>
+                                <button class="btn btn-sm" style="background: var(--warning); color: white;" onclick="editInvoice(${inv.id})">✏️</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteInvoice(${inv.id})">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function viewInvoice(invoiceId) {
+            const invoice = data.invoices.find(i => i.id === invoiceId);
+            if (!invoice) return;
+            
+            const invoiceHTML = generateInvoiceHTML({
+                invoiceNo: invoice.invoiceNo,
+                invoiceType: invoice.invoiceType,
+                invoiceDate: invoice.invoiceDate,
+                customer: data.customers.find(c => c.id === invoice.customerId),
+                items: invoice.items.map(item => {
+                    const product = data.products.find(p => p.id === item.productId);
+                    return { // Ensure product properties are consistent with datacenter
+                        productName: product?.productName,
+                        hsCode: product?.hsCode,
+                        qty: item.qty,
+                        unit: product?.unit,
+                        weight: item.weight,
+                        unitPrice: item.unitPrice,
+                        total: item.total
+                    };
+                }),
+                totalWeight: invoice.totalWeight,
+                grandTotal: invoice.grandTotal,
+                currency: invoice.currency,
+                notes: invoice.notes,
+                transportType: invoice.transportType
+            });
+            
+            document.getElementById('invoicePreviewContent').innerHTML = invoiceHTML;
+            document.getElementById('invoicePreviewModal').classList.add('active');
+        }
+        
+        function editInvoice(invoiceId) {
+            // Switch to create invoice tab and load data
+            switchTab('create-invoice');
+            // TODO: Implement edit functionality
+        }
+        
+        function deleteInvoice(invoiceId) {
+            if (confirm('คุณต้องการลบใบแจ้งหนี้นี้หรือไม่?')) {
+                data.invoices = data.invoices.filter(i => i.id !== invoiceId);
+                saveDataToLocalStorage();
+                loadInvoices();
+                updateDashboard();
+                showAlert('ลบใบแจ้งหนี้สำเร็จ', 'success');
+            }
+        }
+        
+        function filterInvoices() {
+            const search = document.getElementById('invoiceSearch').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const list = document.getElementById('invoicesList');
+            
+            let filtered = data.invoices.filter(inv => inv.invoiceNo.toLowerCase().includes(search));
+            if (status) {
+                filtered = filtered.filter(inv => inv.status === status);
+            }
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<tr><td colspan="7" class="no-data">ไม่พบข้อมูล</td></tr>';
+            } else {
+                filtered = filtered.reverse();
+                list.innerHTML = filtered.map(inv => {
+                    const customer = data.customers.find(c => c.id === inv.customerId);
+                    const statusBadge = inv.status === 'draft' ? 'badge-success' : inv.status === 'completed' ? 'badge-warning' : 'badge-info';
+                    const statusText = inv.status === 'draft' ? 'แบบร่าง' : inv.status === 'completed' ? 'เสร็จสิ้น' : 'ส่งออก';
+                    
+                    return `
+                        <tr>
+                            <td><strong>${inv.invoiceNo}</strong></td>
+                            <td>${customer?.name || '-'}</td>
+                            <td><span class="badge badge-info">${inv.invoiceType}</span></td>
+                            <td>${inv.grandTotal.toFixed(2)} ${inv.currency}</td>
+                            <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                            <td>${new Date(inv.createdAt).toLocaleDateString('th-TH')}</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-sm" style="background: var(--info); color: white;" onclick="viewInvoice(${inv.id})">👁️</button>
+                                    <button class="btn btn-sm" style="background: var(--warning); color: white;" onclick="editInvoice(${inv.id})">✏️</button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteInvoice(${inv.id})">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+        
+        // ===== UTILITY FUNCTIONS =====
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <span>${message}</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            
+            const container = document.querySelector('.container');
+            if (container) {
+                container.insertBefore(alertDiv, container.firstChild);
+            }
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+        
+        function saveDataToLocalStorage() {
+            localStorage.setItem('invoiceCustomers', JSON.stringify(data.customers));
+            localStorage.setItem('invoiceProducts', JSON.stringify(data.products));
+            localStorage.setItem('invoiceInvoices', JSON.stringify(data.invoices));
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
