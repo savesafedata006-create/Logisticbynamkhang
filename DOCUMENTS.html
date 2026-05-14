@@ -3,7 +3,7 @@ ic<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📋 Document Management System - ระบบจัดการเอกสาร</title>
+    <title>Logistics by namkhang - ระบบจัดการเอกสาร</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
         
@@ -537,12 +537,13 @@ ic<!DOCTYPE html>
     <!-- Header -->
     <div class="header">
         <div class="header-content">
-            <h1>📋 Document Management System - ระบบจัดการเอกสาร</h1>
+            <h1>📋 Logistics by namkhang</h1>
             <div class="user-info">
-                <button class="btn btn-ghost btn-sm" onclick="goBack()">⬅ กลับ</button>
+                <button class="btn btn-secondary btn-sm" style="background: rgba(255,255,255,0.2);" onclick="window.history.back()">⬅ ย้อนกลับ</button>
+                <button class="btn btn-secondary btn-sm" style="background: var(--success);" onclick="location.href='index.html'">🏠 หน้าแรก</button>
                 <span id="userName">Admin</span>
                 <span style="color: rgba(255,255,255,0.7); font-size: 0.9rem;" id="userRole">ผู้จัดการ</span>
-                <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+                <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
             </div>
         </div>
     </div>
@@ -557,6 +558,7 @@ ic<!DOCTYPE html>
             <li><a class="nav-link" onclick="switchView('packing')">📦 Packing List</a></li>
             <li><a class="nav-link" onclick="switchView('shipping')">🚢 Shipping Doc</a></li>
             <li><a class="nav-link" onclick="switchView('export')">📤 Export Doc</a></li>
+            <li><a class="nav-link" onclick="location.href='shipping-gov.html'" style="color: var(--warning); font-weight: bold;">🏛️ เอกสารยื่นราชการ</a></li>
             <li><a class="nav-link" onclick="switchView('templates')">🎨 Templates</a></li>
             <li><a class="nav-link" onclick="switchView('settings')">⚙️ Settings</a></li>
         </ul>
@@ -656,6 +658,12 @@ ic<!DOCTYPE html>
                         <div class="document-icon">📤</div>
                         <div class="document-name">Export Document</div>
                         <div class="document-desc">เอกสารส่งออก</div>
+                    </div>
+
+                    <div class="document-card" onclick="location.href='shipping-gov.html'" style="border-color: var(--warning);">
+                        <div class="document-icon">🏛️</div>
+                        <div class="document-name">Shipping Gov Docs</div>
+                        <div class="document-desc">PC, Form E, ใบขนสินค้า</div>
                     </div>
                     
                     <div class="document-card" onclick="openDocumentType('proforma')">
@@ -1032,7 +1040,7 @@ ic<!DOCTYPE html>
             shippingDocs: JSON.parse(localStorage.getItem('docShipping')) || [],
             exportDocs: JSON.parse(localStorage.getItem('docExport')) || [],
             settings: JSON.parse(localStorage.getItem('docSettings')) || {
-                companyName: 'ICL Logistics',
+                companyName: 'Logistics by namkhang',
                 companyAddress: '123 ถนนรัชดา กรุงเทพฯ 10110',
                 companyPhone: '+66-2-999-9999',
                 companyEmail: 'info@icl.co.th',

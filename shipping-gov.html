@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics by namkhang - เอกสารยื่นราชการ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #f1f5f9;
+            --border: #e2e8f0;
+        }
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #f0f4f8;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 { font-family: 'Kanit', sans-serif; font-size: 1.5rem; }
+        
+        .user-info { display: flex; align-items: center; gap: 0.5rem; }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Sarabun', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: 0.2s;
+        }
+        
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-secondary { background: rgba(255,255,255,0.2); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-primary { background: var(--primary); color: white; }
+
+        .main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        
+        .page-title {
+            font-family: 'Kanit', sans-serif;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .doc-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doc-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+        .doc-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--primary);
+        }
+
+        .doc-card.warning::before { background: var(--warning); }
+        .doc-card.success::before { background: var(--success); }
+
+        .doc-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .doc-name { font-family: 'Kanit', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .doc-dept { font-size: 0.8rem; color: var(--gray); margin-bottom: 1rem; font-weight: 600; }
+        
+        .badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .badge-req { background: #fee2e2; color: #991b1b; }
+
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .table-header { padding: 1.2rem; border-bottom: 1px solid var(--border); background: #fafafa; font-weight: 700; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 1rem; background: var(--light-gray); font-size: 0.85rem; color: var(--gray); text-transform: uppercase; }
+        td { padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        
+        .status-pill {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .status-waiting { background: #fef3c7; color: #92400e; }
+        .status-approved { background: #d1fae5; color: #065f46; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>🏛️ Logistics by namkhang</h1>
+            <div class="user-info">
+                <button class="btn btn-secondary" onclick="window.history.back()">⬅ ย้อนกลับ</button>
+                <button class="btn btn-success" onclick="location.href='index.html'">🏠 หน้าแรก</button>
+                <span id="userName">Admin</span>
+                <button class="btn btn-danger" onclick="location.href='index.html'">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="page-title">
+            <div>
+                <h1>ระบบเอกสารยื่นราชการ (Shipping Gov Docs)</h1>
+                <p style="font-size: 0.9rem; color: var(--gray);">รวบรวมแบบฟอร์มและสถานะการขออนุญาตส่งออก</p>
+            </div>
+            <button class="btn btn-primary" onclick="alert('ระบบกำลังเชื่อมต่อกองระบบมาตรฐานฯ')">+ ยื่นคำขอใหม่</button>
+        </div>
+
+        <div class="grid">
+            <!-- PC Card -->
+            <div class="doc-card">
+                <div class="doc-icon">🌱</div>
+                <div class="doc-name">Phytosanitary Certificate (PC)</div>
+                <div class="doc-dept">กรมวิชาการเกษตร (DOA)</div>
+                <p style="font-size: 0.85rem; margin-bottom: 1rem;">ใบรับรองสุขอนามัยพืช เพื่อรับรองว่าสินค้าปลอดศัตรูพืชตามเงื่อนไขประเทศปลายทาง</p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-req">จำเป็นสำหรับผลไม้</span>
+                    <button class="btn btn-primary btn-sm" style="font-size: 0.7rem;">จัดการข้อมูล</button>
+                </div>
+            </div>
+
+            <!-- CO Card -->
+            <div class="doc-card success">
+                <div class="doc-icon">📜</div>
+                <div class="doc-name">Certificate of Origin (Form E)</div>
+                <div class="doc-dept">กรมการค้าต่างประเทศ (DFT)</div>
+                <p style="font-size: 0.85rem; margin-bottom: 1rem;">หนังสือรับรองถิ่นกำเนิดสินค้า เพื่อใช้สิทธิพิเศษทางภาษีศุลกากร (ASEAN-China)</p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge" style="background: #dbeafe; color: #1e40af;">ลดหย่อนภาษี</span>
+                    <button class="btn btn-primary btn-sm" style="font-size: 0.7rem;">จัดการข้อมูล</button>
+                </div>
+            </div>
+
+            <!-- Health Cert Card -->
+            <div class="doc-card warning">
+                <div class="doc-icon">🍎</div>
+                <div class="doc-name">Health Certificate</div>
+                <div class="doc-dept">กองด่านอาหารและยา (FDA)</div>
+                <p style="font-size: 0.85rem; margin-bottom: 1rem;">ใบรับรองสุขอนามัยสำหรับการส่งออกอาหารและผลไม้แปรรูป</p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-req">สินค้าบริโภค</span>
+                    <button class="btn btn-primary btn-sm" style="font-size: 0.7rem;">จัดการข้อมูล</button>
+                </div>
+            </div>
+
+            <!-- Customs Card -->
+            <div class="doc-card">
+                <div class="doc-icon">🚢</div>
+                <div class="doc-name">Export Declaration</div>
+                <div class="doc-dept">กรมศุลกากร (Customs)</div>
+                <p style="font-size: 0.85rem; margin-bottom: 1rem;">ใบขนสินค้าขาออก เพื่อผ่านพิธีการศุลกากรและตัดสต็อกการส่งออก</p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="badge badge-req">ทุก Shipment</span>
+                    <button class="btn btn-primary btn-sm" style="font-size: 0.7rem;">จัดการข้อมูล</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header">⏳ สถานะการยื่นคำขอเอกสารล่าสุด</div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>วันที่ยื่น</th>
+                            <th>ประเภทเอกสาร</th>
+                            <th>เลขอ้างอิง (Ref No.)</th>
+                            <th>Shipment / Job</th>
+                            <th>หน่วยงาน</th>
+                            <th>สถานะ</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="govDocList">
+                        <!-- Sample Data -->
+                        <tr>
+                            <td>13/05/2024</td>
+                            <td><strong>Form E</strong></td>
+                            <td>DFT-67-00452</td>
+                            <td>RN202405-001</td>
+                            <td>DFT</td>
+                            <td><span class="status-pill status-approved">อนุมัติแล้ว</span></td>
+                            <td><button class="btn btn-primary btn-sm" style="padding: 2px 8px;">พิมพ์</button></td>
+                        </tr>
+                        <tr>
+                            <td>13/05/2024</td>
+                            <td><strong>PC (สุขอนามัยพืช)</strong></td>
+                            <td>DOA-PC-9981</td>
+                            <td>RN202405-002</td>
+                            <td>กรมวิชาการเกษตร</td>
+                            <td><span class="status-pill status-waiting">รอตรวจสอบ</span></td>
+                            <td><button class="btn btn-secondary btn-sm" style="padding: 2px 8px; color: var(--dark);">แก้ไข</button></td>
+                        </tr>
+                        <tr>
+                            <td>12/05/2024</td>
+                            <td><strong>ใบขนสินค้าขาออก</strong></td>
+                            <td>CUST-EXP-009</td>
+                            <td>RN202405-001</td>
+                            <td>ศุลกากร</td>
+                            <td><span class="status-pill status-approved">Release</span></td>
+                            <td><button class="btn btn-primary btn-sm" style="padding: 2px 8px;">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; background: #fff; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border);">
+            <h3 style="font-family: 'Kanit'; margin-bottom: 1rem;">📌 ข้อควรระวังในการยื่นเอกสาร</h3>
+            <ul style="padding-left: 1.5rem; font-size: 0.9rem; color: var(--gray); display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <li>ตรวจสอบ <strong>HS CODE</strong> ให้ตรงกับใน Invoice และ Packing List</li>
+                <li>น้ำหนักสุทธิ (Net Weight) ใน <strong>Form E</strong> ต้องตรงกับใบขนสินค้า</li>
+                <li>การขอ <strong>PC</strong> ต้องทำก่อนรถออกไม่เกิน 48 ชม. สำหรับผลไม้สด</li>
+                <li>ตรวจสอบชื่อ <strong>Consignee</strong> ให้ตรงกับเอกสารปลายทาง</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // การดึงข้อมูลเบื้องต้น
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = JSON.parse(sessionStorage.getItem('mck_user'));
+            if (user) {
+                document.getElementById('userName').textContent = user.name;
+            }
+
+            // โหลดข้อมูลจาก LocalStorage ถ้ามี (เหมือนระบบเดิม)
+            loadGovDocs();
+        });
+
+        function loadGovDocs() {
+            // ในอนาคตสามารถดึงจาก mck_jobs หรือตารางแยก mck_gov_docs
+            console.log("Government Documents Module Loaded.");
+        }
+    </script>
+</body>
+</html>

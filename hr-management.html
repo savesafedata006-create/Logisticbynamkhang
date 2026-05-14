@@ -896,10 +896,31 @@ body{font-family:'Sarabun',sans-serif;background:#f8fafc;}
       }
     }
 
-    window.onload = () => {
-      renderTable();
-      renderAuditLogs();
+    window.onload = function() {
+        const sessionUser = JSON.parse(sessionStorage.getItem('mck_user'));
+        if (!sessionUser) {
+            alert('กรุณาล็อกอินผ่านหน้าหลักก่อนเข้าใช้งาน');
+            location.href = 'index.html';
+            return;
+        }
+        currentAdmin = sessionUser;
+        // อัปเดตข้อมูล Header
+        const nameEl = document.getElementById('hr-user-name');
+        const roleEl = document.getElementById('hr-user-role');
+        const avatarEl = document.getElementById('hr-user-avatar');
+        
+        if(nameEl) nameEl.textContent = sessionUser.name;
+        if(roleEl) roleEl.textContent = sessionUser.role;
+        if(avatarEl) avatarEl.textContent = sessionUser.name.charAt(0).toUpperCase();
+
+        renderTable();
+        renderAuditLogs();
     };
+
+    function doLogout() {
+        sessionStorage.removeItem('mck_user');
+        location.href = 'index.html';
+    }
   </script>
 </body>
 </html>

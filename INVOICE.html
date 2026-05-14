@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📄 Invoice Management System - ระบบจัดการเอกสารใบแจ้งหนี้</title>
+    <title>Logistics by namkhang - ระบบจัดการใบแจ้งหนี้</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
         
@@ -653,7 +653,7 @@
     <!-- Header -->
     <div class="header">
         <div class="header-content">
-            <h1>📄 Invoice Management System</h1>
+            <h1>📄 Logistics by namkhang</h1>
             <div class="header-actions">
                 <div class="user-info" style="background: rgba(255,255,255,0.1); padding: 0.4rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);">
                     <div class="user-avatar" id="userAvatar" style="background: var(--warning); color: var(--dark); font-weight: 800;">?</div>
@@ -664,7 +664,7 @@
                 </div>
                 <button class="logout-btn" style="background: white; color: var(--primary); font-weight: 700;" onclick="window.history.back()">⬅ ย้อนกลับ</button>
                 <button class="logout-btn" style="background: var(--success); border: none; font-weight: 700;" id="home-link-inv" onclick="location.href='index.html'">🏠 หน้าแรก</button>
-                <button class="logout-btn" onclick="logout()">Logout</button>
+                <button class="logout-btn" style="background: var(--danger); border: none;" onclick="logout()">Logout</button>
             </div>
         </div>
     </div>
@@ -1091,7 +1091,7 @@
             editingCustomerId: null,
             editingProductId: null,
             settings: JSON.parse(localStorage.getItem('invoiceSettings')) || {
-                companyName: 'บริษัท (แก้ไขได้)',
+                companyName: 'Logistics by namkhang',
                 address: 'ที่อยู่บริษัท (แก้ไขได้)',
                 phone: '+66-0-0000-0000',
                 email: 'info@example.com',

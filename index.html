@@ -344,8 +344,9 @@ body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:var(--dark);line-
         </div>
       </div>
       <button class="btn-logout" style="margin-right:0.4rem;" onclick="window.history.back()">⬅ ย้อนกลับ</button>
+      <button class="btn-logout" style="background: var(--success); color: white; border: none; margin-right: 0.4rem;" onclick="location.href='index.html'">🏠 หน้าแรก</button>
       <button class="btn-logout" style="border-color:var(--primary);color:var(--primary);margin-right:0.4rem;" onclick="openChangePasswordModal()">🔑 เปลี่ยนรหัส</button>
-      <button class="btn-logout" onclick="doLogout()">🚪 ออก</button>
+      <button class="btn-logout" style="background: var(--danger); color: white; border: none;" onclick="doLogout()">🚪 ออก</button>
     </div>
   </div>
 
@@ -910,28 +911,28 @@ body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:var(--dark);line-
 
 <script>
 // ══ USERS ══
-const USERS = {
-  boss:    {pass:'boss123', name:'บอสใหญ่ใจดี',     role:'Boss',initials:'BS'},
-  admin:   {pass:'admin123',name:'Administrator',role:'Admin',initials:'AD'},
-  manager: {pass:'mgr123',  name:'ผู้จัดการ',     role:'Manager',initials:'MG'},
-  cs:      {pass:'cs123',   name:'CS Team',       role:'ประสานงาน',initials:'CS'},
-  doc:     {pass:'doc123',  name:'ฝ่ายเอกสาร',    role:'เอกสาร',initials:'DC'},
-  driver:  {pass:'driver123',name:'คนขับรถ',       role:'Driver',initials:'DR'},
-  tech:    {pass:'tech123', name:'ช่างเทคนิค',     role:'ช่าง',initials:'TC'},
-  dispatch:{pass:'disp123', name:'คนจัดรถ',        role:'Dispatch',initials:'DP'},
-  finance: {pass:'fin123',  name:'ฝ่ายการเงิน',    role:'Finance',initials:'FN'},
+const USERS_FALLBACK = {
+  boss:    {password:'boss123',  name:'บอสใหญ่ใจดี',     role:'Boss',initials:'BS'},
+  admin:   {password:'admin123',name:'Administrator',role:'Admin',initials:'AD'},
+  manager: {password:'mgr123',  name:'ผู้จัดการ',     role:'Manager',initials:'MG'},
+  cs:      {password:'cs123',   name:'CS Team',       role:'ประสานงาน',initials:'CS'},
+  doc:     {password:'doc123',  name:'ฝ่ายเอกสาร',    role:'เอกสาร',initials:'DC'},
+  driver:  {password:'driver123',name:'คนขับรถ',       role:'Driver',initials:'DR'},
+  tech:    {password:'tech123', name:'ช่างเทคนิค',     role:'ช่าง',initials:'TC'},
+  dispatch:{password:'disp123', name:'คนจัดรถ',        role:'Dispatch',initials:'DP'},
+  finance: {password:'fin123',  name:'ฝ่ายการเงิน',    role:'Finance',initials:'FN'},
 };
 
 const ROLE_PERMS = {
   'Boss':        ['all'],
   'Admin':       ['all'],
   'Manager':     ['all'],
-  'ประสานงาน':  ['nav-jobs', 'nav-dashboard', 'nav-manual', 'mod-quickjob', 'mod-datacenter', 'mod-container'],
-  'เอกสาร':     ['nav-jobs', 'nav-dashboard', 'nav-manual', 'mod-document', 'mod-datacenter'],
+  'ประสานงาน':    ['nav-jobs', 'nav-dashboard', 'nav-manual', 'mod-quickjob', 'mod-datacenter', 'mod-container', 'mod-quotation'],
+  'เอกสาร':      ['nav-jobs', 'nav-dashboard', 'nav-manual', 'mod-document', 'mod-datacenter'],
   'Driver':      ['nav-driver'],
   'ช่าง':        ['nav-dashboard', 'nav-manual', 'mod-fleet', 'mod-container'],
-  'Dispatch':    ['nav-jobs', 'nav-dashboard', 'nav-manual', 'mod-fleet', 'mod-container', 'mod-quickjob'],
-  'Finance':     ['nav-jobs', 'nav-dashboard', 'nav-manual', 'mod-invoice', 'mod-quotation', 'mod-fleet'],
+  'Dispatch':    ['nav-jobs', 'nav-dashboard', 'nav-manual', 'mod-fleet', 'mod-container', 'mod-quickjob', 'mod-quotation'],
+  'Finance':     ['nav-jobs', 'nav-dashboard', 'nav-manual', 'mod-invoice', 'mod-quotation', 'mod-fleet', 'mod-hr'],
 };
 
 // ══ MASTER DATA ══
@@ -961,52 +962,32 @@ let currentUser = null;
 
 // ══ LOGIN ══
 function doLogin(u, p) {
-  const uVal = u || document.getElementById('username').value.trim();
+  const uVal = u || document.getElementById('username').value.trim().toLowerCase();
   const pVal = p || document.getElementById('password').value;
   
   // ดึงข้อมูล User จาก Central Storage (ที่ HR จัดการ)
-  let savedUsers = JSON.parse(localStorage.getItem('mck_users'));
+  let savedUsers = JSON.parse(localStorage.getItem('mck_users') || '{}');
   
   // ถ้ายังไม่มีข้อมูลในเครื่อง (ครั้งแรก) ให้ Seed ข้อมูลจาก USERS object
-  if (!savedUsers) {
-    localStorage.setItem('mck_users', JSON.stringify({
-      boss:     {password:'boss123',   name:'บอสใหญ่ใจดี',     role:'Boss', status:'active'},
-      admin:    {password:'admin123',  name:'ผู้ดูแลระบบ',      role:'Admin', status:'active'},
-      manager:  {password:'mgr123',    name:'ผู้จัดการ สมชาย',   role:'Manager', status:'active'},
-      cs:       {password:'cs123',     name:'ทีมประสานงาน',     role:'ประสานงาน', status:'active'},
-      coord:    {password:'coord123',  name:'ทีมประสานงาน',     role:'ประสานงาน', status:'active'},
-      doc:      {password:'doc123',    name:'ฝ่ายเอกสาร',      role:'เอกสาร', status:'active'},
-      driver:   {password:'driver123', name:'นายประสิทธ์พร',    role:'Driver', status:'active'},
-      tech:     {password:'tech123',   name:'ช่างเทคนิค',       role:'ช่าง', status:'active'},
-      dispatch: {password:'disp123',   name:'ทีมจัดรถ',        role:'Dispatch', status:'active'},
-      finance:  {password:'fin123',    name:'ฝ่ายการเงิน',      role:'Finance', status:'active'}
-    }));
-    savedUsers = JSON.parse(localStorage.getItem('mck_users'));
-  }
+  const allUsers = Object.keys(savedUsers).length > 0 ? { ...USERS_FALLBACK, ...savedUsers } : USERS_FALLBACK;
+  
+  const user = allUsers[uVal];
+  const userPass = user ? (user.password || user.pass) : null;
 
-  const user = savedUsers[uVal];
-  const userPass = user ? user.password : null;
-
-  if (!user || userPass !== pVal) {
+  if (!user || String(userPass) !== String(pVal)) {
     const err = document.getElementById('loginError');
     err.style.display = 'block';
     setTimeout(() => err.style.display = 'none', 3000);
     return;
   }
 
-  // ตรวจสอบสถานะ Suspend
   if (user.status === 'suspended') {
-    alert('🚨 บัญชีของคุณถูกระงับการใช้งานชั่วคราว\nกรุณาติดต่อฝ่ายบริหารหรือ HR');
+    alert('บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อบอส');
     return;
   }
 
-  // บันทึก Audit Log เมื่อ Login สำเร็จ
-  addAuditLog(user.name, 'Login', 'เข้าสู่ระบบสำเร็จ (Portal)');
-
-  currentUser = {username: uVal, ...user};
-  currentUser.password = userPass; // เก็บไว้ใช้ยืนยันรหัสชั้นที่ 2
-  // ตรวจสอบ initials กรณีดึงจาก storage
-  if (!currentUser.initials) currentUser.initials = user.name.charAt(0).toUpperCase();
+  currentUser = { username: uVal, ...user };
+  if (!currentUser.initials) currentUser.initials = currentUser.name.charAt(0).toUpperCase();
   
   sessionStorage.setItem('mck_user', JSON.stringify(currentUser));
   showApp();

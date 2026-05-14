@@ -2,6 +2,11 @@
 
 ระบบเว็บแอปพลิเคชันสำหรับจัดการเอกสารส่งออกสินค้าแบบครบวงจร พัฒนาขึ้นเพื่อทดแทนการทำงานบน Excel (เดิมคือ Invoice 10-2.xlsx) เพื่อลดความซับซ้อน ลดข้อผิดพลาด (Human Error) และเพิ่มประสิทธิภาพในการออกเอกสาร
 
+## 🌐 ช่องทางการเข้าใช้งาน (Access Link)
+คุณสามารถเข้าใช้งานระบบได้ทันทีผ่าน:
+*   **Live Demo:** [https://namkhang.github.io/Logisticbynamkhang/DOCUMENTS.html](https://namkhang.github.io/Logisticbynamkhang/DOCUMENTS.html)
+*   **Offline:** ดาวน์โหลดโปรเจคแล้วเปิดไฟล์ `DOCUMENTS.html` ด้วย Web Browser
+
 ## 🚀 ภาพรวมระบบ (Project Overview)
 ระบบนี้ถูกออกแบบมาเพื่อรองรับงานขนส่งทางเรือ รถไฟ (ไทย-จีน-ลาว) และการขนส่งชายแดน โดยเน้นการสร้าง Invoice, Packing List และ Shipping Documents ที่มีความถูกต้องแม่นยำสูงผ่านระบบ Validation อัตโนมัติ
 
@@ -77,4 +82,3 @@
 ---
 **Version**: 1.0.0
 **Last Updated**: 13 May 2024
-**Developer**: ICL Logistics Development Team

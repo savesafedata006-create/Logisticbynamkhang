@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fleet Hub — ICL Logistics</title>
+    <title>Logistics by namkhang - Fleet Hub</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
@@ -40,8 +40,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
       <div class="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
         <i class="fas fa-truck text-2xl text-white"></i>
       </div>
-      <h1 class="text-xl font-bold text-white">Fleet Hub</h1>
-      <p class="text-slate-400 text-xs mt-1">ICL Logistics — ระบบบริหารจัดการรถ</p>
+      <h1 class="text-xl font-bold text-white">Logistics by namkhang</h1>
+      <p class="text-slate-400 text-xs mt-1">Fleet Hub — ระบบบริหารจัดการรถ</p>
     </div>
     <div class="p-6">
       <div class="mb-3">
@@ -75,7 +75,25 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
 
-<!-- MAIN LAYOUT -->
+<!-- Header Bar -->
+<div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white p-4 sticky top-0 z-50 shadow-md">
+    <div class="flex justify-between items-center max-w-full px-4">
+        <h1 class="font-bold text-xl kanit flex items-center gap-2">🚛 Logistics by namkhang</h1>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-xl border border-white/20">
+                <div class="w-8 h-8 bg-warning rounded-full flex items-center justify-center font-bold text-dark" id="header-avatar">?</div>
+                <div class="text-left leading-tight hidden md:block">
+                    <p class="font-bold text-sm" id="sb-user-name">Admin</p>
+                    <p class="text-[10px] opacity-70" id="sb-user-role">Fleet Manager</p>
+                </div>
+            </div>
+            <button class="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg text-xs font-bold transition" onclick="window.history.back()">⬅ ย้อนกลับ</button>
+            <button class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-lg text-xs font-bold transition" onclick="location.href='index.html'">🏠 หน้าแรก</button>
+            <button class="bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg text-xs font-bold transition" onclick="doLogout()">Logout</button>
+        </div>
+    </div>
+</div>
+
 <div class="flex min-h-screen">
   <!-- SIDEBAR -->
   <div class="w-64 bg-slate-900 flex flex-col" style="min-height:100vh;">
@@ -85,8 +103,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
           <i class="fas fa-truck text-white"></i>
         </div>
         <div>
-          <div class="text-white font-bold text-sm">Fleet Hub</div>
-          <div class="text-slate-400 text-xs">ICL Logistics</div>
+          <div class="text-white font-bold text-sm">Logistics by namkhang</div>
+          <div class="text-slate-400 text-xs">Fleet Hub</div>
         </div>
       </div>
     </div>
@@ -1818,33 +1836,25 @@ function showToast(msg, type = 'success') {
 }
 
 // ===== BOOT =====
-window.addEventListener('DOMContentLoaded', () => {
-  // 1. ตรวจสอบว่าล็อกอินจากหน้า Portal (index.html) หรือยัง
-  const portalSession = sessionStorage.getItem('mck_user');
-  if (portalSession) {
-    currentUser = JSON.parse(portalSession);
-    document.getElementById('login-overlay').style.display = 'none';
-    applyRole(currentUser.role);
-    const tabs = ROLE_CONFIG[currentUser.role]?.tabs || ['all'];
-    showTab(tabs[0] === 'all' ? 'dashboard' : tabs[0]);
-    initPage();
-    return;
-  }
-
-  // 2. ถ้าไม่มี Session ให้เช็ค LocalStorage เดิม
-  const saved = localStorage.getItem('fleet_user');
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      document.getElementById('login-overlay').style.display = 'none';
-      applyRole(currentUser.role);
-      const tabs = (ROLE_CONFIG[currentUser.role] || ROLE_CONFIG['Administrator']).tabs;
-      showTab(tabs[0]);
-      initPage();
-    } catch(e) { localStorage.removeItem('fleet_user'); }
-  }
-});
+    window.addEventListener('DOMContentLoaded', () => {
+        const portalSession = sessionStorage.getItem('mck_user');
+        if (portalSession) {
+            currentUser = JSON.parse(portalSession);
+            document.getElementById('login-overlay').style.display = 'none';
+            
+            // อัปเดตข้อมูลผู้ใช้ใน Header
+            document.getElementById('sb-user-name').textContent = currentUser.name;
+            document.getElementById('sb-user-role').textContent = currentUser.role;
+            document.getElementById('header-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            
+            applyRole(currentUser.role);
+            const tabs = ROLE_CONFIG[currentUser.role]?.tabs || ['dashboard'];
+            showTab(tabs[0]);
+            initPage();
+        } else {
+            document.getElementById('login-overlay').style.display = 'flex';
+        }
+    });
 </script>
 </body>
 </html>
-ำหนด
