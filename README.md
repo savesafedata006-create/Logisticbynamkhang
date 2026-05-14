@@ -1,84 +1,131 @@
-# 📦 Logisticbynamkhang - Export Management System (Invoice10)
+# MCK Logistics — ระบบจัดการโลจิสติกส์ครบวงจร
 
-ระบบเว็บแอปพลิเคชันสำหรับจัดการเอกสารส่งออกสินค้าแบบครบวงจร พัฒนาขึ้นเพื่อทดแทนการทำงานบน Excel (เดิมคือ Invoice 10-2.xlsx) เพื่อลดความซับซ้อน ลดข้อผิดพลาด (Human Error) และเพิ่มประสิทธิภาพในการออกเอกสาร
+ระบบเว็บแอปพลิเคชันสำหรับบริหารงานโลจิสติกส์และส่งออกสินค้าแบบครบวงจร รองรับการขนส่งทางเรือ รถไฟ (ไทย–จีน–ลาว) และการขนส่งชายแดน พัฒนาด้วย Vanilla HTML/CSS/JS โดยไม่ต้องพึ่ง Server — ข้อมูลทั้งหมดเก็บใน Browser LocalStorage
 
-## 🌐 ช่องทางการเข้าใช้งาน (Access Link)
-คุณสามารถเข้าใช้งานระบบได้ทันทีผ่าน:
-*   **Live Demo:** [https://namkhang.github.io/Logisticbynamkhang/DOCUMENTS.html](https://namkhang.github.io/Logisticbynamkhang/DOCUMENTS.html)
-*   **Offline:** ดาวน์โหลดโปรเจคแล้วเปิดไฟล์ `DOCUMENTS.html` ด้วย Web Browser
+## 🌐 ทดสอบระบบออนไลน์
 
-## 🚀 ภาพรวมระบบ (Project Overview)
-ระบบนี้ถูกออกแบบมาเพื่อรองรับงานขนส่งทางเรือ รถไฟ (ไทย-จีน-ลาว) และการขนส่งชายแดน โดยเน้นการสร้าง Invoice, Packing List และ Shipping Documents ที่มีความถูกต้องแม่นยำสูงผ่านระบบ Validation อัตโนมัติ
+> **Live Demo:** [https://silenttl.github.io/Logisticbynamkhang/](https://silenttl.github.io/Logisticbynamkhang/)
 
-## ✨ ฟีเจอร์หลัก (Key Features)
+หน้าแรกคือหน้า **Login** — ใช้บัญชีทดสอบด้านล่างเพื่อเข้าใช้งาน
 
-### 1. Invoice Management 🧾
-รองรับการสร้างใบแจ้งหนี้ 7 รูปแบบในระบบเดียว:
-*   **NK**: รูปแบบมาตรฐาน
-*   **TRAIN-CN / TRAIN-LAO**: สำหรับการขนส่งทางรถไฟ
-*   **THB / CNY / USD**: รองรับหลายสกุลเงิน
-*   **MUK**: สำหรับด่านมุกดาหาร
+| Username   | Password    | Role       | สิทธิ์                            |
+|------------|-------------|------------|-----------------------------------|
+| `boss`     | `boss123`   | Boss       | ทุกหน้า                           |
+| `admin`    | `admin123`  | Admin      | ทุกหน้า                           |
+| `manager`  | `mgr123`    | Manager    | ทุกหน้า                           |
+| `cs`       | `cs123`     | ประสานงาน  | Dashboard, Datacenter, Container, Quotation, Shipping |
+| `doc`      | `doc123`    | เอกสาร     | Dashboard, Datacenter, Document, Shipping, SOP |
+| `driver`   | `driver123` | Driver     | Driver Portal เท่านั้น            |
+| `tech`     | `tech123`   | ช่าง        | Dashboard, Fleet, Container       |
+| `dispatch` | `disp123`   | Dispatch   | Dashboard, Fleet, Container, Quotation |
+| `finance`  | `fin123`    | Finance    | Dashboard, Invoice, Quotation, Fleet, HR |
 
-### 2. ระบบตรวจสอบข้อมูล (Validation System)
-ช่วยลดความผิดพลาดก่อนบันทึกเอกสาร:
-*   **HS CODE Validation**: ตรวจสอบการระบุรหัสพิกัดศุลกากร
-*   **Weight Validation**: ป้องกันการลืมใส่น้ำหนัก หรือน้ำหนักไม่ถูกต้อง
-*   **Currency Check**: ตรวจสอบความถูกต้องของสกุลเงินที่ใช้
-*   **Duplicate Detection**: ป้องกันรายการสินค้าซ้ำในใบเดียว
+---
 
-### 3. ระบบคำนวณอัตโนมัติ (Auto Calculation)
-*   คำนวณยอดรวม (Grand Total) และน้ำหนักรวม (Total Weight)
-*   รองรับการคำนวณเงื่อนไขราคา **FOB, CNF, และ CIF**
-*   ระบบจัดการอัตราแลกเปลี่ยน (Exchange Rate) ในตัว
+## 📦 ภาพรวมโมดูล (12 หน้า)
 
-### 4. Document Management & Templates 📋
-*   สร้างและจัดการ Packing List, Shipping Document, และ Export Document
-*   มีระบบ Templates Library สำหรับเลือกรูปแบบเอกสารที่ต้องการ
-*   Dashboard สรุปภาพรวมและสถิติเอกสารทั้งหมด
+| โมดูล | ไฟล์ | คำอธิบาย |
+|-------|------|----------|
+| 🏠 Dashboard | `dashboard.html` | ภาพรวมงาน สถิติ KPI รายวัน |
+| 🗄 Datacenter | `datacenter.html` | ฐานข้อมูลลูกค้า สินค้า Consignee |
+| 📄 ทีมเอกสาร | `document-team.html` | ติดตามสถานะงานเอกสาร |
+| 📦 Container Hub | `container-hub.html` | จัดการตู้คอนเทนเนอร์ การจองและการใช้งาน |
+| 🚛 Fleet Hub | `fleet-hub.html` | บริหารรถและคนขับ ติดตามทะเบียนรถ |
+| 🧾 Invoice | `INVOICE.html` | ออกใบแจ้งหนี้ 7 รูปแบบ พร้อม Packing List |
+| 💰 ต้นทุน/ราคา | `quotation-costing.html` | คำนวณต้นทุน ราคาขาย FOB/CNF/CIF |
+| 🏛 เอกสารราชการ | `shipping-gov.html` | เอกสารส่งออก ใบขน Permit |
+| 👥 HR & Perms | `hr-management.html` | จัดการพนักงาน สิทธิ์เข้าถึงแต่ละหน้า |
+| 🚗 Driver Portal | `driver-portal.html` | พอร์ทัลสำหรับคนขับ งานและรายการจัดส่ง |
+| 🔒 Security | `security-overview.html` | ภาพรวมความปลอดภัย Log การเข้าใช้ |
+| 📋 SOP & WI | `SOP-WI.html` | คู่มือขั้นตอนการทำงานและ Work Instruction |
 
-## 🛠 เทคโนโลยีที่ใช้ (Tech Stack)
+---
 
-*   **Frontend**: HTML5, CSS3, JavaScript (Vanilla ES6+)
-*   **UI Framework**: Responsive Design (รองรับทั้ง Desktop, Tablet, และ Mobile)
-*   **Storage**: Browser LocalStorage (สำหรับการเก็บข้อมูลฝั่ง Client ใน Phase 1)
-*   **Data Structure**: JSON-based storage
+## 🔐 ระบบ Authentication (MCK Auth)
 
-## 📂 โครงสร้างข้อมูล (Data Storage)
-ระบบจัดเก็บข้อมูลใน `LocalStorage` โดยใช้ Keys หลักดังนี้:
-*   `docInvoices`: ข้อมูลใบแจ้งหนี้
-*   `docPacking`: ข้อมูลรายการบรรจุภัณฑ์
-*   `docShipping`: ข้อมูลเอกสารการขนส่ง
-*   `docSettings`: การตั้งค่าบริษัทและอัตราแลกเปลี่ยน
+ระบบใช้ **MCK_Auth** — โมดูล JS ที่เขียนเป็น IIFE กลาง ไฟล์เดียว (`auth.js`) ใช้ร่วมกันทุกหน้า
+
+**คุณสมบัติหลัก:**
+- **Persistent Login** — session เก็บใน `localStorage` ไม่ต้อง login ซ้ำแม้ปิด browser
+- **Role-Based Access Control (RBAC)** — แต่ละ role มีสิทธิ์เข้าหน้าต่างๆ ตามที่กำหนด
+- **Auth Guard** — ทุกหน้าย่อยมี `MCK_Auth.check('pageKey')` ใน `<head>` ป้องกันการเข้าถึงโดยตรง
+- **Permission Matrix UI** — หน้า HR มีตารางให้ Admin แก้ไขสิทธิ์ได้แบบ Real-time
+- **Single User Database** — ผู้ใช้ทั้งหมดเก็บใน `localStorage` key `mck_users` ใช้ร่วมกันทุกหน้า
+
+**LocalStorage Keys หลัก:**
+| Key | เนื้อหา |
+|-----|---------|
+| `mck_session` | Session ของผู้ใช้ที่ login อยู่ |
+| `mck_users` | ข้อมูลผู้ใช้ทั้งหมด (เพิ่มจาก HR ได้) |
+| `mck_page_perms` | สิทธิ์เข้าถึงแต่ละหน้าต่อ role (แก้ไขจาก HR) |
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend:** HTML5, CSS3, JavaScript (Vanilla ES6+)
+- **Styling:** Tailwind CSS (CDN) + `shared.css` design system ของโปรเจค
+- **Storage:** Browser LocalStorage (Client-side, ไม่ต้องการ Server)
+- **Auth:** Custom IIFE module (`auth.js`) — ไม่ใช้ library ภายนอก
+- **Icons:** Font Awesome 6
+
+---
 
 ## ⚙️ การติดตั้งและเริ่มต้นใช้งาน
 
-1.  **Clone Project**:
-    ```bash
-    git clone https://github.com/namkhang/Logisticbynamkhang.git
-    ```
-2.  **เปิดใช้งาน**:
-    เปิดไฟล์ `DOCUMENTS.html` หรือ `INVOICE.html` ผ่านเว็บเบราว์เซอร์ (แนะนำ Google Chrome)
-3.  **การตั้งค่า**:
-    ไปที่เมนู **Settings** ⚙️ เพื่อตั้งค่าข้อมูลบริษัทและอัตราแลกเปลี่ยนก่อนเริ่มใช้งานครั้งแรก
+```bash
+# Clone
+git clone https://github.com/Silenttl/Logisticbynamkhang.git
+cd Logisticbynamkhang
 
-## 📊 ขั้นตอนการทำงาน (Workflow)
-1.  **Master Data**: เพิ่มข้อมูลลูกค้า (Customer) และสินค้า (Product) ในระบบ
-2.  **Create**: เลือกประเภท Invoice และกรอกข้อมูลหัวเอกสาร
-3.  **Add Items**: เลือกสินค้าและระบุจำนวน (ระบบจะดึง HS CODE และคำนวณราคาให้อัตโนมัติ)
-4.  **Validate & Save**: ระบบตรวจสอบความถูกต้องและบันทึกลงในฐานข้อมูล
-5.  **Print/Export**: พิมพ์เอกสารหรือบันทึกเป็น PDF ผ่านเบราว์เซอร์
+# เปิดในเบราว์เซอร์ (แนะนำ Chrome / Edge)
+open index.html
+```
 
-## 🛣 Roadmap ในอนาคต
-- [ ] เชื่อมต่อฐานข้อมูลฝั่ง Server (Node.js + PostgreSQL/MySQL)
-- [ ] ระบบส่งเอกสารผ่าน Email และ SMS Notification
-- [ ] ระบบ Export เป็น PDF โดยตรงจากระบบ
-- [ ] ระบบ Authentication และ Role-based Access Control
-- [ ] ระบบจัดการสต็อกสินค้า (Inventory Integration)
+> ไม่ต้องติดตั้ง dependency หรือ build step — เปิดไฟล์ได้เลย
 
-## 🔐 ความปลอดภัยและข้อแนะนำ
-*   **Data Backup**: เนื่องจากปัจจุบันเก็บข้อมูลใน LocalStorage ควรหมั่นทำการ Backup หรือใช้ฟีเจอร์ Export ข้อมูลอย่างสม่ำเสมอ
-*   **Security**: ข้อมูลจะถูกเก็บไว้ที่เครื่องของผู้ใช้งานเท่านั้น (Client-side)
+**ขั้นตอนแรก:**
+1. เปิด `index.html` → หน้า Login จะปรากฏ
+2. Login ด้วย `boss / boss123` เพื่อเข้าถึงทุกโมดูล
+3. ไปที่ **HR & Perms** เพื่อจัดการสิทธิ์และเพิ่มผู้ใช้
 
 ---
-**Version**: 1.0.0
-**Last Updated**: 13 May 2024
+
+## 📊 โครงสร้างไฟล์
+
+```
+Logisticbynamkhang/
+├── index.html              ← หน้า Login + Module Launcher
+├── auth.js                 ← MCK Auth — ระบบ Login กลาง
+├── shared.css              ← Design system ร่วม
+├── dashboard.html
+├── datacenter.html
+├── document-team.html
+├── container-hub.html
+├── fleet-hub.html
+├── INVOICE.html
+├── quotation-costing.html
+├── shipping-gov.html
+├── hr-management.html
+├── driver-portal.html
+├── security-overview.html
+└── SOP-WI.html
+```
+
+---
+
+## 🛣 Roadmap
+
+- [x] ระบบ Authentication + Role-Based Access Control
+- [x] Permission Matrix UI ใน HR Page
+- [x] Persistent Login (localStorage session)
+- [x] Auth Guard ทุกหน้า
+- [ ] Export เอกสารเป็น PDF โดยตรง
+- [ ] ระบบ Notification / แจ้งเตือนงาน
+- [ ] เชื่อมต่อ Backend (Node.js + PostgreSQL)
+- [ ] ระบบ Audit Log เต็มรูปแบบ
+- [ ] Mobile App (PWA)
+
+---
+
+**Version:** 2.0.0 | **Last Updated:** May 2026 | **Author:** Silenttl
