@@ -16,7 +16,7 @@ body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:var(--dark);line-
 
 /* ══ LOGIN ══ */
 #loginScreen{
-  display:flex;align-items:center;justify-content:center;
+  display:none;align-items:center;justify-content:center;
   min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e40af 50%,#0f172a 100%);
   padding:1rem;
 }
@@ -62,7 +62,7 @@ body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:var(--dark);line-
 }
 
 /* ══ APP ══ */
-#app{display:none;flex-direction:column;min-height:100vh}
+#app{display:flex;flex-direction:column;min-height:100vh}
 
 /* TOPBAR */
 .topbar{
@@ -368,7 +368,7 @@ body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:var(--dark);line-
       <div class="dash-hero">
         <div>
           <h2>ยินดีต้อนรับ 👋</h2>
-          <p id="heroSub">MCK International Trading Co., Ltd.</p>
+          <p id="heroSub">Logistics by namkhang</p>
         </div>
         <div class="dash-hero-date">
           <strong id="heroDate">—</strong>
@@ -422,6 +422,12 @@ body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:var(--dark);line-
               <div class="module-title">ต้นทุน & เสนอราคา</div>
               <div class="module-desc">วิเคราะห์ต้นทุนเที่ยววิ่ง และคำนวณราคาเสนอขายลูกค้า</div>
               <span class="module-badge" style="background:#fef3c7;color:#92400e">CS & Fleet</span>
+            </a>
+            <a id="mod-shipping" class="module-card" href="shipping-gov.html">
+              <span class="module-icon">🚢</span>
+              <div class="module-title">เอกสารยื่นราชการ</div>
+              <div class="module-desc">เอกสาร Shipping สำหรับยื่นหน่วยงานราชการ</div>
+              <span class="module-badge" style="background:#e0f2fe;color:#0369a1">Shipping</span>
             </a>
             <a id="mod-hr" class="module-card" href="hr-management.html">
               <span class="module-icon">👥</span>
@@ -909,6 +915,7 @@ body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:var(--dark);line-
   </div>
 </div>
 
+<script src="auth.js"></script>
 <script>
 // ══ USERS ══
 const USERS_FALLBACK = {
@@ -962,42 +969,30 @@ let currentUser = null;
 
 // ══ LOGIN ══
 function doLogin(u, p) {
-  const uVal = u || document.getElementById('username').value.trim().toLowerCase();
+  const uVal = u || document.getElementById('username').value.trim();
   const pVal = p || document.getElementById('password').value;
-  
-  // ดึงข้อมูล User จาก Central Storage (ที่ HR จัดการ)
-  let savedUsers = JSON.parse(localStorage.getItem('mck_users') || '{}');
-  
-  // ถ้ายังไม่มีข้อมูลในเครื่อง (ครั้งแรก) ให้ Seed ข้อมูลจาก USERS object
-  const allUsers = Object.keys(savedUsers).length > 0 ? { ...USERS_FALLBACK, ...savedUsers } : USERS_FALLBACK;
-  
-  const user = allUsers[uVal];
-  const userPass = user ? (user.password || user.pass) : null;
 
-  if (!user || String(userPass) !== String(pVal)) {
+  const result = MCK_Auth.login(uVal, pVal);
+  if (!result.ok) {
     const err = document.getElementById('loginError');
+    err.textContent = result.msg;
     err.style.display = 'block';
-    setTimeout(() => err.style.display = 'none', 3000);
+    setTimeout(() => err.style.display = 'none', 3500);
     return;
   }
 
-  if (user.status === 'suspended') {
-    alert('บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อบอส');
+  currentUser = result.user;
+
+  if (currentUser.role === 'Driver') {
+    window.location.href = 'driver-portal.html';
     return;
   }
 
-  currentUser = { username: uVal, ...user };
-  if (!currentUser.initials) currentUser.initials = currentUser.name.charAt(0).toUpperCase();
-  
-  sessionStorage.setItem('mck_user', JSON.stringify(currentUser));
   showApp();
 }
 
 function doLogout() {
-  sessionStorage.removeItem('mck_user');
-  currentUser = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
+  MCK_Auth.logout();
 }
 
 // show driver tab only for driver (demo: ถ้าสลับ role แล้วอยากให้เห็นเฉพาะคนขับจริงค่อยคุมเพิ่ม)
@@ -1012,28 +1007,34 @@ function showApp() {
   loadStats();
   
   const userPerms = ROLE_PERMS[currentUser.role] || [];
-
-  // Apply Role-based Permissions for Driver
-  const isDriver = currentUser.role === 'Driver';
-  
-  // Redirect Driver to separated system
-  if (isDriver && !window.location.pathname.includes('driver-portal')) {
-    window.location.href = 'driver-portal.html';
-    return;
-  }
+  // Page-level perms from MCK_Auth (managed by HR)
+  const pagePerms = MCK_Auth.getPerms()[currentUser.role] || [];
+  const hasAll = userPerms.includes('all') || pagePerms.indexOf('all') !== -1;
 
   // ══ DYNAMIC UI FILTERING ══
-  const allProtectedElements = [
-    'mod-dashboard', 'mod-datacenter', 'mod-document', 'mod-container',
-    'mod-fleet', 'mod-invoice', 'mod-quotation', 'mod-hr', 'mod-quickjob',
-    'nav-jobs', 'nav-driver', 'nav-dashboard', 'nav-manual'
-  ];
+  const navProtected = ['nav-jobs', 'nav-driver', 'nav-dashboard', 'nav-manual'];
+  const modToPage = {
+    'mod-dashboard':  'dashboard',  'mod-datacenter': 'datacenter',
+    'mod-document':   'document',   'mod-container':  'container',
+    'mod-fleet':      'fleet',      'mod-invoice':    'invoice',
+    'mod-quotation':  'quotation',  'mod-shipping':   'shipping',
+    'mod-hr':         'hr',
+  };
 
-  if (!userPerms.includes('all')) {
-    allProtectedElements.forEach(id => {
+  if (!hasAll) {
+    // Nav tabs — use ROLE_PERMS
+    navProtected.forEach(id => {
       const el = document.getElementById(id);
       if (el && !userPerms.includes(id)) el.style.display = 'none';
     });
+    // Module cards — use MCK_Auth page perms
+    Object.entries(modToPage).forEach(([modId, pageKey]) => {
+      const el = document.getElementById(modId);
+      if (el && pagePerms.indexOf(pageKey) === -1) el.style.display = 'none';
+    });
+    // quickjob: show if nav-jobs or quickjob in perms
+    const qj = document.getElementById('mod-quickjob');
+    if (qj && !userPerms.includes('mod-quickjob') && !userPerms.includes('all')) qj.style.display = 'none';
     // ซ่อน monitoring sections ที่เป็น office-only
     document.getElementById('driver-monitor-row').style.display = 'none';
     document.getElementById('additional-work-monitor-row').style.display = 'none';
@@ -1564,6 +1565,28 @@ document.addEventListener('click', e => {
     document.querySelectorAll('.ac-list').forEach(l => l.classList.remove('open'));
 });
 
+// ══ CHANGE PASSWORD ══
+function doChangePassword() {
+  const oldPass = document.getElementById('chg-old-pass').value;
+  const newPass = document.getElementById('chg-new-pass').value;
+  const confirm = document.getElementById('chg-confirm-pass').value;
+  if (!oldPass || !newPass) return alert('กรุณากรอกรหัสผ่านให้ครบ');
+  if (newPass !== confirm) return alert('รหัสผ่านใหม่ไม่ตรงกัน');
+  if (String(currentUser.password) !== String(oldPass)) return alert('รหัสผ่านเดิมไม่ถูกต้อง');
+
+  const users = MCK_Auth.getUsers();
+  if (users[currentUser.username]) {
+    users[currentUser.username].password = newPass;
+    localStorage.setItem('mck_users', JSON.stringify(users));
+    const newSession = Object.assign({}, currentUser, { password: newPass });
+    localStorage.setItem('mck_session', JSON.stringify(newSession));
+    sessionStorage.setItem('mck_user', JSON.stringify(newSession));
+    currentUser = newSession;
+    closeModal('modalChangePassword');
+    alert('✅ เปลี่ยนรหัสผ่านเรียบร้อยแล้ว');
+  }
+}
+
 // ══ MODAL ══
 function openModal(id)  { document.getElementById(id).classList.add('open') }
 function closeModal(id) { document.getElementById(id).classList.remove('open') }
@@ -1573,10 +1596,17 @@ document.addEventListener('click', e => {
 
 // ══ INIT ══
 (function init() {
-  const saved = sessionStorage.getItem('mck_user');
-  if (saved) {
-    currentUser = JSON.parse(saved);
+  const session = MCK_Auth.getUser();
+  if (session) {
+    currentUser = session;
+    sessionStorage.setItem('mck_user', JSON.stringify(session)); // backward compat
+    if (currentUser.role === 'Driver') {
+      window.location.href = 'driver-portal.html';
+      return;
+    }
     showApp();
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
   }
 })();
 </script>

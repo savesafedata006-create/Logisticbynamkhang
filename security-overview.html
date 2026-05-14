@@ -5,44 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Security Overview — MCK Logistics</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script>
+<script>MCK_Auth.check('security');</script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
-body{font-family:'Sarabun',sans-serif;background:#fff1f2;color:#1e293b;}
+body{color:#1e293b;}
 .kanit{font-family:'Kanit',sans-serif;}
 .security-card { background: white; border-radius: 20px; border: 2px solid #fecaca; }
 .chart-bar { background: linear-gradient(to top, #ef4444, #f87171); border-radius: 4px 4px 0 0; min-height: 2px; transition: height 0.6s ease-out; }
 </style>
 </head>
-<body class="p-4 md:p-8">
-  <div class="max-w-6xl mx-auto">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
+<body>
+  <!-- Standard Topbar -->
+  <header class="g-topbar">
+    <div class="g-topbar-left">
+      <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
+      <div class="g-logo">🔒</div>
       <div>
-        <h1 class="text-3xl font-bold text-red-800 kanit flex items-center gap-3">
-          <i class="fas fa-shield-virus"></i> Security Overview
-        </h1>
-        <p class="text-red-600 font-semibold text-sm uppercase tracking-wider">สำหรับบอสและผู้ดูแลความปลอดภัยเท่านั้น</p>
-      </div>
-      <a href="index.html" class="bg-white border-2 border-red-200 px-5 py-2.5 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 transition">
-        <i class="fas fa-arrow-left mr-2"></i>กลับหน้าหลัก
-      </a>
-      <div class="flex items-center gap-3" style="background:white; padding:0.5rem 1rem; border-radius:12px; border:1px solid #e2e8f0;">
-      <div class="flex items-center gap-3" style="background:white; padding:0.5rem 1rem; border-radius:12px; border:1px solid #fecaca;">
-        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" 
-             id="user-avatar-display" style="background:#ef4444;">-</div>
-        <div class="text-sm hidden md:block text-right">
-          <span class="text-slate-400 font-bold uppercase text-[10px] block leading-tight">ผู้ใช้งาน</span>
-          <span class="font-bold text-slate-700" id="user-identity">—</span>
-        </div>
-        <button onclick="window.history.back()" class="bg-white border border-red-200 px-4 py-2 rounded-lg text-sm font-bold text-red-600 hover:bg-red-50 transition">
-          <i class="fas fa-arrow-left mr-1"></i> ย้อนกลับ
-        </button>
-        <a href="index.html" id="home-link-security" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700 transition flex items-center gap-2 shadow-md">
-          <i class="fas fa-home"></i> หน้าแรก
-        </a>
+        <div class="g-title">Security Overview</div>
+        <div class="g-subtitle">สำหรับบอสและผู้ดูแลความปลอดภัยเท่านั้น</div>
       </div>
     </div>
+    <div class="g-topbar-right">
+      <div class="g-user-chip g-hide-mobile">
+        <div class="g-user-avatar" id="user-avatar-display">-</div>
+        <div>
+          <div class="g-user-name" id="user-identity">—</div>
+          <div class="g-user-role">Admin</div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="max-w-6xl mx-auto p-4 md:p-6">
 
     <!-- Weekly Stats -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -175,14 +169,10 @@ body{font-family:'Sarabun',sans-serif;background:#fff1f2;color:#1e293b;}
     }
 
     window.onload = () => {
-      const user = JSON.parse(sessionStorage.getItem('mck_user'));
-      if (!user || user.role !== 'Boss') {
-        alert('⚠️ เฉพาะสิทธิ์ Boss เท่านั้นที่สามารถดูหน้านี้ได้');
-        location.href = 'index.html';
-        return;
-      }
+      MCK_Auth.fillTopbar();
       renderSecurityOverview();
     };
   </script>
+</div><!-- /max-w-6xl -->
 </body>
 </html>

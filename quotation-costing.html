@@ -5,39 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quotation & Costing — MCK Logistics</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script>
+<script>MCK_Auth.check('quotation');</script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Kanit:wght@500;600&display=swap');
-body{font-family:'Sarabun',sans-serif;background:#f8fafc;}
+body{background:#f0f4f8;}
 .kanit{font-family:'Kanit',sans-serif;}
 input:focus, select:focus { outline:none; border-color:#2563eb; ring: 2px #dbeafe; }
+
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --dark: #1e293b;
+}
 </style>
 </head>
-<body class="p-4 md:p-8">
-  <div class="max-w-5xl mx-auto">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
+<body class="bg-slate-50">
+
+  <!-- Standard Topbar -->
+  <header class="g-topbar">
+    <div class="g-topbar-left">
+      <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
+      <div class="g-logo">LN</div>
       <div>
-        <h1 class="text-2xl font-bold text-slate-800 kanit">💰 Quotation & Costing</h1>
-        <p class="text-slate-500 text-sm">ระบบคำนวณต้นทุนเที่ยววิ่งและประมาณการราคาเสนอขาย</p>
+        <div class="g-title">Quotation & Costing</div>
+        <div class="g-subtitle">คำนวณต้นทุนและราคาเสนอขาย</div>
       </div>
-      <div class="flex items-center gap-3">
-        <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 text-sm hidden md:block text-right">
-          <span class="text-slate-400 font-bold uppercase text-[10px] block leading-tight">บัญชีผู้ใช้</span>
-      <div class="flex items-center gap-3" style="background:white; padding:0.5rem 1rem; border-radius:12px; border:1px solid #e2e8f0;">
-        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" 
-             id="user-avatar-display" style="background:#2563eb;">-</div>
-        <div class="text-sm hidden md:block text-right">
-          <span class="text-slate-400 font-bold uppercase text-[10px] block leading-tight">ผู้ใช้งาน</span>
-          <span class="font-bold text-slate-700" id="user-info-display">—</span>
+    </div>
+    <div class="g-topbar-right">
+      <div class="g-user-chip g-hide-mobile">
+        <div class="g-user-avatar" id="user-avatar-display">?</div>
+        <div>
+          <div class="g-user-name" id="user-info-display">Admin</div>
+          <div class="g-user-role">ผู้จัดการ</div>
         </div>
-        <button onclick="window.history.back()" class="bg-white border border-slate-300 px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition">
-          <i class="fas fa-arrow-left mr-1"></i> ย้อนกลับ
-        </button>
-        <a href="index.html" id="home-btn-qc" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition flex items-center gap-2 shadow-md">
-          <i class="fas fa-home"></i> หน้าแรก
-        </a>
       </div>
+      <button class="g-btn g-btn-danger" onclick="doLogout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto p-4 md:p-8">
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-slate-800 kanit">Quotation & Costing</h2>
+        <p class="text-slate-500 text-sm">ระบบคำนวณต้นทุนเที่ยววิ่งและประมาณการราคาเสนอขาย</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -128,17 +141,17 @@ input:focus, select:focus { outline:none; border-color:#2563eb; ring: 2px #dbeaf
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
             <div>
               <p class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-2">สรุปต้นทุนเที่ยววิ่ง (Fleet Cost)</p>
-              <div class="text-4xl font-bold kanit" id="res_total_cost">฿ 0.00</div>
+              <div class="text-4xl font-bold font-mono" id="res_total_cost">฿ 0.00</div>
               <div class="mt-4 space-y-2 text-sm text-slate-400">
                 <div class="flex justify-between"><span>ค่าน้ำมัน:</span><span id="res_fuel_cost" class="text-white">—</span></div>
                 <div class="flex justify-between"><span>ค่าคนขับ + จิปาถะ:</span><span id="res_driver_total" class="text-white">—</span></div>
                 <div class="flex justify-between"><span>เครื่องปั่นไฟ:</span><span id="res_gen_cost" class="text-white">—</span></div>
-                <div class="flex justify-between border-t border-slate-700 pt-2"><span>ต้นทุนเฉลี่ย/กม:</span><span id="res_cost_km" class="text-blue-300 font-bold">—</span></div>
+                <div class="flex justify-between border-t border-slate-700 pt-2 font-bold"><span>ต้นทุนเฉลี่ย/กม:</span><span id="res_cost_km" class="text-blue-300">—</span></div>
               </div>
             </div>
             <div class="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
               <p class="text-green-400 text-xs font-bold uppercase tracking-wider mb-2">ราคาเสนอขายแนะนำ (Selling Price)</p>
-              <div class="text-5xl font-bold kanit text-green-400" id="res_sell_price">฿ 0.00</div>
+              <div class="text-5xl font-bold font-mono text-green-400" id="res_sell_price">฿ 0.00</div>
               <div class="mt-4 space-y-2 text-sm text-slate-300">
                 <div class="flex justify-between"><span>กำไรคาดการณ์:</span><span id="res_profit" class="text-green-300 font-bold">—</span></div>
                 <div class="flex justify-between border-t border-white/10 pt-2"><span>เรทเสนอขาย/กม:</span><span id="res_sell_km" class="text-white font-bold">—</span></div>
@@ -340,6 +353,8 @@ input:focus, select:focus { outline:none; border-color:#2563eb; ring: 2px #dbeaf
       link.click();
       document.body.removeChild(link);
     }
+
+    function doLogout() { MCK_Auth.logout(); }
   </script>
 </body>
 </html>

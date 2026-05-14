@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logistics by namkhang - Fleet Hub</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script>
+<script>MCK_Auth.check('fleet');</script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Kanit:wght@500;600&display=swap');
-body{font-family:'Sarabun',sans-serif;background:#f1f5f9;}
+body{background:#f0f4f8;}
 .tab-pane{display:none;}.tab-pane.active{display:block;}
 .nav-btn{display:flex;align-items:center;padding:10px 14px;border-radius:8px;font-size:14px;cursor:pointer;transition:.2s;color:#94a3b8;gap:10px;border-left:3px solid transparent;}
 .nav-btn:hover{background:rgba(255,255,255,.06);color:#e2e8f0;}
@@ -22,7 +23,7 @@ body{font-family:'Sarabun',sans-serif;background:#f1f5f9;}
 .toast.show{opacity:1;}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;}
 .modal-bg.hidden{display:none;}
-#login-overlay{position:fixed;inset:0;background:rgba(15,23,42,.96);z-index:9000;display:flex;align-items:center;justify-content:center;}
+#login-overlay{display:none;}
 .kpi-card{transition:transform .2s;}.kpi-card:hover{transform:translateY(-2px);}
 table thead th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
 tr:hover td{background:#f8fafc;}
@@ -75,24 +76,27 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
 
-<!-- Header Bar -->
-<div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white p-4 sticky top-0 z-50 shadow-md">
-    <div class="flex justify-between items-center max-w-full px-4">
-        <h1 class="font-bold text-xl kanit flex items-center gap-2">🚛 Logistics by namkhang</h1>
-        <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-xl border border-white/20">
-                <div class="w-8 h-8 bg-warning rounded-full flex items-center justify-center font-bold text-dark" id="header-avatar">?</div>
-                <div class="text-left leading-tight hidden md:block">
-                    <p class="font-bold text-sm" id="sb-user-name">Admin</p>
-                    <p class="text-[10px] opacity-70" id="sb-user-role">Fleet Manager</p>
-                </div>
-            </div>
-            <button class="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg text-xs font-bold transition" onclick="window.history.back()">⬅ ย้อนกลับ</button>
-            <button class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-lg text-xs font-bold transition" onclick="location.href='index.html'">🏠 หน้าแรก</button>
-            <button class="bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg text-xs font-bold transition" onclick="doLogout()">Logout</button>
-        </div>
+<!-- Standard Topbar -->
+<header class="g-topbar">
+  <div class="g-topbar-left">
+    <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
+    <div class="g-logo">LN</div>
+    <div>
+      <div class="g-title">Fleet Hub</div>
+      <div class="g-subtitle">ระบบบริหารจัดการรถและคนขับ</div>
     </div>
-</div>
+  </div>
+  <div class="g-topbar-right">
+    <div class="g-user-chip g-hide-mobile">
+      <div class="g-user-avatar" id="header-avatar">?</div>
+      <div>
+        <div class="g-user-name" id="sb-user-name">Admin</div>
+        <div class="g-user-role" id="sb-user-role">Fleet Manager</div>
+      </div>
+    </div>
+    <button class="g-btn g-btn-danger" onclick="doLogout()">Logout</button>
+  </div>
+</header>
 
 <div class="flex min-h-screen">
   <!-- SIDEBAR -->
@@ -1142,11 +1146,7 @@ function quickLogin(u, p) {
   document.getElementById('ov-pass').value = p;
   doLogin();
 }
-function doLogout() {
-  localStorage.removeItem('fleet_user');
-  sessionStorage.removeItem('mck_user'); // Clear central session
-  location.reload();
-}
+function doLogout() { MCK_Auth.logout(); }
 
 function applyRole(role) {
   const cfg = ROLE_CONFIG[role] || ROLE_CONFIG['Administrator'];
@@ -1837,23 +1837,21 @@ function showToast(msg, type = 'success') {
 
 // ===== BOOT =====
     window.addEventListener('DOMContentLoaded', () => {
-        const portalSession = sessionStorage.getItem('mck_user');
-        if (portalSession) {
-            currentUser = JSON.parse(portalSession);
-            document.getElementById('login-overlay').style.display = 'none';
-            
-            // อัปเดตข้อมูลผู้ใช้ใน Header
-            document.getElementById('sb-user-name').textContent = currentUser.name;
-            document.getElementById('sb-user-role').textContent = currentUser.role;
-            document.getElementById('header-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
-            
-            applyRole(currentUser.role);
-            const tabs = ROLE_CONFIG[currentUser.role]?.tabs || ['dashboard'];
-            showTab(tabs[0]);
-            initPage();
-        } else {
-            document.getElementById('login-overlay').style.display = 'flex';
-        }
+        // ดึงข้อมูลจาก Session หลัก หรือใช้ค่าเริ่มต้น
+        const portalSession = JSON.parse(sessionStorage.getItem('mck_user') || '{"name":"Admin","role":"Admin"}');
+        currentUser = portalSession;
+        
+        document.getElementById('login-overlay').style.display = 'none';
+        
+        // อัปเดตข้อมูล Header
+        document.getElementById('sb-user-name').textContent = currentUser.name;
+        document.getElementById('sb-user-role').textContent = currentUser.role;
+        document.getElementById('header-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+        
+        applyRole(currentUser.role);
+        const tabs = ROLE_CONFIG[currentUser.role]?.tabs || ROLE_CONFIG['Admin'].tabs;
+        showTab('dashboard');
+        initPage();
     });
 </script>
 </body>

@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>📄 SOP / WI — โฟลการทำงานแบบละเอียด</title>
+  <link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script>
+<script>MCK_Auth.check('sop');</script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
     *{margin:0;padding:0;box-sizing:border-box}
     :root{
       --primary:#2563eb;
@@ -188,19 +190,20 @@
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="topbar-logo">MCK</div>
+  <!-- Standard Topbar -->
+  <header class="g-topbar">
+    <div class="g-topbar-left">
+      <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
+      <div class="g-logo">LN</div>
       <div>
-        <div class="topbar-title">SOP / WI</div>
-        <div style="font-size:.82rem;color:var(--gray);margin-top:.08rem">โฟลการทำงานแบบละเอียด (สำหรับทีมเอกสาร/การส่งออก)</div>
+        <div class="g-title">SOP / WI</div>
+        <div class="g-subtitle">โฟลการทำงานแบบละเอียด — ทีมเอกสาร/การส่งออก</div>
       </div>
     </div>
-    <div class="topbar-right">
-      <button class="btn btn-ghost" onclick="goBack()">⬅ กลับ</button>
-      <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์/Save PDF</button>
+    <div class="g-topbar-right">
+      <button class="g-btn g-btn-ghost" onclick="window.print()">🖨️ พิมพ์/Save PDF</button>
     </div>
-  </div>
+  </header>
 
   <div class="wrap">
     <div class="hero">

@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HR Management — MCK Logistics</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script>
+<script>MCK_Auth.check('hr');</script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
-body{font-family:'Sarabun',sans-serif;background:#f8fafc;}
+body{background:#f0f4f8;}
 .kanit{font-family:'Kanit',sans-serif;}
 .pass-hidden { filter: blur(5px); transition: 0.3s; cursor: pointer; }
 .pass-hidden:hover { filter: blur(2px); }
@@ -19,17 +20,28 @@ body{font-family:'Sarabun',sans-serif;background:#f8fafc;}
 .check-yes { color: #10b981; font-weight: bold; }
 </style>
 </head>
-<body class="p-4 md:p-8">
-  <div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-8">
+<body>
+  <!-- Standard Topbar -->
+  <header class="g-topbar">
+    <div class="g-topbar-left">
+      <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
+      <div class="g-logo">LN</div>
       <div>
-        <h1 class="text-2xl font-bold text-slate-800 kanit">👥 HR & Permission Management</h1>
-        <p class="text-slate-500 text-sm">จัดการข้อมูลพนักงานและกำหนดสิทธิ์เข้าใช้งานระบบ</p>
+        <div class="g-title">HR & Permissions</div>
+        <div class="g-subtitle">จัดการพนักงานและสิทธิ์เข้าใช้งาน</div>
       </div>
-      <a href="index.html" class="bg-white border px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition">
-        <i class="fas fa-arrow-left mr-2"></i>กลับหน้าหลัก
-      </a>
     </div>
+    <div class="g-topbar-right">
+      <div class="g-user-chip g-hide-mobile">
+        <div class="g-user-avatar">A</div>
+        <div>
+          <div class="g-user-name">Admin</div>
+          <div class="g-user-role">ผู้ดูแลระบบ</div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="max-w-6xl mx-auto p-4 md:p-6">
 
     <!-- HR Permission Guide (New Section) -->
     <div class="manual-box shadow-sm">
@@ -99,7 +111,7 @@ body{font-family:'Sarabun',sans-serif;background:#f8fafc;}
             <div class="flex justify-between text-sm p-2 bg-yellow-50 text-yellow-700 rounded-lg"><strong>Finance</strong><span>Invoices/Fuel</span></div>
             <div class="flex justify-between text-sm p-2 bg-orange-50 text-orange-700 rounded-lg"><strong>Driver</strong><span>Mobile Only</span></div>
           </div>
-        </button>
+        </div>
       </div>
 
       <!-- User Table -->
@@ -132,6 +144,22 @@ body{font-family:'Sarabun',sans-serif;background:#f8fafc;}
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Permission Matrix Section -->
+    <div class="mt-8">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-5 border-b flex justify-between items-center bg-slate-50">
+          <div>
+            <h3 class="font-bold text-slate-700 kanit">🔐 จัดการสิทธิ์เข้าถึงหน้าต่างๆ (Page Permissions)</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Boss / Admin / Manager มีสิทธิ์เต็มเสมอ — กำหนดสิทธิ์ของ Role อื่นได้ด้านล่าง</p>
+          </div>
+          <button onclick="savePagePerms()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition">💾 บันทึกสิทธิ์</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm" id="perm-matrix-table"></table>
         </div>
       </div>
     </div>
@@ -374,34 +402,6 @@ body{font-family:'Sarabun',sans-serif;background:#f8fafc;}
     </div>
   </div>
 
-  <!-- SSO Login Overlay -->
-  <div id="loginOverlay" class="fixed inset-0 bg-slate-900/95 z-[999] flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden">
-      <div class="p-6 bg-slate-900 text-white text-center">
-        <div class="text-5xl mb-2">👥</div>
-        <h2 class="font-bold text-xl kanit">HR Management</h2>
-        <p class="text-slate-400 text-sm mt-1">MCK International Logistics</p>
-      </div>
-      <div class="p-6 space-y-4">
-        <div id="login-error" class="hidden bg-red-50 text-red-600 text-sm p-3 rounded-xl text-center"></div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Username</label>
-          <input type="text" id="ov-user" class="w-full border rounded-xl px-4 py-2" placeholder="username" onkeydown="if(event.key==='Enter')overlayLogin()">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Password</label>
-          <input type="password" id="ov-pass" class="w-full border rounded-xl px-4 py-2" placeholder="••••••" onkeydown="if(event.key==='Enter')overlayLogin()">
-        </div>
-        <button onclick="overlayLogin()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-700 transition">เข้าสู่ระบบ</button>
-        <div class="text-center text-xs text-slate-400 pt-1">
-          Quick:
-          <button onclick="quickLogin('boss','boss123')" class="ml-2 text-purple-600 hover:underline font-bold">Boss</button>
-          <button onclick="quickLogin('admin','admin123')" class="ml-2 text-blue-600 hover:underline font-bold">Admin</button>
-          <button onclick="quickLogin('finance','fin123')" class="ml-2 text-yellow-600 hover:underline font-bold">Finance</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Payroll Run Modal -->
   <div id="payrollRunModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
@@ -897,30 +897,67 @@ body{font-family:'Sarabun',sans-serif;background:#f8fafc;}
     }
 
     window.onload = function() {
-        const sessionUser = JSON.parse(sessionStorage.getItem('mck_user'));
-        if (!sessionUser) {
-            alert('กรุณาล็อกอินผ่านหน้าหลักก่อนเข้าใช้งาน');
-            location.href = 'index.html';
-            return;
-        }
-        currentAdmin = sessionUser;
-        // อัปเดตข้อมูล Header
-        const nameEl = document.getElementById('hr-user-name');
-        const roleEl = document.getElementById('hr-user-role');
-        const avatarEl = document.getElementById('hr-user-avatar');
-        
-        if(nameEl) nameEl.textContent = sessionUser.name;
-        if(roleEl) roleEl.textContent = sessionUser.role;
-        if(avatarEl) avatarEl.textContent = sessionUser.name.charAt(0).toUpperCase();
-
+        currentAdmin = MCK_Auth.getUser() || {name:'Admin', role:'Admin', password:'admin123'};
+        MCK_Auth.fillTopbar();
         renderTable();
         renderAuditLogs();
+        renderPermMatrix();
     };
 
-    function doLogout() {
-        sessionStorage.removeItem('mck_user');
-        location.href = 'index.html';
+    // ── Permission Matrix ──────────────────────────────────
+    function renderPermMatrix() {
+      const perms    = MCK_Auth.getPerms();
+      const pages    = MCK_Auth.ALL_PAGES;
+      const fullRoles= ['Boss','Admin','Manager'];
+      const editRoles= ['ประสานงาน','เอกสาร','Finance','Dispatch','ช่าง','Driver'];
+      const roleStyles = {
+        'Boss':'bg-slate-900 text-white','Admin':'bg-purple-100 text-purple-700',
+        'Manager':'bg-blue-100 text-blue-700','ประสานงาน':'bg-green-100 text-green-700',
+        'เอกสาร':'bg-slate-100 text-slate-700','Finance':'bg-yellow-100 text-yellow-700',
+        'Dispatch':'bg-indigo-100 text-indigo-700','ช่าง':'bg-orange-100 text-orange-700',
+        'Driver':'bg-red-100 text-red-700'
+      };
+
+      let html = `<thead><tr class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase">
+        <th class="p-3 text-left sticky left-0 bg-slate-50 z-10 min-w-[110px]">Role</th>
+        ${pages.map(p=>`<th class="p-3 text-center" style="min-width:76px">${p.label}</th>`).join('')}
+      </tr></thead><tbody>`;
+
+      fullRoles.forEach(role => {
+        html += `<tr class="border-b"><td class="p-3 sticky left-0 bg-white z-10">
+          <span class="px-2 py-0.5 rounded text-[11px] font-bold ${roleStyles[role]||''}">${role}</span>
+        </td>${pages.map(_=>`<td class="p-3 text-center text-emerald-500 font-bold">✓</td>`).join('')}</tr>`;
+      });
+
+      editRoles.forEach(role => {
+        const rp = perms[role] || [];
+        html += `<tr class="border-b hover:bg-slate-50"><td class="p-3 sticky left-0 bg-white hover:bg-slate-50 z-10">
+          <span class="px-2 py-0.5 rounded text-[11px] font-bold ${roleStyles[role]||''}">${role}</span>
+        </td>${pages.map(p=>`<td class="p-3 text-center">
+          <input type="checkbox" class="w-4 h-4 accent-blue-600 cursor-pointer"
+            data-role="${role}" data-page="${p.key}" ${rp.includes(p.key)?'checked':''}>
+        </td>`).join('')}</tr>`;
+      });
+
+      document.getElementById('perm-matrix-table').innerHTML = html + '</tbody>';
     }
+
+    function savePagePerms() {
+      const fullRoles = ['Boss','Admin','Manager'];
+      const editRoles = ['ประสานงาน','เอกสาร','Finance','Dispatch','ช่าง','Driver'];
+      const newPerms  = {};
+      fullRoles.forEach(r => newPerms[r] = ['all']);
+      editRoles.forEach(r => newPerms[r] = []);
+
+      document.querySelectorAll('#perm-matrix-table input[type="checkbox"]').forEach(cb => {
+        if (cb.checked) newPerms[cb.dataset.role].push(cb.dataset.page);
+      });
+
+      MCK_Auth.savePerms(newPerms);
+      addAuditLog(currentAdmin.name || 'Admin', '🔐 อัปเดตสิทธิ์', 'แก้ไข Permission Matrix');
+      alert('✅ บันทึกสิทธิ์เรียบร้อยแล้ว');
+    }
+    // ──────────────────────────────────────────────────────
   </script>
 </body>
 </html>

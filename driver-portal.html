@@ -5,29 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Driver Portal — MCK Logistics</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script>
+<script>MCK_Auth.check('driver');</script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Kanit:wght@500;600;700&display=swap');
-body { font-family: 'Sarabun', sans-serif; background: #f8fafc; }
+body { background: #f0f4f8; }
 .kanit { font-family: 'Kanit', sans-serif; }
 .status-card { border-left: 6px solid; }
 </style>
 </head>
 <body class="pb-20">
-  <!-- Top Bar -->
-  <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-md">
-    <div class="flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center font-bold text-lg kanit">DR</div>
-        <div>
-          <p class="text-xs text-slate-400">พนักงานขับรถ</p>
-          <p class="font-bold text-sm kanit" id="driver-name">นายประสิทธ์พร สุขสม</p>
-        </div>
+  <!-- Standard Topbar -->
+  <header class="g-topbar">
+    <div class="g-topbar-left">
+      <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
+      <div class="g-logo">DR</div>
+      <div>
+        <div class="g-title">Driver Portal</div>
+        <div class="g-subtitle" id="driver-name">พนักงานขับรถ</div>
       </div>
-      <button onclick="logout()" class="text-slate-400 hover:text-white"><i class="fas fa-sign-out-alt text-xl"></i></button>
-      <button onclick="window.history.back()" class="text-slate-400 hover:text-white ml-2"><i class="fas fa-arrow-left text-xl"></i></button>
     </div>
-  </nav>
+    <div class="g-topbar-right">
+      <button class="g-btn g-btn-danger" onclick="logout()">Logout</button>
+    </div>
+  </header>
 
   <div class="p-4 space-y-6">
     <!-- Dashboard Stats -->
@@ -543,10 +544,7 @@ body { font-family: 'Sarabun', sans-serif; background: #f8fafc; }
       closeFuelModal();
     }
 
-    function logout() {
-      sessionStorage.removeItem('mck_user');
-      location.href = 'index.html';
-    }
+    function logout() { MCK_Auth.logout(); }
 
     window.onload = () => {
       currentUser = JSON.parse(sessionStorage.getItem('mck_user'));

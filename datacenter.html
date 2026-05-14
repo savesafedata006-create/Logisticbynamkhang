@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Datacenter - MCK International Trading</title>
+<title>Logistics by namkhang - Datacenter</title>
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script>
+<script>MCK_Auth.check('datacenter');</script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Kanit:wght@400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --primary:#2563eb;--primary-dark:#1e40af;--success:#10b981;--danger:#ef4444;
@@ -178,14 +180,26 @@ tbody tr:hover td{background:#f8fafc}
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="header-left">
-    <div class="logo">MCK</div>
-    <h1>Datacenter <small>ศูนย์กลางข้อมูล MCK International Trading</small></h1>
+<!-- Standard Topbar -->
+<header class="g-topbar">
+  <div class="g-topbar-left">
+    <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
+    <div class="g-logo">LN</div>
+    <div>
+      <div class="g-title">Datacenter</div>
+      <div class="g-subtitle">ศูนย์กลางข้อมูล — Buyers, Shipments, Products, Routes</div>
+    </div>
   </div>
-  <a href="index.html" class="back-btn">← หน้าหลัก</a>
-</div>
+  <div class="g-topbar-right">
+    <div class="g-user-chip g-hide-mobile" id="dc-user-chip" style="display:none">
+      <div class="g-user-avatar" id="dc-avatar">A</div>
+      <div>
+        <div class="g-user-name" id="dc-uname">Admin</div>
+        <div class="g-user-role" id="dc-urole">ผู้จัดการ</div>
+      </div>
+    </div>
+  </div>
+</header>
 
 <div class="layout">
 
@@ -837,8 +851,8 @@ function seedData(){
   }
   if(!loadObj(KEYS.company).name_en){
     save(KEYS.company,{
-      name_th:'บริษัท เอ็มซีเค อินเตอร์เนชั่นแนล เทรดดิ้ง จำกัด',
-      name_en:'MCK INTERNATIONAL TRADING CO.,LTD.',
+      name_th:'โลจิสติกส์ บาย นำค้าง',
+      name_en:'Logistics by namkhang',
       address:'71/2 MOO 7 NA KHA, LANG SUAN, CHUMPHON 86110 THAILAND',
       taxid:'0865562000931',tel:'0621955365',email:'jingyikoyii@gmail.com',
       doa:'DOA 59000 10 013565',gmp47:'UT242707R0',gmp47_exp:'2027-12-04',
