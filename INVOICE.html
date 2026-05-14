@@ -6,6 +6,8 @@
     <title>Logistics by namkhang - ระบบจัดการใบแจ้งหนี้</title>
     <link rel="stylesheet" href="shared.css">
 <script src="auth.js"></script>
+<script src="nav-component.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>MCK_Auth.check('invoice');</script>
     <style>
         
@@ -653,26 +655,7 @@
 </head>
 <body>
     <!-- Standard Topbar -->
-    <header class="g-topbar">
-      <div class="g-topbar-left">
-        <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
-        <div class="g-logo">LN</div>
-        <div>
-          <div class="g-title">Invoice System</div>
-          <div class="g-subtitle">ระบบจัดการใบแจ้งหนี้ดิจิทัล</div>
-        </div>
-      </div>
-      <div class="g-topbar-right">
-        <div class="g-user-chip g-hide-mobile">
-          <div class="g-user-avatar" id="userAvatar">?</div>
-          <div>
-            <div class="g-user-name" id="userName">User</div>
-            <div class="g-user-role" id="userRoleDisplay">Role</div>
-          </div>
-        </div>
-        <button class="g-btn g-btn-danger" onclick="logout()">Logout</button>
-      </div>
-    </header>
+    <div id="topbar-root" data-title="Invoice System" data-subtitle="ระบบจัดการใบแจ้งหนี้ดิจิทัล" data-logo="LN"></div>
     
     <!-- Main Container -->
     <div class="container">
@@ -1070,6 +1053,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-warning" onclick="printInvoice()">🖨️ พิมพ์</button>
+                <button type="button" class="btn btn-success" onclick="exportPDF()" style="background:#16a34a;color:#fff;border:none;">📄 บันทึก PDF</button>
                 <button type="button" class="btn btn-secondary" onclick="closeModal('invoicePreviewModal')">ปิด</button>
             </div>
         </div>
@@ -1188,10 +1172,11 @@
             if (currentUserSession) {
                 data.currentUser = currentUserSession;
             }
-            document.getElementById('userName').textContent = data.currentUser.name;
-            document.getElementById('userRoleDisplay').textContent = data.currentUser.role;
-            if (data.currentUser.role === 'Driver') document.getElementById('home-link-inv').onclick = () => location.href='driver-portal.html';
-            document.getElementById('userAvatar').textContent = data.currentUser.avatar || data.currentUser.initials || (data.currentUser.name||'?').charAt(0).toUpperCase();
+            // Topbar display handled by MCK_Auth.fillTopbar() via nav-component
+            if (data.currentUser.role === 'Driver') {
+                const homeLink = document.getElementById('home-link-inv');
+                if (homeLink) homeLink.onclick = () => location.href = 'driver-portal.html';
+            }
         }
         
         function goBack() {
@@ -1202,11 +1187,7 @@
             }
         }
 
-        function logout() {
-            if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
-                window.location.href = 'index.html';
-            }
-        }
+        function logout() { MCK_Auth.logout(); }
         
         // ===== TAB SWITCHING =====
         function switchTab(tabName) {
@@ -1888,6 +1869,20 @@
         
         function printInvoice() {
             window.print();
+        }
+
+        function exportPDF() {
+            var el = document.getElementById('invoicePreviewContent');
+            if (!el) return;
+            var invNo = (data.currentInvoice && data.currentInvoice.invoiceNumber) || 'invoice';
+            var opt = {
+                margin:       [8, 8, 8, 8],
+                filename:     invNo + '.pdf',
+                image:        { type: 'jpeg', quality: 0.97 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(el).save();
         }
         
         function loadInvoices() {

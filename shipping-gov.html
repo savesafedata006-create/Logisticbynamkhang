@@ -6,6 +6,7 @@
     <title>Logistics by namkhang - เอกสารยื่นราชการ</title>
     <link rel="stylesheet" href="shared.css">
 <script src="auth.js"></script>
+<script src="nav-component.js"></script>
 <script>MCK_Auth.check('shipping');</script>
     <style>
         
@@ -150,25 +151,7 @@
 </head>
 <body>
 <!-- Standard Topbar -->
-<header class="g-topbar">
-  <div class="g-topbar-left">
-    <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
-    <div class="g-logo">LN</div>
-    <div>
-      <div class="g-title">เอกสารยื่นราชการ</div>
-      <div class="g-subtitle">Shipping — เอกสารสำหรับยื่นหน่วยงานราชการ</div>
-    </div>
-  </div>
-  <div class="g-topbar-right">
-    <div class="g-user-chip g-hide-mobile">
-      <div class="g-user-avatar">A</div>
-      <div>
-        <div class="g-user-name" id="userName">Admin</div>
-        <div class="g-user-role">ผู้จัดการ</div>
-      </div>
-    </div>
-  </div>
-</header>
+<div id="topbar-root" data-title="เอกสารยื่นราชการ" data-subtitle="Shipping — เอกสารสำหรับยื่นหน่วยงานราชการ" data-logo="LN"></div>
 
     <div class="main">
         <div class="page-title">

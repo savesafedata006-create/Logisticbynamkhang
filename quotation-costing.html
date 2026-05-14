@@ -7,6 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="shared.css">
 <script src="auth.js"></script>
+<script src="nav-component.js"></script>
 <script>MCK_Auth.check('quotation');</script>
 <style>
 body{background:#f0f4f8;}
@@ -26,26 +27,7 @@ input:focus, select:focus { outline:none; border-color:#2563eb; ring: 2px #dbeaf
 <body class="bg-slate-50">
 
   <!-- Standard Topbar -->
-  <header class="g-topbar">
-    <div class="g-topbar-left">
-      <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
-      <div class="g-logo">LN</div>
-      <div>
-        <div class="g-title">Quotation & Costing</div>
-        <div class="g-subtitle">คำนวณต้นทุนและราคาเสนอขาย</div>
-      </div>
-    </div>
-    <div class="g-topbar-right">
-      <div class="g-user-chip g-hide-mobile">
-        <div class="g-user-avatar" id="user-avatar-display">?</div>
-        <div>
-          <div class="g-user-name" id="user-info-display">Admin</div>
-          <div class="g-user-role">ผู้จัดการ</div>
-        </div>
-      </div>
-      <button class="g-btn g-btn-danger" onclick="doLogout()">Logout</button>
-    </div>
-  </header>
+  <div id="topbar-root" data-title="Quotation &amp; Costing" data-subtitle="คำนวณต้นทุนและราคาเสนอขาย" data-logo="LN"></div>
 
   <div class="max-w-7xl mx-auto p-4 md:p-8">
     <div class="mb-8">

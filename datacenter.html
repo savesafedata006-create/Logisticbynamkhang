@@ -6,6 +6,7 @@
 <title>Logistics by namkhang - Datacenter</title>
 <link rel="stylesheet" href="shared.css">
 <script src="auth.js"></script>
+<script src="nav-component.js"></script>
 <script>MCK_Auth.check('datacenter');</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -181,25 +182,7 @@ tbody tr:hover td{background:#f8fafc}
 <body>
 
 <!-- Standard Topbar -->
-<header class="g-topbar">
-  <div class="g-topbar-left">
-    <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
-    <div class="g-logo">LN</div>
-    <div>
-      <div class="g-title">Datacenter</div>
-      <div class="g-subtitle">ศูนย์กลางข้อมูล — Buyers, Shipments, Products, Routes</div>
-    </div>
-  </div>
-  <div class="g-topbar-right">
-    <div class="g-user-chip g-hide-mobile" id="dc-user-chip" style="display:none">
-      <div class="g-user-avatar" id="dc-avatar">A</div>
-      <div>
-        <div class="g-user-name" id="dc-uname">Admin</div>
-        <div class="g-user-role" id="dc-urole">ผู้จัดการ</div>
-      </div>
-    </div>
-  </div>
-</header>
+<div id="topbar-root" data-title="Datacenter" data-subtitle="ศูนย์กลางข้อมูล — Buyers, Shipments, Products, Routes" data-logo="LN"></div>
 
 <div class="layout">
 

@@ -7,6 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="shared.css">
 <script src="auth.js"></script>
+<script src="nav-component.js"></script>
 <script>MCK_Auth.check('container');</script>
 <style>
         :root {
@@ -45,26 +46,7 @@
 <body class="bg-slate-100 min-h-screen">
 
 <!-- Standard Topbar -->
-<header class="g-topbar">
-  <div class="g-topbar-left">
-    <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
-    <div class="g-logo">LN</div>
-    <div>
-      <div class="g-title">Container Hub</div>
-      <div class="g-subtitle">ระบบจัดการตู้คอนเทนเนอร์</div>
-    </div>
-  </div>
-  <div class="g-topbar-right">
-    <div class="g-user-chip g-hide-mobile">
-      <div class="g-user-avatar" id="ub-avatar">?</div>
-      <div>
-        <div class="g-user-name" id="ub-name">Admin</div>
-        <div class="g-user-role" id="ub-role">ผู้จัดการ</div>
-      </div>
-    </div>
-    <button class="g-btn g-btn-danger" onclick="doLogout()">Logout</button>
-  </div>
-</header>
+<div id="topbar-root" data-title="Container Hub" data-subtitle="ระบบจัดการตู้คอนเทนเนอร์" data-logo="LN"></div>
 
 <!-- Tab Navigation -->
 <div class="bg-white border-b border-slate-200 px-6 sticky top-16 z-30 shadow-sm">

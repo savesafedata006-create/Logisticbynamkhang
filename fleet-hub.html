@@ -7,6 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="shared.css">
 <script src="auth.js"></script>
+<script src="nav-component.js"></script>
 <script>MCK_Auth.check('fleet');</script>
 <style>
 body{background:#f0f4f8;}
@@ -77,26 +78,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
 <div id="toast" class="toast"></div>
 
 <!-- Standard Topbar -->
-<header class="g-topbar">
-  <div class="g-topbar-left">
-    <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
-    <div class="g-logo">LN</div>
-    <div>
-      <div class="g-title">Fleet Hub</div>
-      <div class="g-subtitle">ระบบบริหารจัดการรถและคนขับ</div>
-    </div>
-  </div>
-  <div class="g-topbar-right">
-    <div class="g-user-chip g-hide-mobile">
-      <div class="g-user-avatar" id="header-avatar">?</div>
-      <div>
-        <div class="g-user-name" id="sb-user-name">Admin</div>
-        <div class="g-user-role" id="sb-user-role">Fleet Manager</div>
-      </div>
-    </div>
-    <button class="g-btn g-btn-danger" onclick="doLogout()">Logout</button>
-  </div>
-</header>
+<div id="topbar-root" data-title="Fleet Hub" data-subtitle="ระบบบริหารจัดการรถและคนขับ" data-logo="LN"></div>
 
 <div class="flex min-h-screen">
   <!-- SIDEBAR -->
@@ -1308,7 +1290,20 @@ function renderTrackingList() {
   const el = document.getElementById('tracking-list');
   if (!el) return;
   const active = jobs.filter(j => j.status === 'running');
-  el.innerHTML = active.map(j => `
+  const MILESTONES = [
+    { value: 'departed',  label: '🚛 ออกจากต้นทาง' },
+    { value: 'transit',   label: '🛣 ระหว่างทาง' },
+    { value: 'gate_in',   label: '🏗 เข้าด่าน Gate-in' },
+    { value: 'border',    label: '🌐 ข้ามแดน' },
+    { value: 'arrived',   label: '📍 ถึงปลายทาง' },
+    { value: 'delivered', label: '✅ ส่งของแล้ว' },
+  ];
+  el.innerHTML = active.map(j => {
+    const msOpts = MILESTONES.map(m =>
+      `<option value="${m.value}" ${j.milestone === m.value ? 'selected' : ''}>${m.label}</option>`
+    ).join('');
+    const msLabel = (MILESTONES.find(m => m.value === j.milestone) || MILESTONES[0]).label;
+    return `
     <div class="p-5 hover:bg-slate-50">
       <div class="flex justify-between items-start">
         <div>
@@ -1322,12 +1317,21 @@ function renderTrackingList() {
           <div class="text-xs text-slate-400 mt-1">ETA: ${j.depart ? new Date(new Date(j.depart).getTime() + j.km*90000).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : '—'}</div>
         </div>
       </div>
-      <div class="mt-3 flex gap-2">
+      <div class="mt-3 flex flex-wrap gap-2 items-center">
+        <select onchange="updateMilestone('${j.id}', this.value)"
+          class="text-xs border border-slate-300 rounded px-2 py-1 bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-400">
+          ${msOpts}
+        </select>
         <button onclick="updateStatus('${j.id}','done')" class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200 font-semibold">✓ ส่งของแล้ว</button>
         <button onclick="showContact('${j.driver}')" class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded hover:bg-slate-200 font-semibold"><i class="fas fa-phone mr-1"></i>ติดต่อ</button>
+        <label class="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded hover:bg-purple-200 font-semibold cursor-pointer">
+          📎 แนบ POD/EIR
+          <input type="file" accept="image/*,application/pdf" class="hidden" onchange="attachPOD('${j.id}', this)">
+        </label>
+        ${j.podFile ? `<span class="text-xs text-green-600 font-semibold">✓ ${j.podFile}</span>` : ''}
       </div>
-    </div>
-  `).join('') || '<div class="p-6 text-center text-slate-400">ไม่มีรถวิ่งอยู่ตอนนี้</div>';
+    </div>`;
+  }).join('') || '<div class="p-6 text-center text-slate-400">ไม่มีรถวิ่งอยู่ตอนนี้</div>';
 
   // contacts
   const dc = document.getElementById('driver-contacts');
@@ -1352,6 +1356,25 @@ function updateStatus(jobId, status) {
   renderTrackingList();
   renderJobTable();
   showToast(`${jobId} อัพเดทสถานะ: ${status === 'done' ? 'เสร็จแล้ว' : status}`, 'success');
+}
+
+function updateMilestone(jobId, milestone) {
+  const milestoneLabels = {
+    departed: 'ออกจากต้นทาง', transit: 'ระหว่างทาง', gate_in: 'เข้าด่าน Gate-in',
+    border: 'ข้ามแดน', arrived: 'ถึงปลายทาง', delivered: 'ส่งของแล้ว',
+  };
+  const j = jobs.find(x => x.id === jobId);
+  if (j) j.milestone = milestone;
+  showToast(`${jobId}: ${milestoneLabels[milestone] || milestone}`, 'info');
+}
+
+function attachPOD(jobId, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const j = jobs.find(x => x.id === jobId);
+  if (j) j.podFile = file.name;
+  showToast(`${jobId}: แนบ POD "${file.name}" แล้ว`, 'success');
+  renderTrackingList();
 }
 
 function showContact(name) {

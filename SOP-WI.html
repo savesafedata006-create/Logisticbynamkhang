@@ -6,6 +6,7 @@
   <title>📄 SOP / WI — โฟลการทำงานแบบละเอียด</title>
   <link rel="stylesheet" href="shared.css">
 <script src="auth.js"></script>
+<script src="nav-component.js"></script>
 <script>MCK_Auth.check('sop');</script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
@@ -191,19 +192,7 @@
 </head>
 <body>
   <!-- Standard Topbar -->
-  <header class="g-topbar">
-    <div class="g-topbar-left">
-      <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
-      <div class="g-logo">LN</div>
-      <div>
-        <div class="g-title">SOP / WI</div>
-        <div class="g-subtitle">โฟลการทำงานแบบละเอียด — ทีมเอกสาร/การส่งออก</div>
-      </div>
-    </div>
-    <div class="g-topbar-right">
-      <button class="g-btn g-btn-ghost" onclick="window.print()">🖨️ พิมพ์/Save PDF</button>
-    </div>
-  </header>
+  <div id="topbar-root" data-title="SOP / WI" data-subtitle="โฟลการทำงานแบบละเอียด — ทีมเอกสาร/การส่งออก" data-logo="LN"></div>
 
   <div class="wrap">
     <div class="hero">

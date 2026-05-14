@@ -7,6 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="shared.css">
 <script src="auth.js"></script>
+<script src="nav-component.js"></script>
 <script>MCK_Auth.check('security');</script>
 <style>
 body{color:#1e293b;}
@@ -17,25 +18,7 @@ body{color:#1e293b;}
 </head>
 <body>
   <!-- Standard Topbar -->
-  <header class="g-topbar">
-    <div class="g-topbar-left">
-      <a href="index.html" class="g-btn g-btn-ghost">← ย้อนกลับ</a>
-      <div class="g-logo">🔒</div>
-      <div>
-        <div class="g-title">Security Overview</div>
-        <div class="g-subtitle">สำหรับบอสและผู้ดูแลความปลอดภัยเท่านั้น</div>
-      </div>
-    </div>
-    <div class="g-topbar-right">
-      <div class="g-user-chip g-hide-mobile">
-        <div class="g-user-avatar" id="user-avatar-display">-</div>
-        <div>
-          <div class="g-user-name" id="user-identity">—</div>
-          <div class="g-user-role">Admin</div>
-        </div>
-      </div>
-    </div>
-  </header>
+  <div id="topbar-root" data-title="Security Overview" data-subtitle="สำหรับบอสและผู้ดูแลความปลอดภัยเท่านั้น" data-logo="🔒"></div>
   <div class="max-w-6xl mx-auto p-4 md:p-6">
 
     <!-- Weekly Stats -->
