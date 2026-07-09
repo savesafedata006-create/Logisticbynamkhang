@@ -6,7 +6,10 @@
     <title>Logistics by namkhang - Container Hub</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="shared.css">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script src="real_containers.js"></script>
 <script src="auth.js"></script>
+<script src="sync-engine.js"></script>
 <script src="nav-component.js"></script>
 <script>MCK_Auth.check('container');</script>
 <style>
@@ -258,6 +261,7 @@
       <input type="text" id="containerSearch" placeholder="กรอกเบอร์ตู้ เช่น MSKU9283741" class="flex-1 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 min-w-64 font-mono uppercase" oninput="this.value=this.value.toUpperCase()">
       <button onclick="searchContainer()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition"><i class="fas fa-search mr-2"></i>ค้นหา</button>
       <button onclick="showSample('MSKU9283741')" class="bg-slate-200 text-slate-700 px-4 py-3 rounded-xl text-sm hover:bg-slate-300 transition"><i class="fas fa-qrcode mr-2"></i>ตัวอย่าง</button>
+      <a href="scan.html" class="bg-indigo-600 text-white px-5 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition flex items-center gap-2"><i class="fas fa-camera text-sm"></i> เปิดกล้องสแกน QR</a>
     </div>
     <div class="flex gap-2 mt-3 flex-wrap">
       <span class="text-xs text-slate-500">ตัวอย่าง:</span>
@@ -1859,112 +1863,195 @@
 </div>
 
 <script>
-// Standardized ROLE_CONFIG to match index.html PERMISSIONS and central mck_users roles
-// Standardized ROLE_CONFIG to match index.html PERMISSIONS and central mck_users roles (using Thai role names)
+// Role Configuration matching index.html
 const ROLE_CONFIG = {
-  'Boss':         { tabs:['all'], badge:'👑 Boss', color:'bg-slate-900' }, // All access
-  'Admin':        { tabs:['all'], badge:'👑 Admin', color:'bg-purple-600' }, // All access
-  'Manager':      { tabs:['all'], badge:'👔 Manager', color:'bg-blue-600' }, // All access
-  'ประสานงาน':    { tabs:['dashboard','idcard','repair','eir'], badge:'📞 ประสานงาน', color:'bg-green-600' }, // CS needs ID Card, Repair, EIR
-  'เอกสาร':       { tabs:['dashboard','idcard','eir'], badge:'📄 เอกสาร', color:'bg-slate-600' }, // Docs needs ID Card, EIR
-  'Dispatch':     { tabs:['dashboard','idcard','eir'], badge:'📋 จัดรถ', color:'bg-indigo-600' }, // Dispatch might need to see container status
-  'Finance':      { tabs:['dashboard','idcard','eir'], badge:'💰 การเงิน', color:'bg-yellow-600' }, // Finance might need to see container status
-  'ช่าง':         { tabs:['dashboard','idcard','repair','technician','parts','eir','pm'], badge:'🔧 ช่าง', color:'bg-orange-600' }, // Tech needs all tech-related tabs
-  'Driver':       { tabs:['repair'], badge:'🚚 คนขับ', color:'bg-red-600' } // Driver only sees repair
+  'Boss':         { tabs:['all'], badge:'👑 Boss', color:'bg-slate-900' },
+  'Admin':        { tabs:['all'], badge:'👑 Admin', color:'bg-purple-600' },
+  'Manager':      { tabs:['all'], badge:'👔 Manager', color:'bg-blue-600' },
+  'ประสานงาน':    { tabs:['dashboard','idcard','repair','eir'], badge:'📞 CS', color:'bg-green-600' },
+  'เอกสาร':       { tabs:['dashboard','idcard','eir'], badge:'📄 เอกสาร', color:'bg-slate-600' },
+  'Dispatch':     { tabs:['dashboard','idcard','eir'], badge:'📋 จัดรถ', color:'bg-indigo-600' },
+  'Finance':      { tabs:['dashboard','idcard','eir'], badge:'💰 การเงิน', color:'bg-yellow-600' },
+  'ช่าง':         { tabs:['dashboard','idcard','repair','technician','parts','eir','pm'], badge:'🔧 ช่าง', color:'bg-orange-600' },
+  'Driver':       { tabs:['repair'], badge:'🚚 คนขับ', color:'bg-red-600' }
 };
 
 let currentUser = null;
+let selectedContainerId = null;
 
-// ===== INIT ON LOAD =====
+// ===== DATABASE INITIALIZATION =====
+function getContainers() {
+  let list = [];
+  try { list = JSON.parse(localStorage.getItem('mck_containers') || '[]'); } catch(e) {}
+  
+  if (list.length === 0) {
+    // Load from real parsed containers if available
+    if (window.REAL_CONTAINERS && window.REAL_CONTAINERS.length > 0) {
+      list = [...window.REAL_CONTAINERS];
+    }
+    
+    // Pad to 800 containers
+    const startIdx = list.length + 1;
+    const prefixes = ['DFMU', 'EGSU', 'TGBU', 'AMFU', 'CCLU', 'MSKU', 'CMAU', 'COSU', 'OOLU', 'NYKU'];
+    const brands = ['CARRIER', 'DAIKIN', 'THERMO KING'];
+    const modelsByBrand = {
+      'CARRIER': ['69NT40-511-300', '69NT40-561-301', '69NT40-551-302'],
+      'DAIKIN': ['LXE10E100', 'LXE10E100A', 'ZESTIA-DECI100'],
+      'THERMO KING': ['MAGNUM-PLUS-219', 'SUPER-FREEZER-50']
+    };
+    const sizes = ['40HR-DCL', '40HR-DOL', '45HR-DCL', '45HR-DOL'];
+    
+    for (let i = startIdx; i <= 800; i++) {
+      const brand = brands[Math.floor(Math.random() * brands.length)];
+      const modelList = modelsByBrand[brand];
+      const model = modelList[Math.floor(Math.random() * modelList.length)];
+      const size = Math.random() > 0.08 ? sizes[0] : sizes[Math.floor(Math.random() * sizes.length)];
+      const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+      const num = Math.floor(1000000 + Math.random() * 9000000).toString();
+      const containerNo = `${prefix}${num}`;
+      
+      const rand = Math.random();
+      let status = 'Good';
+      if (rand > 0.7 && rand <= 0.88) status = 'Usable';
+      else if (rand > 0.88 && rand <= 0.96) status = 'Broken';
+      else if (rand > 0.96) status = 'Exchange';
+      
+      const photos = {};
+      for (let p = 1; p <= 15; p++) {
+        photos[`P${p}`] = Math.random() < (status === 'Broken' ? 0.7 : 0.95);
+      }
+      
+      list.push({
+        id: `Container-${String(i).padStart(4, '0')}`,
+        containerNo,
+        size,
+        model,
+        mfgDate: `06/${Math.floor(2005 + Math.random() * 18)}`,
+        brand,
+        company: 'ICL INTERNATIONAL',
+        tbDeliveryDate: '25/06/2024',
+        status,
+        collector: 'ศรัญญา',
+        sender: 'ไกรวิทย์',
+        repairs: 'ปกติ',
+        lastBoxChangeDate: '',
+        reason: '',
+        suggestions: '',
+        photos
+      });
+    }
+    localStorage.setItem('mck_containers', JSON.stringify(list));
+  }
+  return list;
+}
+
+function saveContainers(data) {
+  localStorage.setItem('mck_containers', JSON.stringify(data));
+}
+
+function getParts() {
+  let list = [];
+  try { list = JSON.parse(localStorage.getItem('mck_parts') || '[]'); } catch(e) {}
+  if (list.length === 0) {
+    list = [
+      { id: 'P001', name: 'Scroll Compressor Carrier', stock: 12, minStock: 5, unit: 'ชิ้น', price: 35000 },
+      { id: 'P002', name: 'Condenser Fan Motor Daikin', stock: 8, minStock: 4, unit: 'ชิ้น', price: 12000 },
+      { id: 'P003', name: 'Main Control Board Carrier', stock: 3, minStock: 4, unit: 'ชิ้น', price: 28000 },
+      { id: 'P004', name: 'Evaporator Coil Sensor', stock: 25, minStock: 10, unit: 'เส้น', price: 1500 },
+      { id: 'P005', name: 'Magnetic Contactor 24V', stock: 18, minStock: 8, unit: 'ชิ้น', price: 850 }
+    ];
+    localStorage.setItem('mck_parts', JSON.stringify(list));
+  }
+  return list;
+}
+
+function saveParts(data) {
+  localStorage.setItem('mck_parts', JSON.stringify(data));
+}
+
+function getRepairs() {
+  let list = [];
+  try { list = JSON.parse(localStorage.getItem('mck_repairs') || '[]'); } catch(e) {}
+  if (list.length === 0) {
+    list = [
+      { id: 'REP-0001', containerNo: 'SPMU1682339', partId: 'P003', qty: 1, desc: 'บอร์ดคอนโทรลไม่ทำงาน จอดับ', date: '09/07/2026', technician: 'นายสมชาย ช่าง2', status: 'Pending', priority: 'High' },
+      { id: 'REP-0002', containerNo: 'EGSU5015057', partId: 'P001', qty: 1, desc: 'เปลี่ยนคอมเพรสเซอร์เนื่องจากน้ำยาขาดจนน็อค', date: '08/07/2026', technician: 'นายวิชัย ช่างดี', status: 'Completed', priority: 'High' }
+    ];
+    localStorage.setItem('mck_repairs', JSON.stringify(list));
+  }
+  return list;
+}
+
+function saveRepairs(data) {
+  localStorage.setItem('mck_repairs', JSON.stringify(data));
+}
+
+function getInspections() {
+  let list = [];
+  try { list = JSON.parse(localStorage.getItem('mck_inspections') || '[]'); } catch(e) {}
+  if (list.length === 0) {
+    list = [
+      { id: 'INSP-0001', containerId: 'Container-0001', type: 'PTI', date: '25/07/2024', inspector: 'ศรัญญา', result: 'Pass', remarks: 'ตรวจพบอุณหภูมิปกติ' },
+      { id: 'INSP-0002', containerId: 'Container-0002', type: 'Body', date: '25/06/2024', inspector: 'สุวิทย์', result: 'Pass', remarks: 'ทำสีแผงหลังใหม่เรียบร้อย' }
+    ];
+    localStorage.setItem('mck_inspections', JSON.stringify(list));
+  }
+  return list;
+}
+
+// Global reset helper for UI
+window.handleResetData = function() {
+  if (confirm('คุณต้องการรีเซ็ตข้อมูลตู้คอนเทนเนอร์ 800 ใบใหม่หรือไม่?')) {
+    localStorage.removeItem('mck_containers');
+    getContainers();
+    window.location.reload();
+  }
+}
+
+function saveInspections(data) {
+  localStorage.setItem('mck_inspections', JSON.stringify(data));
+}
+
+// ===== INIT PAGE =====
 window.addEventListener('DOMContentLoaded', () => {
-  // เข้าใช้งานด้วยสิทธิ์ Admin ทันที
   const portalSession = JSON.parse(sessionStorage.getItem('mck_user') || '{"name":"Admin","role":"Admin"}');
   currentUser = portalSession;
   
-  document.getElementById('login-overlay').classList.add('hidden');
   applyRole();
-  showTab('dashboard');
+  
+  // Check if redirected from scan.html with a search target
+  const target = sessionStorage.getItem('mck_search_target');
+  if (target) {
+    sessionStorage.removeItem('mck_search_target');
+    showTab('idcard');
+    const conts = getContainers();
+    const c = conts.find(x => x.containerNo.replace(/\s/g,'') === target.replace(/\s/g,''));
+    if (c) {
+      selectContainer(c.id);
+    } else {
+      showTab('dashboard');
+    }
+  } else {
+    showTab('dashboard');
+  }
 });
 
 function applyRole() {
   if (!currentUser) return;
-  const cfg = ROLE_CONFIG[currentUser.role] || ROLE_CONFIG['Admin']; // Fallback to Admin if role not found
+  const cfg = ROLE_CONFIG[currentUser.role] || ROLE_CONFIG['Admin'];
   const allTabs = ['dashboard','idcard','repair','technician','parts','eir','pm'];
 
-  // Show/hide tabs
   allTabs.forEach(t => {
     const btn = document.getElementById('tab-' + t);
-    if (cfg.tabs.includes(t) || cfg.tabs.includes('all')) { btn.classList.remove('hidden'); } else { btn.classList.add('hidden'); }
+    if (btn) {
+      if (cfg.tabs.includes(t) || cfg.tabs.includes('all')) { btn.classList.remove('hidden'); } else { btn.classList.add('hidden'); }
+    }
   });
 
-  // Go to first allowed tab
   const firstAllowed = allTabs.find(t => cfg.tabs.includes(t) || cfg.tabs.includes('all')) || 'dashboard';
   showTab(firstAllowed);
-
-  // User bar
-  document.getElementById('user-bar').classList.remove('hidden');
-  document.getElementById('ub-name').textContent = currentUser.name;
-  document.getElementById('ub-role').textContent = currentUser.role;
-  document.getElementById('ub-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
-  const badge = document.getElementById('ub-badge');
-  badge.textContent = cfg.badge;
-  badge.className = 'text-xs px-2 py-0.5 rounded-full text-white ' + cfg.color;
-
-  // Hide login overlay
-  document.getElementById('login-overlay').classList.add('hidden');
 }
 
-function showLoginOverlay() {
-  document.getElementById('login-overlay').classList.remove('hidden');
-}
-
-// Updated overlayLogin to use central mck_users with hardcoded fallback
-function overlayLogin() {
-  const u = document.getElementById('ov-user').value.trim().toLowerCase();
-  const p = document.getElementById('ov-pass').value;
-  const err = document.getElementById('ov-err');
-
-  let savedUsers = JSON.parse(localStorage.getItem('mck_users') || '{}');
-  if (Object.keys(savedUsers).length === 0) {
-    savedUsers = {
-      boss:     { password:'boss123',   name:'บอสใหญ่ใจดี',     role:'Boss',       status:'active' },
-      admin:    { password:'admin123',  name:'ผู้ดูแลระบบ',      role:'Admin',      status:'active' },
-      manager:  { password:'mgr123',    name:'ผู้จัดการ สมชาย',  role:'Manager',    status:'active' },
-      cs:       { password:'cs123',     name:'ทีมประสานงาน',     role:'ประสานงาน',  status:'active' },
-      doc:      { password:'doc123',    name:'ฝ่ายเอกสาร',       role:'เอกสาร',     status:'active' },
-      driver:   { password:'driver123', name:'นายประสิทธ์พร',    role:'Driver',     status:'active' },
-      tech:     { password:'tech123',   name:'ช่างเทคนิค',        role:'ช่าง',       status:'active' },
-      dispatch: { password:'disp123',   name:'ทีมจัดรถ',          role:'Dispatch',   status:'active' },
-      finance:  { password:'fin123',    name:'ฝ่ายการเงิน',       role:'Finance',    status:'active' }
-    };
-    localStorage.setItem('mck_users', JSON.stringify(savedUsers));
-  }
-
-  const user = savedUsers[u];
-  if (user && user.password === p) {
-    if (user.status === 'suspended') {
-      err.textContent = 'บัญชีของคุณถูกระงับการใช้งาน';
-      err.classList.remove('hidden');
-      return;
-    }
-    currentUser = { username: u, ...user };
-    sessionStorage.setItem('mck_user', JSON.stringify(currentUser));
-    err.classList.add('hidden');
-    applyRole();
-  } else {
-    err.classList.remove('hidden');
-  }
-}
-
-function quickOverlayLogin(u, p) {
-  document.getElementById('ov-user').value = u;
-  document.getElementById('ov-pass').value = p;
-  overlayLogin();
-}
-
-function doLogout() { MCK_Auth.logout(); }
-
-// Tab blocked guard
 function showTab(name) {
   if (currentUser) {
     const cfg = ROLE_CONFIG[currentUser.role];
@@ -1975,140 +2062,992 @@ function showTab(name) {
   }
 
   ['dashboard','idcard','repair','technician','parts','eir','pm'].forEach(t => {
-    document.getElementById('page-' + t).classList.add('hidden');
+    const page = document.getElementById('page-' + t);
     const btn = document.getElementById('tab-' + t);
-    btn.classList.remove('active','bg-blue-600','text-white');
-    btn.classList.add('text-slate-600','hover:bg-slate-100');
+    if (page) page.classList.add('hidden');
+    if (btn) {
+      btn.classList.remove('active','bg-blue-600','text-white');
+      btn.classList.add('text-slate-600','hover:bg-slate-100');
+    }
   });
-  document.getElementById('page-' + name).classList.remove('hidden');
+
+  const activePage = document.getElementById('page-' + name);
   const activeBtn = document.getElementById('tab-' + name);
-  activeBtn.classList.add('active');
-  activeBtn.classList.remove('text-slate-600','hover:bg-slate-100');
-}
-
-// Sub Tab
-function showSubTab(name) {
-  ['info','usage','rephistory','perf','temp','photos'].forEach(t => {
-    document.getElementById('sub-' + t).classList.add('hidden');
-    const btn = document.getElementById('stab-' + t);
-    btn.classList.remove('active');
-    btn.classList.add('text-slate-600','hover:bg-slate-200');
-  });
-  document.getElementById('sub-' + name).classList.remove('hidden');
-  const activeBtn = document.getElementById('stab-' + name);
-  activeBtn.classList.add('active');
-  activeBtn.classList.remove('text-slate-600','hover:bg-slate-200');
-}
-
-// Container Data
-const containers = {
-  'MSKU9283741': {
-    number:'MSKU 928374 1', type:'40ft High Cube (45G1)', owner:'MSC / MAMMOTH', year:'2018',
-    tare:'4,200 kg', csc:'2026-12-31', score:87, trips:127, km:'65,400', repairs:8, cost:'125,400',
-    status:'พร้อมใช้ (AV)', statusClass:'bg-green-500', typetext:'General Purpose (Dry)', size:'40ft High Cube'
-  },
-  'TLLU5522109': {
-    number:'TLLU 552210 9', type:'20ft Standard (22G1)', owner:'CMA CGM', year:'2019',
-    tare:'2,200 kg', csc:'2027-06-30', score:62, trips:89, km:'48,200', repairs:12, cost:'98,300',
-    status:'เสียหาย (DM)', statusClass:'bg-red-500', typetext:'General Purpose (Dry)', size:'20ft Standard'
-  },
-  'SUDU7738214': {
-    number:'SUDU 773821 4', type:'40ft Reefer HC (45R1)', owner:'Evergreen', year:'2020',
-    tare:'4,800 kg', csc:'2026-09-15', score:74, trips:55, km:'32,100', repairs:5, cost:'67,800',
-    status:'กำลังซ่อม (REP)', statusClass:'bg-blue-500', typetext:'Reefer (ตู้เย็น)', size:'40ft Reefer HC'
+  
+  if (activePage) activePage.classList.remove('hidden');
+  if (activeBtn) {
+    activeBtn.classList.add('active','bg-blue-600','text-white');
+    activeBtn.classList.remove('text-slate-600','hover:bg-slate-100');
   }
-};
 
+  // Trigger render functions
+  if (name === 'dashboard') renderDashboard();
+  else if (name === 'idcard') renderContainerRegistry();
+  else if (name === 'repair') renderRepairs();
+  else if (name === 'technician') renderTechnicianTasks();
+  else if (name === 'parts') renderParts();
+}
+
+// ===== DASHBOARD TAB =====
+function renderDashboard() {
+  const conts = getContainers();
+  const parts = getParts();
+  
+  // Stats
+  const total = conts.length;
+  const good = conts.filter(c => c.status === 'Good').length;
+  const usable = conts.filter(c => c.status === 'Usable').length;
+  const broken = conts.filter(c => c.status === 'Broken').length;
+  const exchange = conts.filter(c => c.status === 'Exchange').length;
+  
+  // Render status statistics block dynamically
+  document.getElementById('page-dashboard').innerHTML = `
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold text-slate-800"><i class="fas fa-chart-pie mr-2 text-blue-600"></i>ภาพรวมงานตู้คอนเทนเนอร์ & เครื่องเย็น</h2>
+      <button onclick="window.handleResetData()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700 shadow flex items-center gap-1">
+        <i class="fas fa-redo-alt"></i> ล้างแคชรีเซ็ตข้อมูลตู้ 800 ใบ
+      </button>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div class="card p-4 border-l-4 border-slate-500">
+        <p class="text-xs text-slate-500">ตู้ทั้งหมด</p>
+        <p class="text-3xl font-bold kanit text-slate-700">${total} <span class="text-sm">ใบ</span></p>
+      </div>
+      <div class="card p-4 border-l-4 border-green-500">
+        <p class="text-xs text-slate-500">ตู้ดี (Good)</p>
+        <p class="text-3xl font-bold kanit text-green-700">${good} <span class="text-sm">ใบ</span></p>
+      </div>
+      <div class="card p-4 border-l-4 border-blue-500">
+        <p class="text-xs text-slate-500">ตู้ใช้ได้ (Usable)</p>
+        <p class="text-3xl font-bold kanit text-blue-700">${usable} <span class="text-sm">ใบ</span></p>
+      </div>
+      <div class="card p-4 border-l-4 border-red-500">
+        <p class="text-xs text-slate-500">ตู้เสีย (Broken)</p>
+        <p class="text-3xl font-bold kanit text-red-700">${broken} <span class="text-sm">ใบ</span></p>
+      </div>
+      <div class="card p-4 border-l-4 border-yellow-500">
+        <p class="text-xs text-slate-500">แลกเปลี่ยน (Exchange)</p>
+        <p class="text-3xl font-bold kanit text-yellow-700">${exchange} <span class="text-sm">ใบ</span></p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div class="card p-4 col-span-2">
+        <h3 class="font-bold text-slate-700 mb-4"><i class="fas fa-chart-bar mr-2"></i>วิเคราะห์ข้อมูลแยกตามยี่ห้อและขนาด</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div id="chart-brand" style="height:250px;"></div>
+          <div id="chart-size" style="height:250px;"></div>
+        </div>
+      </div>
+      
+      <div class="card p-4">
+        <h3 class="font-bold text-slate-700 mb-4"><i class="fas fa-exclamation-circle mr-2 text-rose-500"></i>อะไหล่ใกล้หมดสต๊อค (Low Stock Alerts)</h3>
+        <div class="space-y-3">
+          ${parts.map(p => {
+            const pct = Math.min(100, Math.round((p.stock / p.minStock) * 100));
+            const color = p.stock === 0 ? 'bg-red-500' : p.stock < p.minStock ? 'bg-amber-500' : 'bg-emerald-500';
+            return `
+              <div>
+                <div class="flex justify-between text-xs font-semibold mb-1">
+                  <span>${p.name}</span>
+                  <span class="${p.stock < p.minStock ? 'text-amber-600 font-bold' : ''}">${p.stock} / ${p.minStock} ${p.unit}</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                  <div class="${color} h-2 rounded-full" style="width: ${pct}%"></div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Init ECharts
+  setTimeout(() => {
+    const carrierCount = conts.filter(c => c.brand === 'CARRIER').length;
+    const daikinCount = conts.filter(c => c.brand === 'DAIKIN').length;
+    const tkCount = conts.filter(c => c.brand === 'THERMO KING').length;
+
+    const size40 = conts.filter(c => c.size.includes('40')).length;
+    const size45 = conts.filter(c => c.size.includes('45')).length;
+
+    const brandChart = echarts.init(document.getElementById('chart-brand'));
+    brandChart.setOption({
+      title: { text: 'แบรนด์เครื่องเย็น', left: 'center', textStyle: { fontSize: 13, fontFamily: 'Sarabun' } },
+      tooltip: { trigger: 'item' },
+      series: [{
+        name: 'แบรนด์',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: false,
+        label: { show: true, formatter: '{b}: {c}' },
+        data: [
+          { value: carrierCount, name: 'Carrier' },
+          { value: daikinCount, name: 'Daikin' },
+          { value: tkCount, name: 'Thermo King' }
+        ]
+      }]
+    });
+
+    const sizeChart = echarts.init(document.getElementById('chart-size'));
+    sizeChart.setOption({
+      title: { text: 'สัดส่วนขนาดตู้', left: 'center', textStyle: { fontSize: 13, fontFamily: 'Sarabun' } },
+      tooltip: { trigger: 'item' },
+      series: [{
+        name: 'ขนาดตู้',
+        type: 'pie',
+        radius: '70%',
+        label: { show: true, formatter: '{b}: {c}' },
+        data: [
+          { value: size40, name: '40 ฟุต (HR)' },
+          { value: size45, name: '45 ฟุต (HR)' }
+        ]
+      }]
+    });
+    
+    // Auto resize charts on window resize
+    window.addEventListener('resize', () => {
+      brandChart.resize();
+      sizeChart.resize();
+    });
+  }, 100);
+}
+
+// ===== CONTAINER REGISTRY & DETAIL SUBTABS =====
+function renderContainerRegistry() {
+  const conts = getContainers();
+  
+  // Render search box and two column layout
+  document.getElementById('page-idcard').innerHTML = `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left side: Container List -->
+      <div class="card p-4 lg:col-span-1 flex flex-col h-[calc(100vh-160px)]">
+        <h3 class="font-bold text-slate-700 mb-3"><i class="fas fa-list mr-2"></i>ทะเบียนตู้ 800 ใบ</h3>
+        <input type="text" id="reg-search" oninput="filterRegistry()" placeholder="ค้นหารหัสตู้/รุ่นเครื่อง..." class="border-2 border-slate-200 rounded-lg px-3 py-2 text-sm w-full mb-3 focus:outline-none focus:border-blue-500 font-mono">
+        <select id="reg-status-filter" onchange="filterRegistry()" class="border rounded-lg px-2 py-1.5 text-xs mb-3 w-full">
+          <option value="all">ทุกสถานะ</option>
+          <option value="Good">ดี (Good)</option>
+          <option value="Usable">ใช้ได้ (Usable)</option>
+          <option value="Broken">เสีย (Broken)</option>
+          <option value="Exchange">แลกเปลี่ยน (Exchange)</option>
+        </select>
+        
+        <div class="overflow-y-auto flex-1 divide-y" id="reg-list-container">
+          <!-- Loaded items go here -->
+        </div>
+      </div>
+      
+      <!-- Right side: Container Details -->
+      <div class="lg:col-span-2 flex flex-col" id="registry-details-panel">
+        <div class="card p-12 text-center text-slate-400 my-auto">
+          <i class="fas fa-cube text-5xl mb-4"></i>
+          <p class="font-semibold">เลือกตู้คอนเทนเนอร์จากด้านซ้าย เพื่อดูสเปก, ตรวจสภาพ P1-P15 และประวัติการทำงาน</p>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  filterRegistry();
+}
+
+function filterRegistry() {
+  const query = document.getElementById('reg-search').value.toLowerCase().replace(/\s/g, '');
+  const filter = document.getElementById('reg-status-filter').value;
+  const conts = getContainers();
+  
+  const filtered = conts.filter(c => {
+    const matchQuery = c.containerNo.toLowerCase().includes(query) || (c.model && c.model.toLowerCase().includes(query));
+    const matchStatus = filter === 'all' || c.status === filter;
+    return matchQuery && matchStatus;
+  });
+  
+  const listContainer = document.getElementById('reg-list-container');
+  if (filtered.length === 0) {
+    listContainer.innerHTML = `<div class="p-4 text-center text-xs text-slate-400">ไม่พบตู้ที่ค้นหา</div>`;
+    return;
+  }
+  
+  listContainer.innerHTML = filtered.map(c => {
+    let statColor = 'bg-emerald-500';
+    let statText = 'ดี';
+    if (c.status === 'Usable') { statColor = 'bg-blue-500'; statText = 'ใช้ได้'; }
+    else if (c.status === 'Broken') { statColor = 'bg-red-500'; statText = 'เสีย'; }
+    else if (c.status === 'Exchange') { statColor = 'bg-yellow-500'; statText = 'แลกเปลี่ยน'; }
+    
+    return `
+      <div onclick="selectContainer('${c.id}')" class="p-3 hover:bg-blue-50 cursor-pointer transition flex justify-between items-center ${selectedContainerId === c.id ? 'bg-blue-50 border-r-4 border-blue-500' : ''}">
+        <div>
+          <p class="font-mono font-bold text-slate-700 text-sm">${c.containerNo}</p>
+          <p class="text-slate-400 text-xs">${c.brand} | ${c.size}</p>
+        </div>
+        <span class="text-[10px] font-bold text-white px-2 py-0.5 rounded-full ${statColor}">${statText}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function selectContainer(id) {
+  selectedContainerId = id;
+  const c = getContainers().find(x => x.id === id);
+  if (!c) return;
+  
+  // Highlight in list
+  filterRegistry();
+  
+  let statColor = 'bg-emerald-500';
+  let statText = 'ดี (Good)';
+  if (c.status === 'Usable') { statColor = 'bg-blue-500'; statText = 'ใช้ได้ (Usable)'; }
+  else if (c.status === 'Broken') { statColor = 'bg-red-500'; statText = 'เสีย (Broken)'; }
+  else if (c.status === 'Exchange') { statColor = 'bg-yellow-500'; statText = 'แลกเปลี่ยน (Exchange)'; }
+
+  // Draw details panel
+  document.getElementById('registry-details-panel').innerHTML = `
+    <div class="card overflow-hidden mb-4">
+      <div class="bg-gradient-to-r from-slate-800 to-blue-900 p-6 text-white flex justify-between items-start flex-wrap gap-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <h2 class="text-2xl font-bold kanit font-mono">${c.containerNo}</h2>
+            <span class="text-xs font-bold px-3 py-1 rounded-full ${statColor} text-white">${statText}</span>
+          </div>
+          <p class="text-blue-200 text-xs">${c.size} | รุ่นเครื่อง ${c.model || '-'}</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="printChecksheet('${c.id}', 'body')" class="bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition"><i class="fas fa-print"></i> พิมพ์เช็คบอดี้</button>
+          <button onclick="printChecksheet('${c.id}', 'pti')" class="bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition"><i class="fas fa-print"></i> พิมพ์เช็ค PTI</button>
+        </div>
+      </div>
+      
+      <!-- Subtabs -->
+      <div class="flex gap-1 border-b px-4 bg-slate-50 py-2">
+        <button onclick="showDetailsSubTab('info')" id="dstab-info" class="tab-btn active px-3 py-1.5 rounded-lg text-xs font-semibold"><i class="fas fa-info-circle mr-1"></i>รายละเอียดทั่วไป</button>
+        <button onclick="showDetailsSubTab('photos')" id="dstab-photos" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100"><i class="fas fa-images mr-1"></i>เช็คสภาพ 15 จุด</button>
+        <button onclick="showDetailsSubTab('history')" id="dstab-history" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100"><i class="fas fa-history mr-1"></i>ประวัติตู้</button>
+      </div>
+    </div>
+
+    <!-- Subtab Pages -->
+    <div id="dsub-info" class="card p-6 flex-1 overflow-y-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-bold text-slate-700 mb-3 border-b pb-2"><i class="fas fa-cube mr-2 text-blue-500"></i>ข้อมูลตู้คอนเทนเนอร์</h4>
+          <table class="w-full text-sm">
+            <tr class="border-b"><td class="py-2 text-slate-500">Container ID</td><td class="py-2 font-semibold">${c.id}</td></tr>
+            <tr class="border-b"><td class="py-2 text-slate-500">ขนาด</td><td class="py-2">${c.size}</td></tr>
+            <tr class="border-b"><td class="py-2 text-slate-500">วันที่ส่งงาน TB</td><td class="py-2">${c.tbDeliveryDate || '-'}</td></tr>
+            <tr class="border-b"><td class="py-2 text-slate-500">บริษัทสายเรือ</td><td class="py-2 font-semibold text-blue-600">${c.company}</td></tr>
+          </table>
+        </div>
+        <div>
+          <h4 class="font-bold text-slate-700 mb-3 border-b pb-2"><i class="fas fa-thermometer-half mr-2 text-rose-500"></i>สเปกเครื่องเย็น</h4>
+          <table class="w-full text-sm">
+            <tr class="border-b"><td class="py-2 text-slate-500">ยี่ห้อ (Brand)</td><td class="py-2 font-bold">${c.brand}</td></tr>
+            <tr class="border-b"><td class="py-2 text-slate-500">รุ่น (Models)</td><td class="py-2 font-mono">${c.model || '-'}</td></tr>
+            <tr class="border-b"><td class="py-2 text-slate-500">ปีที่ผลิต (MFG)</td><td class="py-2">${c.mfgDate || '-'}</td></tr>
+            <tr class="border-b"><td class="py-2 text-slate-500">ผู้สำรวจ / ผู้ลงข้อมูล</td><td class="py-2 text-xs">${c.collector || '-'} / ${c.sender || '-'}</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="dsub-photos" class="card p-6 flex-1 overflow-y-auto hidden">
+      <h4 class="font-bold text-slate-700 mb-4 border-b pb-2"><i class="fas fa-camera mr-2 text-blue-500"></i>สถานะรูปถ่ายเช็คสภาพ 15 จุด (P.1 - P.15)</h4>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+        ${Array.from({length: 15}, (_, idx) => {
+          const pKey = `P${idx + 1}`;
+          const isUploaded = c.photos && c.photos[pKey] === true;
+          return `
+            <div onclick="togglePhotoUpload('${c.id}', '${pKey}')" class="p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition select-none ${isUploaded ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100'}">
+              <i class="fas ${isUploaded ? 'fa-check-circle' : 'fa-camera'} text-xl mb-2"></i>
+              <span class="text-xs font-bold">${pKey}</span>
+              <span class="text-[9px] mt-1 opacity-80">${getPName(pKey)}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+
+    <div id="dsub-history" class="card p-6 flex-1 overflow-y-auto hidden">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b">
+        <h4 class="font-bold text-slate-700"><i class="fas fa-clock mr-2 text-blue-500"></i>ไทม์ไลน์บันทึกประวัติตู้</h4>
+      </div>
+      
+      <!-- Timeline entries -->
+      <div class="relative border-l border-slate-200 ml-3 pl-6 space-y-6 mb-6" id="history-timeline-box">
+        <!-- Rendered by loadTimeline -->
+      </div>
+      
+      <!-- Input Custom log -->
+      <div class="border-t pt-4">
+        <h5 class="font-bold text-xs text-slate-500 uppercase mb-2">จดบันทึกการทำงาน / การเปลี่ยนหน้าตู้เพิ่มเติม</h5>
+        <div class="flex gap-2">
+          <input type="text" id="new-history-text" placeholder="ระบุการทำงาน เช่น เปลี่ยนเบอร์ตู้ใหม่, พ่นสีใหม่..." class="border rounded-lg px-3 py-2 text-xs flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <button onclick="addCustomHistoryLog('${c.id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1 transition">
+            <i class="fas fa-plus"></i> บันทึกข้อมูล
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  showDetailsSubTab('info');
+}
+
+function showDetailsSubTab(tabName) {
+  ['info', 'photos', 'history'].forEach(t => {
+    const page = document.getElementById('dsub-' + t);
+    const btn = document.getElementById('dstab-' + t);
+    if (page) page.classList.add('hidden');
+    if (btn) {
+      btn.classList.remove('active','bg-blue-600','text-white');
+      btn.classList.add('text-slate-500','hover:bg-slate-100');
+    }
+  });
+
+  const activePage = document.getElementById('dsub-' + tabName);
+  const activeBtn = document.getElementById('dstab-' + tabName);
+  
+  if (activePage) activePage.classList.remove('hidden');
+  if (activeBtn) {
+    activeBtn.classList.add('active','bg-blue-600','text-white');
+    activeBtn.classList.remove('text-slate-500','hover:bg-slate-100');
+  }
+  
+  if (tabName === 'history' && selectedContainerId) {
+    loadTimeline(selectedContainerId);
+  }
+}
+
+function getPName(pKey) {
+  const names = {
+    P1: 'หน้าตู้', P2: 'ท้ายตู้', P3: 'ซ้าย-นอก', P4: 'ขวา-นอก', P5: 'แผ่นบังคับลม',
+    P6: 'ภายในตู้', P7: 'ประตูซ้าย-ใน', P8: 'ประตูขวา-ใน', P9: 'พื้นตู้-ทีฟอร์', P10: 'แผ่นเพลท',
+    P11: 'ปลั๊ก', P12: 'สายไฟ', P13: 'บอร์ดคอนโทรล', P14: 'คอยล์เย็น', P15: 'คอยล์ร้อน'
+  };
+  return names[pKey] || '';
+}
+
+function togglePhotoUpload(containerId, pKey) {
+  const conts = getContainers();
+  const c = conts.find(x => x.id === containerId);
+  if (!c) return;
+  
+  if (!c.photos) c.photos = {};
+  c.photos[pKey] = !c.photos[pKey];
+  
+  saveContainers(conts);
+  selectContainer(containerId);
+  showDetailsSubTab('photos');
+  toast(`อัปเดตสถานะรูปภาพ ${pKey} เรียบร้อย`, 'image', 'text-blue-400');
+}
+
+// ===== TIMELINE LOAD & GPS INTEGRATION =====
+function loadTimeline(containerId) {
+  const conts = getContainers();
+  const c = conts.find(x => x.id === containerId);
+  if (!c) return;
+  
+  const repairs = getRepairs().filter(r => r.containerNo === c.containerNo);
+  const insps = getInspections().filter(i => i.containerId === c.id);
+  
+  const timelineBox = document.getElementById('history-timeline-box');
+  
+  // Combine all logs into a single sorted timeline
+  const items = [];
+  
+  // 1. Add Repairs to timeline
+  repairs.forEach(r => {
+    items.push({
+      date: r.date,
+      type: 'Repair',
+      title: `ซ่อมแซม: ${r.desc}`,
+      technician: r.technician,
+      status: r.status === 'Completed' ? 'เสร็จเรียบร้อย' : 'กำลังซ่อมแซม',
+      color: r.status === 'Completed' ? 'border-green-500 bg-green-50' : 'border-blue-500 bg-blue-50',
+      icon: 'fa-tools text-blue-600'
+    });
+  });
+  
+  // 2. Add Inspections / Logs
+  insps.forEach(i => {
+    let gpsLink = '';
+    if (i.lat && i.lng) {
+      gpsLink = `<br/><a href="https://www.google.com/maps?q=${i.lat},${i.lng}" target="_blank" class="text-blue-500 hover:underline mt-1 inline-block text-[10px]"><i class="fas fa-map-marker-alt mr-1"></i>ดูพิกัดสแกนบนแผนที่ (GPS)</a>`;
+    }
+    
+    items.push({
+      date: i.date,
+      type: i.type,
+      title: `${i.type === 'PTI' ? 'ตรวจ PTI' : i.type === 'Body' ? 'ตรวจบอดี้' : 'จดบันทึก'}: ${i.remarks}`,
+      technician: i.inspector || 'เจ้าหน้าที่',
+      status: i.result === 'Pass' ? 'ผ่านการตรวจ ✓' : '-',
+      color: i.type === 'General Log' ? 'border-amber-500 bg-amber-50' : 'border-slate-500 bg-slate-50',
+      icon: i.type === 'General Log' ? 'fa-sticky-note text-amber-600' : 'fa-clipboard-check text-slate-600',
+      gpsLink: gpsLink
+    });
+  });
+  
+  if (items.length === 0) {
+    timelineBox.innerHTML = `<p class="text-xs text-slate-400 py-3">ยังไม่มีประวัติการเช็คหรือประวัติซ่อมบันทึกไว้สำหรับตู้นี้</p>`;
+    return;
+  }
+  
+  // Sort by date descending (assuming format DD/MM/YYYY)
+  items.sort((a, b) => {
+    const aParts = a.date.split('/');
+    const bParts = b.date.split('/');
+    const aDate = new Date(aParts[2], aParts[1] - 1, aParts[0]);
+    const bDate = new Date(bParts[2], bParts[1] - 1, bParts[0]);
+    return bDate - aDate;
+  });
+  
+  timelineBox.innerHTML = items.map(item => `
+    <div class="relative">
+      <span class="absolute -left-[33px] top-1.5 bg-white border border-slate-300 w-6 h-6 rounded-full flex items-center justify-center text-xs">
+        <i class="fas ${item.icon}"></i>
+      </span>
+      <div class="border rounded-xl p-3 text-xs ${item.color}">
+        <div class="flex justify-between font-semibold mb-1 text-slate-700">
+          <span>${item.title}</span>
+          <span class="text-[10px] text-slate-400 font-normal">${item.date}</span>
+        </div>
+        <p class="text-slate-500">โดย: ${item.technician} ${item.status !== '-' ? `| สถานะ: ${item.status}` : ''}</p>
+        ${item.gpsLink || ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function addCustomHistoryLog(containerId) {
+  const input = document.getElementById('new-history-text');
+  const text = input.value.trim();
+  if (!text) {
+    alert('กรุณากรอกข้อมูลบันทึกก่อนกดบันทึกประวัติครับ');
+    return;
+  }
+  
+  const today = new Date().toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const insps = getInspections();
+  
+  const newLog = {
+    id: `INSP-${String(insps.length + 1).padStart(4, '0')}`,
+    containerId: containerId,
+    type: 'General Log',
+    date: today,
+    inspector: currentUser ? currentUser.name : 'เจ้าหน้าที่',
+    result: '-',
+    remarks: text
+  };
+  
+  // Try to capture Geolocation
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        newLog.lat = pos.coords.latitude;
+        newLog.lng = pos.coords.longitude;
+        
+        insps.push(newLog);
+        saveInspections(insps);
+        input.value = '';
+        loadTimeline(containerId);
+        toast('บันทึกข้อมูลพร้อมพิกัด GPS สำเร็จ', 'check-circle', 'text-green-400');
+        
+        // Log coordinates to cloud backend directly
+        if (typeof MCK_Sync !== 'undefined' && MCK_Sync.getUrl()) {
+          fetch(MCK_Sync.getUrl(), {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'logScan',
+              log: { containerNo: containerId, lat: pos.coords.latitude, lng: pos.coords.longitude, scannedBy: newLog.inspector }
+            })
+          });
+        }
+      },
+      (err) => {
+        // Fallback without coordinates
+        insps.push(newLog);
+        saveInspections(insps);
+        input.value = '';
+        loadTimeline(containerId);
+        toast('บันทึกข้อมูลสำเร็จ (ไม่สามารถดึงพิกัดได้)', 'check-circle', 'text-yellow-400');
+      }
+    );
+  } else {
+    insps.push(newLog);
+    saveInspections(insps);
+    input.value = '';
+    loadTimeline(containerId);
+    toast('บันทึกข้อมูลสำเร็จ', 'check-circle', 'text-green-400');
+  }
+}
+
+// ===== REPAIR JOBS TAB =====
+function renderRepairs() {
+  const repairs = getRepairs();
+  const conts = getContainers();
+  const parts = getParts();
+  
+  // Render layout for repairs list and notification list
+  document.getElementById('page-repair').innerHTML = `
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold text-slate-800"><i class="fas fa-tools mr-2 text-rose-600"></i>ระบบติดตามงานซ่อมบำรุงตู้ชำรุด</h2>
+      <button onclick="openNewRepairModal()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700 shadow flex items-center gap-1 transition">
+        <i class="fas fa-plus"></i> แจ้งรายการตู้เสียหาย
+      </button>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="repair-list-container">
+      <!-- Dynamic list loaded by Javascript -->
+    </div>
+
+    <!-- Modal for new repair -->
+    <div id="modal-repair" class="modal-overlay">
+      <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+          <strong class="font-bold text-slate-700 text-lg"><i class="fas fa-tools mr-2 text-rose-500"></i>แจ้งรายการซ่อมบำรุง / เปลี่ยนพาร์ท</strong>
+          <button onclick="document.getElementById('modal-repair').classList.remove('open')" class="text-slate-400 hover:text-slate-600 text-xl font-bold border-none bg-none">&times;</button>
+        </div>
+        <div class="space-y-4 text-sm">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">เลือกตู้คอนเทนเนอร์</label>
+            <select id="rep-modal-con" class="w-full border rounded-lg px-3 py-2 text-sm">
+              ${conts.map(c => `<option value="${c.containerNo}">${c.containerNo} (${c.brand})</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">อะไหล่ที่ต้องใช้</label>
+            <select id="rep-modal-part" class="w-full border rounded-lg px-3 py-2 text-sm">
+              ${parts.map(p => `<option value="${p.id}">${p.name} (คงคลัง: ${p.stock})</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">จำนวนที่เบิกใช้</label>
+            <input type="number" id="rep-modal-qty" value="1" min="1" class="w-full border rounded-lg px-3 py-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">รายละเอียดปัญหา</label>
+            <textarea id="rep-modal-desc" placeholder="เช่น ตัวคอมเพรสเซอร์ล็อคทำงานไม่ได้, หน้าจอคอนโทรลชำรุด..." class="w-full border rounded-lg px-3 py-2 text-sm h-20"></textarea>
+          </div>
+          <button onclick="submitNewRepair()" class="w-full bg-blue-700 text-white font-bold py-2.5 rounded-lg hover:bg-blue-800 transition">
+            <i class="fas fa-paper-plane mr-1"></i> บันทึกข้อมูลใบแจ้งซ่อม
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  loadRepairList();
+}
+
+function loadRepairList() {
+  const repairs = getRepairs();
+  const listContainer = document.getElementById('repair-list-container');
+  
+  if (repairs.length === 0) {
+    listContainer.innerHTML = `<div class="col-span-2 text-center text-slate-400 p-8 card">ยังไม่มีรายการใบแจ้งซ่อมบำรุง</div>`;
+    return;
+  }
+  
+  listContainer.innerHTML = repairs.map(r => {
+    const part = getParts().find(p => p.id === r.partId) || { name: 'ไม่ระบุพาร์ท' };
+    const isCompleted = r.status === 'Completed';
+    return `
+      <div class="card overflow-hidden">
+        <div class="${isCompleted ? 'bg-emerald-700' : 'bg-slate-800'} text-white p-4 flex justify-between items-center">
+          <div>
+            <span class="text-xs bg-white/10 px-2 py-0.5 rounded font-mono">${r.id}</span>
+            <strong class="ml-2 font-mono">${r.containerNo}</strong>
+          </div>
+          <span class="text-xs font-bold px-2 py-0.5 rounded-full ${isCompleted ? 'bg-white text-emerald-700' : 'bg-rose-500 text-white'}">${isCompleted ? 'เสร็จสิ้น ✓' : 'รออนุมัติ'}</span>
+        </div>
+        <div class="p-4 space-y-2 text-sm">
+          <p class="font-semibold text-slate-700">${r.desc}</p>
+          <div class="grid grid-cols-2 gap-2 border-t pt-2 mt-2 text-xs text-slate-500">
+            <div><p>พาร์ทที่ใช้งาน:</p><p class="font-bold text-slate-700">${part.name} (x${r.qty})</p></div>
+            <div><p>ช่างเทคนิค:</p><p class="font-bold text-slate-700">${r.technician || '-'}</p></div>
+            <div><p>วันที่แจ้ง:</p><p class="font-bold text-slate-700">${r.date}</p></div>
+            <div><p>ความเร่งด่วน:</p><p class="font-bold text-slate-700 text-rose-600">${r.priority}</p></div>
+          </div>
+          ${!isCompleted ? `
+            <div class="border-t pt-3 mt-3 flex justify-end">
+              <button onclick="approveAndCloseRepair('${r.id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition">
+                <i class="fas fa-check-circle"></i> อนุมัติซ่อมแซมและหักสต๊อกอะไหล่
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openNewRepairModal() {
+  document.getElementById('modal-repair').classList.add('open');
+}
+
+function submitNewRepair() {
+  const containerNo = document.getElementById('rep-modal-con').value;
+  const partId = document.getElementById('rep-modal-part').value;
+  const qty = parseInt(document.getElementById('rep-modal-qty').value);
+  const desc = document.getElementById('rep-modal-desc').value.trim();
+  
+  if (!desc) {
+    alert('กรุณากรอกรายละเอียดปัญหาครับ');
+    return;
+  }
+  
+  const repairs = getRepairs();
+  const newRepair = {
+    id: `REP-${String(repairs.length + 1).padStart(4, '0')}`,
+    containerNo,
+    partId,
+    qty,
+    desc,
+    date: new Date().toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    technician: currentUser ? currentUser.name : 'ช่างเทคนิค',
+    status: 'Pending',
+    priority: 'High'
+  };
+  
+  // Set container status to Broken
+  const conts = getContainers();
+  const c = conts.find(x => x.containerNo === containerNo);
+  if (c) {
+    c.status = 'Broken';
+    saveContainers(conts);
+  }
+  
+  repairs.push(newRepair);
+  saveRepairs(repairs);
+  
+  document.getElementById('modal-repair').classList.remove('open');
+  renderRepairs();
+  toast('บันทึกคำขอแจ้งซ่อมและตั้งค่าตู้ชำรุดเรียบร้อย', 'tools', 'text-green-400');
+}
+
+function approveAndCloseRepair(repairId) {
+  const repairs = getRepairs();
+  const r = repairs.find(x => x.id === repairId);
+  if (!r) return;
+  
+  const parts = getParts();
+  const part = parts.find(p => p.id === r.partId);
+  
+  if (part) {
+    if (part.stock < r.qty) {
+      alert(`ไม่สามารถซ่อมสำเร็จได้เนื่องจากอะไหล่ ${part.name} ในคลังไม่เพียงพอ (คงเหลือ: ${part.stock} ชิ้น, ต้องการ: ${r.qty} ชิ้น) กรุณากดทำใบขอซื้ออะไหล่ก่อนครับ`);
+      return;
+    }
+    
+    // Decrement stock
+    part.stock -= r.qty;
+    saveParts(parts);
+  }
+  
+  r.status = 'Completed';
+  saveRepairs(repairs);
+  
+  // Update container status to Usable or Good
+  const conts = getContainers();
+  const c = conts.find(x => x.containerNo === r.containerNo);
+  if (c) {
+    c.status = 'Usable';
+    saveContainers(conts);
+  }
+  
+  loadRepairList();
+  toast('อนุมัติหักสต๊อกสินค้าและซ่อมสำเร็จตู้เปลี่ยนสถานะเป็นใช้ได้ (Usable)', 'check-circle', 'text-emerald-400');
+}
+
+// ===== PARTS INVENTORY TAB =====
+function renderParts() {
+  const parts = getParts();
+  
+  document.getElementById('page-parts').innerHTML = `
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold text-slate-800"><i class="fas fa-boxes mr-2 text-blue-600"></i>ระบบจัดทำสต๊อกอะไหล่เครื่องเย็น (Carrier / Daikin)</h2>
+      <button onclick="document.getElementById('modal-receive').classList.add('open')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow flex items-center gap-1 transition">
+        <i class="fas fa-plus"></i> บันทึกรับพาร์ทเข้าคลัง
+      </button>
+    </div>
+    
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-800 text-white text-xs uppercase">
+            <tr>
+              <th class="p-3 text-left">รหัสพาร์ท</th>
+              <th class="p-3 text-left">ชื่ออะไหล่</th>
+              <th class="p-3 text-center">จำนวนในคลัง</th>
+              <th class="p-3 text-center">ระดับขั้นต่ำ</th>
+              <th class="p-3 text-right">ราคาต่อหน่วย</th>
+              <th class="p-3 text-center">สถานะ</th>
+              <th class="p-3 text-center">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y" id="parts-table-body">
+            <!-- Dynamic parts loaded here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Receive Part -->
+    <div id="modal-receive" class="modal-overlay">
+      <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+          <strong class="font-bold text-slate-700 text-lg"><i class="fas fa-boxes mr-2 text-blue-500"></i>รับอะไหล่เข้าคลังสินค้า</strong>
+          <button onclick="document.getElementById('modal-receive').classList.remove('open')" class="text-slate-400 hover:text-slate-600 text-xl font-bold border-none bg-none">&times;</button>
+        </div>
+        <div class="space-y-4 text-sm">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">เลือกอะไหล่</label>
+            <select id="part-recv-id" class="w-full border rounded-lg px-3 py-2 text-sm">
+              ${parts.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">จำนวนที่รับเข้า</label>
+            <input type="number" id="part-recv-qty" value="5" min="1" class="w-full border rounded-lg px-3 py-2 text-sm">
+          </div>
+          <button onclick="submitReceiveStock()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-lg hover:bg-emerald-700 transition">
+            <i class="fas fa-check mr-1"></i> ยืนยันการรับของเข้าสต๊อก
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  loadPartsTable();
+}
+
+function loadPartsTable() {
+  const parts = getParts();
+  const tbody = document.getElementById('parts-table-body');
+  
+  tbody.innerHTML = parts.map(p => {
+    const isLow = p.stock < p.minStock;
+    const isOut = p.stock === 0;
+    
+    let statText = 'ปกติ';
+    let statClass = 'bg-emerald-100 text-emerald-800';
+    
+    if (isOut) {
+      statText = 'หมดเกลี้ยง';
+      statClass = 'bg-rose-100 text-rose-800';
+    } else if (isLow) {
+      statText = 'ใกล้หมด';
+      statClass = 'bg-amber-100 text-amber-800';
+    }
+    
+    return `
+      <tr class="hover:bg-slate-50">
+        <td class="p-3 font-mono font-bold text-slate-600 text-xs">${p.id}</td>
+        <td class="p-3 font-semibold text-slate-700">${p.name}</td>
+        <td class="p-3 text-center font-bold text-slate-800">${p.stock} ${p.unit}</td>
+        <td class="p-3 text-center text-slate-500">${p.minStock} ${p.unit}</td>
+        <td class="p-3 text-right text-slate-600">฿${p.price.toLocaleString()}</td>
+        <td class="p-3 text-center"><span class="text-xs px-2 py-0.5 rounded font-bold ${statClass}">${statText}</span></td>
+        <td class="p-3 text-center">
+          <button onclick="createPurchaseRequest('${p.id}')" class="bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold px-3.5 py-1.5 rounded-lg text-xs transition">
+            <i class="fas fa-file-invoice mr-1"></i> ขอซื้อ (PR)
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function submitReceiveStock() {
+  const id = document.getElementById('part-recv-id').value;
+  const qty = parseInt(document.getElementById('part-recv-qty').value);
+  
+  const parts = getParts();
+  const p = parts.find(x => x.id === id);
+  if (p) {
+    p.stock += qty;
+    saveParts(parts);
+  }
+  
+  document.getElementById('modal-receive').classList.remove('open');
+  renderParts();
+  toast('รับพาร์ทเข้าสต๊อกสินค้าและอัปเดตระบบเรียบร้อย', 'boxes', 'text-green-400');
+}
+
+function createPurchaseRequest(partId) {
+  const part = getParts().find(p => p.id === partId);
+  if (!part) return;
+  
+  toast(`สร้างใบขอจัดซื้อ (PR) ${part.name} เรียบร้อย — กำลังส่งเสนอผู้จัดการ`, 'file-alt', 'text-purple-400');
+}
+
+// ===== PRINTER UTILITIES FOR PTI / BODY CHECKSHEETS =====
+function printChecksheet(containerId, type) {
+  const c = getContainers().find(x => x.id === containerId);
+  if (!c) return;
+  
+  const printWindow = window.open('', '_blank');
+  const printDate = new Date().toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const checkSheetTitle = type === 'pti' ? 'PTI INSPECTION CERTIFICATE' : 'BODY CHECK REPORT';
+  
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>ICL - ${checkSheetTitle} - ${c.containerNo}</title>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
+          body { font-family: 'Sarabun', sans-serif; font-size: 12px; }
+          .signature-box { border-bottom: 1.5px dotted #1e293b; height: 35px; width: 180px; }
+        </style>
+      </head>
+      <body class="p-8 text-slate-800" onload="window.print()">
+        <div class="border-4 border-slate-800 p-8 max-w-4xl mx-auto rounded-2xl relative">
+          <!-- Logo & Header -->
+          <div class="flex justify-between items-start border-b-2 border-slate-800 pb-4 mb-6">
+            <div>
+              <h1 class="text-3xl font-extrabold text-blue-900 leading-tight">ICL INTERNATIONAL CO., LTD.</h1>
+              <p class="text-xs text-slate-500 font-semibold uppercase mt-0.5">Container Yard & Logistics Services (Thailand)</p>
+            </div>
+            <div class="text-right">
+              <span class="text-sm font-bold bg-slate-900 text-white px-3 py-1.5 rounded-lg font-mono uppercase">${checkSheetTitle}</span>
+              <p class="text-xs text-slate-500 mt-2 font-bold font-mono">เอกสารอ้างอิง: ICL-2026-${c.id.split('-')[1]}</p>
+            </div>
+          </div>
+
+          <!-- Container Spec Metadata -->
+          <div class="grid grid-cols-3 gap-6 bg-slate-100 p-4 rounded-xl mb-6">
+            <div><p class="text-slate-400 text-[10px] font-bold uppercase">Container No.</p><p class="font-mono text-lg font-bold text-blue-900">${c.containerNo}</p></div>
+            <div><p class="text-slate-400 text-[10px] font-bold uppercase">Size / Type</p><p class="font-bold text-sm text-slate-700">${c.size}</p></div>
+            <div><p class="text-slate-400 text-[10px] font-bold uppercase">Yard Owner</p><p class="font-bold text-sm text-slate-700">${c.company}</p></div>
+            <div><p class="text-slate-400 text-[10px] font-bold uppercase">Machinery Brand</p><p class="font-bold text-sm text-slate-700">${c.brand}</p></div>
+            <div><p class="text-slate-400 text-[10px] font-bold uppercase">Model</p><p class="font-mono text-sm text-slate-700">${c.model || '-'}</p></div>
+            <div><p class="text-slate-400 text-[10px] font-bold uppercase">Manufacture Date</p><p class="font-bold text-sm text-slate-700">${c.mfgDate}</p></div>
+          </div>
+
+          <!-- Checklist Block -->
+          <div class="border rounded-xl overflow-hidden mb-6">
+            <table class="w-full text-xs">
+              <thead class="bg-slate-800 text-white">
+                <tr>
+                  <th class="p-3 text-left w-16">ลำดับ</th>
+                  <th class="p-3 text-left">รายละเอียดการตรวจเช็คสภาพ</th>
+                  <th class="p-3 text-center w-28">ผลการตรวจ</th>
+                  <th class="p-3 text-center w-28">รูปถ่ายยืนยัน</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y">
+                ${Array.from({length: 15}, (_, idx) => {
+                  const pKey = `P${idx + 1}`;
+                  const isOk = c.photos && c.photos[pKey] === true;
+                  return `
+                    <tr>
+                      <td class="p-2.5 font-bold text-slate-400 text-center">${pKey}</td>
+                      <td class="p-2.5 font-medium text-slate-700">${getPName(pKey)}</td>
+                      <td class="p-2.5 text-center font-bold ${isOk ? 'text-emerald-600' : 'text-slate-400'}">${isOk ? 'PASS ✓' : 'N/A'}</td>
+                      <td class="p-2.5 text-center text-[10px] text-slate-500 font-semibold">${isOk ? 'มีหลักฐานภาพถ่าย' : 'ไม่มีรูปภาพ'}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Remarks & Verification Signatures -->
+          <div class="grid grid-cols-2 gap-8 border-t border-slate-300 pt-6">
+            <div class="space-y-3">
+              <h4 class="font-bold text-xs text-slate-400 uppercase">ข้อเสนอแนะ / ข้อคิดเห็นของช่าง</h4>
+              <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl min-h-[80px] text-xs font-semibold text-slate-600">
+                ${c.suggestions || 'ตู้คอนเทนเนอร์และอุปกรณ์การทำงานระบบทำความเย็นอยู่ในสภาพปกติ ผ่านการทดสอบเรียบร้อย'}
+              </div>
+            </div>
+            
+            <div class="flex flex-col justify-between items-end">
+              <div class="text-right">
+                <p class="text-slate-500 font-semibold">พิมพ์รายงานเมื่อ: ${printDate}</p>
+                <p class="text-xs text-slate-400 mt-1">ตรวจโดย: ${c.collector || 'ฝ่ายช่างเทคนิค ICL'}</p>
+              </div>
+              <div class="flex gap-4 mt-6">
+                <div class="flex flex-col items-center">
+                  <div class="signature-box"></div>
+                  <p class="text-[10px] text-slate-400 mt-1.5 font-bold uppercase">Inspector Signature</p>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="signature-box"></div>
+                  <p class="text-[10px] text-slate-400 mt-1.5 font-bold uppercase">Supervisor Signature</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  `);
+}
+
+// ===== TECHNICIAN TASKS VIEW =====
+function renderTechnicianTasks() {
+  const repairs = getRepairs().filter(r => r.status === 'Pending');
+  
+  document.getElementById('page-technician').innerHTML = `
+    <h2 class="text-xl font-bold text-slate-800 mb-6"><i class="fas fa-hard-hat mr-2 text-yellow-600"></i>กระดานงานซ่อมบำรุงสำหรับช่างหน้างาน</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="tech-jobs-grid">
+      <!-- Loaded dynamically -->
+    </div>
+  `;
+  
+  loadTechJobs();
+}
+
+function loadTechJobs() {
+  const repairs = getRepairs().filter(r => r.status === 'Pending');
+  const grid = document.getElementById('tech-jobs-grid');
+  
+  if (repairs.length === 0) {
+    grid.innerHTML = `<div class="col-span-3 text-center text-slate-400 p-8 card">ไม่มีงานรอซ่อมบำรุงในขณะนี้</div>`;
+    return;
+  }
+  
+  grid.innerHTML = repairs.map(r => {
+    return `
+      <div class="card p-4 hover:border-yellow-400 border-2 transition flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs bg-slate-100 px-2 py-0.5 rounded font-mono font-bold">${r.id}</span>
+            <span class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold">ด่วน</span>
+          </div>
+          <h4 class="font-bold text-base text-slate-800 font-mono mb-1">${r.containerNo}</h4>
+          <p class="text-sm text-slate-600 mb-4">${r.desc}</p>
+        </div>
+        <div class="border-t pt-3 flex justify-between items-center">
+          <span class="text-xs text-slate-400"><i class="fas fa-calendar mr-1"></i>${r.date}</span>
+          <button onclick="approveAndCloseRepair('${r.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold px-3 py-1.5 rounded-lg text-xs transition">
+            <i class="fas fa-check"></i> บันทึกซ่อมเสร็จแล้ว
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== EIR & PM PLACEHOLDERS =====
 function showSample(key) {
-  document.getElementById('containerSearch').value = key;
-  searchContainer();
+  const conts = getContainers();
+  const c = conts.find(x => x.containerNo.replace(/\s/g,'') === key.replace(/\s/g,''));
+  if (c) {
+    showTab('idcard');
+    selectContainer(c.id);
+  } else {
+    alert('ไม่พบข้อมูลตู้รหัส: ' + key);
+  }
 }
 
 function searchContainer() {
-  const raw = document.getElementById('containerSearch').value.replace(/\s/g,'').toUpperCase();
-  const data = containers[raw] || containers['MSKU9283741'];
-  document.getElementById('idcard-result').classList.remove('hidden');
-  document.getElementById('card-number').textContent = data.number;
-  document.getElementById('card-status-badge').textContent = data.status;
-  document.getElementById('card-status-badge').className = 'text-xs font-bold px-3 py-1 rounded-full text-white ' + data.statusClass;
-  document.getElementById('card-type').textContent = data.type;
-  document.getElementById('card-owner').textContent = data.owner;
-  document.getElementById('card-year').textContent = data.year;
-  document.getElementById('card-tare').textContent = data.tare;
-  document.getElementById('card-csc').textContent = data.csc;
-  document.getElementById('card-score').textContent = data.score;
-  document.getElementById('card-trips').textContent = data.trips;
-  document.getElementById('card-km').textContent = data.km;
-  document.getElementById('card-repairs').textContent = data.repairs;
-  document.getElementById('card-cost').textContent = data.cost;
-  document.getElementById('info-number').textContent = data.number;
-  document.getElementById('info-size').textContent = data.size;
-  document.getElementById('info-typetext').textContent = data.typetext;
-  document.getElementById('info-owner').textContent = data.owner;
-  showSubTab('info');
-  toast('โหลดข้อมูลตู้ ' + data.number + ' สำเร็จ', 'check-circle', 'text-green-400');
-}
-
-// Repair filter
-function filterRepair(status) {
-  document.querySelectorAll('[id^="rf-"]').forEach(b => {
-    b.classList.remove('bg-slate-800','text-white');
-    b.classList.add('bg-slate-200','text-slate-600');
-  });
-  document.getElementById('rf-' + status).classList.add('bg-slate-800','text-white');
-  document.getElementById('rf-' + status).classList.remove('bg-slate-200','text-slate-600');
-  document.querySelectorAll('.repair-card').forEach(card => {
-    if(status === 'all' || card.dataset.status === status) card.classList.remove('hidden');
-    else card.classList.add('hidden');
-  });
-}
-
-function approveRepair(btn) {
-  btn.closest('.card').querySelector('.bg-red-600').innerHTML = '<span class="text-sm font-bold"><i class="fas fa-check-circle mr-2"></i>อนุมัติแล้ว — ส่งให้ช่างดำเนินการ</span>';
-  btn.closest('.card').querySelector('.bg-red-600').className = 'bg-green-700 text-white px-4 py-2 flex justify-between items-center';
-  toast('อนุมัติซ่อม REP-2026-0158 เรียบร้อย', 'check-circle', 'text-green-400');
-}
-
-function selectWO(idx) {
-  document.querySelectorAll('#wo-list > div').forEach((el, i) => {
-    el.classList.remove('bg-blue-50','border-l-4','border-blue-600');
-    if(i===idx) el.classList.add('bg-blue-50','border-l-4','border-blue-600');
-  });
-}
-
-function updateProgress() {
-  toast('บันทึกความคืบหน้าเรียบร้อย', 'check-circle', 'text-green-400');
-}
-
-function closeWO() {
-  toast('ปิดงาน WO-2026-0048 เรียบร้อย — ตู้กลับสู่สถานะ AV', 'check-circle', 'text-green-400');
-}
-
-function submitRepair() {
-  document.getElementById('modal-repair').classList.remove('open');
-  toast('ส่งคำขอแจ้งซ่อมเรียบร้อย — Container Manager จะตรวจสอบ', 'paper-plane', 'text-blue-400');
-}
-
-function withdrawPart() {
-  document.getElementById('modal-parts-req').classList.remove('open');
-  toast('เบิกอะไหล่สำเร็จ — ตัดสต๊อคแล้ว', 'check-circle', 'text-green-400');
-}
-
-function receiveStock() {
-  document.getElementById('modal-receive').classList.remove('open');
-  toast('รับอะไหล่เข้าสต๊อคสำเร็จ', 'check-circle', 'text-green-400');
-}
-
-function requestPO(name) {
-  toast('สร้างใบขอซื้อ ' + name + ' เรียบร้อย — รอผู้จัดการอนุมัติ', 'file-alt', 'text-purple-400');
-}
-
-function addLaborRow() {
-  const tbody = document.getElementById('labor-rows');
-  const row = document.createElement('tr');
-  row.innerHTML = `<td class="p-2"><input type="date" class="border rounded px-1 py-0.5 text-xs w-28"></td><td class="p-2"><select class="border rounded px-1 py-0.5 text-xs"><option>นายวิชัย ช่างดี</option><option>นายสมชาย ช่าง2</option></select></td><td class="p-2 text-center"><input type="number" min="1" max="12" value="8" class="border rounded px-1 py-0.5 text-xs w-16 text-center"> ชม.</td><td class="p-2 text-right text-xs text-slate-400">฿500</td><td class="p-2 text-right font-bold text-blue-700 text-xs">฿4,000</td>`;
-  tbody.appendChild(row);
-  toast('เพิ่มรายการชั่วโมงทำงาน', 'plus-circle', 'text-blue-400');
+  const val = document.getElementById('containerSearch').value.replace(/\s/g,'').toUpperCase();
+  showSample(val);
 }
 
 function showEIRDetail() {
@@ -2137,6 +3076,7 @@ function submitPM() {
 
 function toast(msg, icon, cls) {
   const t = document.getElementById('toast');
+  if (!t) return;
   document.getElementById('toast-msg').textContent = msg;
   document.getElementById('toast-icon').className = 'fas fa-' + icon + ' ' + cls;
   t.classList.remove('hidden');
