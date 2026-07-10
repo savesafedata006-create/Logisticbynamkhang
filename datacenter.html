@@ -1,382 +1,978 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Logistics by namkhang - Datacenter</title>
-<link rel="stylesheet" href="shared.css">
-<script src="auth.js"></script>
-<script src="sync-engine.js"></script>
-<script src="nav-component.js"></script>
-<script>MCK_Auth.check('datacenter');</script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --primary:#2563eb;--primary-dark:#1e40af;--success:#10b981;--danger:#ef4444;
-  --warning:#f59e0b;--info:#06b6d4;--dark:#1e293b;--gray:#64748b;
-  --light:#f1f5f9;--border:#e2e8f0;--white:#ffffff;
-}
-body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:var(--dark);line-height:1.6}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics by namkhang - Datacenter</title>
+    <link rel="stylesheet" href="shared.css">
+    <script src="auth.js"></script>
+    <script src="sync-engine.js"></script>
+    <script src="nav-component.js"></script>
+    <script>
+        MCK_Auth.check('datacenter');
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
 
-/* HEADER */
-.header{background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;padding:1rem 2rem;
-  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:200;
-  box-shadow:0 4px 16px rgba(0,0,0,0.15)}
-.header-left{display:flex;align-items:center;gap:1rem}
-.logo{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.2);
-  display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;font-weight:800;font-size:1rem}
-.header h1{font-family:'Kanit',sans-serif;font-size:1.25rem}
-.header h1 small{display:block;font-size:0.72rem;opacity:.8;font-weight:400}
-.back-btn{padding:.45rem 1.1rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
-  color:#fff;border-radius:8px;text-decoration:none;font-size:.88rem;transition:.2s}
-.back-btn:hover{background:rgba(255,255,255,.25)}
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light: #f1f5f9;
+            --border: #e2e8f0;
+            --white: #ffffff;
+        }
 
-/* LAYOUT */
-.layout{display:flex;min-height:calc(100vh - 62px)}
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #f0f4f8;
+            color: var(--dark);
+            line-height: 1.6
+        }
+        /* HEADER */
 
-/* SIDEBAR */
-.sidebar{width:220px;background:#fff;border-right:1px solid var(--border);flex-shrink:0;
-  position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto}
-.sidebar-section{padding:.75rem 1rem .25rem;font-size:.7rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em}
-.sidebar-item{display:flex;align-items:center;gap:.65rem;padding:.65rem 1.25rem;cursor:pointer;
-  font-size:.9rem;color:var(--gray);transition:.15s;border-left:3px solid transparent}
-.sidebar-item:hover{background:var(--light);color:var(--primary)}
-.sidebar-item.active{background:#eff6ff;color:var(--primary);border-left-color:var(--primary);font-weight:600}
-.sidebar-item .icon{font-size:1.1rem;width:22px;text-align:center}
-.sidebar-badge{margin-left:auto;background:var(--primary);color:#fff;font-size:.68rem;
-  padding:.1rem .45rem;border-radius:10px;font-weight:700}
+        .header {
+            background: linear-gradient(135deg, #1e40af, #2563eb);
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15)
+        }
 
-/* MAIN */
-.main{flex:1;padding:2rem;overflow-y:auto;max-width:calc(100% - 220px)}
-.page{display:none}.page.active{display:block}
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem
+        }
 
-/* CARDS */
-.card{background:#fff;border-radius:12px;border:1px solid var(--border);
-  box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:1.5rem}
-.card-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center}
-.card-header h2{font-family:'Kanit',sans-serif;font-size:1.05rem;color:var(--dark)}
-.card-body{padding:1.5rem}
+        .logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 800;
+            font-size: 1rem
+        }
 
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
-.stat{background:#fff;border-radius:10px;padding:1.25rem;border:1px solid var(--border);
-  border-left:4px solid var(--primary);box-shadow:0 2px 6px rgba(0,0,0,.04)}
-.stat.green{border-left-color:var(--success)}.stat.orange{border-left-color:var(--warning)}
-.stat.red{border-left-color:var(--danger)}.stat.cyan{border-left-color:var(--info)}
-.stat-val{font-family:'Kanit',sans-serif;font-size:2rem;font-weight:700;color:var(--dark);line-height:1}
-.stat-lbl{font-size:.8rem;color:var(--gray);margin-top:.35rem}
+        .header h1 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.25rem
+        }
 
-/* TABLE */
-.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-size:.875rem}
-thead th{background:#1e40af;color:#fff;padding:.7rem 1rem;text-align:left;
-  font-weight:600;white-space:nowrap;font-size:.82rem}
-tbody td{padding:.65rem 1rem;border-bottom:1px solid var(--border);vertical-align:middle}
-tbody tr:last-child td{border-bottom:none}
-tbody tr:hover td{background:#f8fafc}
-.td-actions{display:flex;gap:.4rem;white-space:nowrap}
+        .header h1 small {
+            display: block;
+            font-size: 0.72rem;
+            opacity: .8;
+            font-weight: 400
+        }
 
-/* FORM */
-.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
-.form-grid-2{grid-template-columns:repeat(2,1fr)}
-.form-grid-3{grid-template-columns:repeat(3,1fr)}
-.fg{display:flex;flex-direction:column;gap:.3rem}
-.fg label{font-size:.83rem;font-weight:600;color:var(--dark)}
-.fg label .req{color:var(--danger)}
-.fg input,.fg select,.fg textarea{
-  padding:.6rem .85rem;border:1.5px solid var(--border);border-radius:7px;
-  font-family:'Sarabun',sans-serif;font-size:.9rem;background:#fafafa;transition:.2s}
-.fg input:focus,.fg select:focus,.fg textarea:focus{
-  outline:none;border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-.fg textarea{resize:vertical;min-height:72px}
+        .back-btn {
+            padding: .45rem 1.1rem;
+            background: rgba(255, 255, 255, .15);
+            border: 1px solid rgba(255, 255, 255, .3);
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: .88rem;
+            transition: .2s
+        }
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.6rem 1.2rem;
-  border:none;border-radius:7px;font-family:'Sarabun',sans-serif;font-size:.875rem;
-  font-weight:600;cursor:pointer;transition:.2s;white-space:nowrap}
-.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:#1d4ed8}
-.btn-success{background:var(--success);color:#fff}.btn-success:hover{background:#059669}
-.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:#dc2626}
-.btn-warning{background:var(--warning);color:#fff}.btn-warning:hover{background:#d97706}
-.btn-info{background:var(--info);color:#fff}.btn-info:hover{background:#0891b2}
-.btn-ghost{background:var(--light);color:var(--dark);border:1px solid var(--border)}
-.btn-ghost:hover{background:var(--border)}
-.btn-outline{background:#fff;color:var(--primary);border:2px solid var(--primary)}.btn-outline:hover{background:#eff6ff}
-.btn-sm{padding:.35rem .8rem;font-size:.8rem}
-.btn-xs{padding:.2rem .55rem;font-size:.75rem}
-.btn-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem}
+        .back-btn:hover {
+            background: rgba(255, 255, 255, .25)
+        }
+        /* LAYOUT */
 
-/* BADGES */
-.badge{display:inline-block;padding:.15rem .55rem;border-radius:20px;font-size:.72rem;font-weight:700}
-.badge-blue{background:#dbeafe;color:#1e40af}
-.badge-green{background:#d1fae5;color:#065f46}
-.badge-red{background:#fee2e2;color:#991b1b}
-.badge-yellow{background:#fef3c7;color:#92400e}
-.badge-gray{background:#f1f5f9;color:var(--gray)}
-.badge-purple{background:#ede9fe;color:#5b21b6}
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 62px)
+        }
+        /* SIDEBAR */
 
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;
-  align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:#fff;border-radius:14px;width:90%;max-width:680px;max-height:90vh;
-  overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
-.modal-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center}
-.modal-header h3{font-family:'Kanit',sans-serif;font-size:1.1rem}
-.modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--gray);line-height:1}
-.modal-body{padding:1.5rem}
-.modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.6rem}
+        .sidebar {
+            width: 220px;
+            background: #fff;
+            border-right: 1px solid var(--border);
+            flex-shrink: 0;
+            position: sticky;
+            top: 62px;
+            height: calc(100vh - 62px);
+            overflow-y: auto
+        }
 
-/* SEARCH BAR */
-.search-bar{display:flex;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center}
-.search-bar input,.search-bar select{
-  padding:.55rem .9rem;border:1.5px solid var(--border);border-radius:8px;
-  font-family:'Sarabun',sans-serif;font-size:.88rem;background:#fff}
-.search-bar input{flex:1;min-width:200px}
-.search-bar input:focus,.search-bar select:focus{outline:none;border-color:var(--primary)}
+        .sidebar-section {
+            padding: .75rem 1rem .25rem;
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: .05em
+        }
 
-/* EMPTY STATE */
-.empty{text-align:center;padding:3rem 1rem;color:var(--gray)}
-.empty-icon{font-size:3rem;margin-bottom:.75rem}
-.empty p{font-size:.9rem}
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+            padding: .65rem 1.25rem;
+            cursor: pointer;
+            font-size: .9rem;
+            color: var(--gray);
+            transition: .15s;
+            border-left: 3px solid transparent
+        }
 
-/* ALERT */
-.alert{padding:.8rem 1.1rem;border-radius:8px;font-size:.875rem;margin-bottom:1rem;display:flex;gap:.5rem;align-items:flex-start}
-.alert-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
-.alert-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
-.alert-success{background:#f0fdf4;border:1px solid #bbf7d0;color:#065f46}
+        .sidebar-item:hover {
+            background: var(--light);
+            color: var(--primary)
+        }
 
-/* DIVIDER */
-.divider{height:1px;background:var(--border);margin:1.25rem 0}
+        .sidebar-item.active {
+            background: #eff6ff;
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 600
+        }
 
-/* TAG */
-.tag{display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .6rem;border-radius:5px;
-  font-size:.75rem;font-weight:600;background:var(--light);color:var(--gray)}
+        .sidebar-item .icon {
+            font-size: 1.1rem;
+            width: 22px;
+            text-align: center
+        }
 
-/* SECTION TITLE */
-.sec-title{font-family:'Kanit',sans-serif;font-size:.95rem;font-weight:700;color:var(--primary);
-  margin-bottom:.85rem;padding-bottom:.4rem;border-bottom:2px solid #dbeafe}
+        .sidebar-badge {
+            margin-left: auto;
+            background: var(--primary);
+            color: #fff;
+            font-size: .68rem;
+            padding: .1rem .45rem;
+            border-radius: 10px;
+            font-weight: 700
+        }
+        /* MAIN */
 
-/* RATE DISPLAY */
-.rate-box{background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-radius:10px;
-  padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.2rem}
-.rate-box .rate-val{font-family:'Kanit',sans-serif;font-size:1.5rem;font-weight:700}
-.rate-box .rate-lbl{font-size:.78rem;opacity:.85}
-.rate-box .rate-date{font-size:.72rem;opacity:.65;margin-top:.25rem}
+        .main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            max-width: calc(100% - 220px)
+        }
 
-/* ACTIVITY */
-.activity-item{display:flex;gap:.85rem;padding:.75rem 0;border-bottom:1px solid var(--light)}
-.activity-item:last-child{border-bottom:none}
-.activity-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:.35rem}
-.activity-text{font-size:.88rem;flex:1}
-.activity-time{font-size:.75rem;color:var(--gray);white-space:nowrap}
+        .page {
+            display: none
+        }
 
-@media(max-width:768px){
-  .sidebar{display:none}
-  .main{max-width:100%;padding:1rem}
-  .form-grid-3{grid-template-columns:1fr}
-}
-</style>
+        .page.active {
+            display: block
+        }
+        /* CARDS */
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+            margin-bottom: 1.5rem
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .card-header h2 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.05rem;
+            color: var(--dark)
+        }
+
+        .card-body {
+            padding: 1.5rem
+        }
+        /* STATS */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem
+        }
+
+        .stat {
+            background: #fff;
+            border-radius: 10px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .04)
+        }
+
+        .stat.green {
+            border-left-color: var(--success)
+        }
+
+        .stat.orange {
+            border-left-color: var(--warning)
+        }
+
+        .stat.red {
+            border-left-color: var(--danger)
+        }
+
+        .stat.cyan {
+            border-left-color: var(--info)
+        }
+
+        .stat-val {
+            font-family: 'Kanit', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1
+        }
+
+        .stat-lbl {
+            font-size: .8rem;
+            color: var(--gray);
+            margin-top: .35rem
+        }
+        /* TABLE */
+
+        .tbl-wrap {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .875rem
+        }
+
+        thead th {
+            background: #1e40af;
+            color: #fff;
+            padding: .7rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+            font-size: .82rem
+        }
+
+        tbody td {
+            padding: .65rem 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none
+        }
+
+        tbody tr:hover td {
+            background: #f8fafc
+        }
+
+        .td-actions {
+            display: flex;
+            gap: .4rem;
+            white-space: nowrap
+        }
+        /* FORM */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem
+        }
+
+        .form-grid-2 {
+            grid-template-columns: repeat(2, 1fr)
+        }
+
+        .form-grid-3 {
+            grid-template-columns: repeat(3, 1fr)
+        }
+
+        .fg {
+            display: flex;
+            flex-direction: column;
+            gap: .3rem
+        }
+
+        .fg label {
+            font-size: .83rem;
+            font-weight: 600;
+            color: var(--dark)
+        }
+
+        .fg label .req {
+            color: var(--danger)
+        }
+
+        .fg input,
+        .fg select,
+        .fg textarea {
+            padding: .6rem .85rem;
+            border: 1.5px solid var(--border);
+            border-radius: 7px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: .9rem;
+            background: #fafafa;
+            transition: .2s
+        }
+
+        .fg input:focus,
+        .fg select:focus,
+        .fg textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .1)
+        }
+
+        .fg textarea {
+            resize: vertical;
+            min-height: 72px
+        }
+        /* BUTTONS */
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            padding: .6rem 1.2rem;
+            border: none;
+            border-radius: 7px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: .875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s;
+            white-space: nowrap
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #fff
+        }
+
+        .btn-success:hover {
+            background: #059669
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff
+        }
+
+        .btn-danger:hover {
+            background: #dc2626
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #fff
+        }
+
+        .btn-warning:hover {
+            background: #d97706
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: #fff
+        }
+
+        .btn-info:hover {
+            background: #0891b2
+        }
+
+        .btn-ghost {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid var(--border)
+        }
+
+        .btn-ghost:hover {
+            background: var(--border)
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: var(--primary);
+            border: 2px solid var(--primary)
+        }
+
+        .btn-outline:hover {
+            background: #eff6ff
+        }
+
+        .btn-sm {
+            padding: .35rem .8rem;
+            font-size: .8rem
+        }
+
+        .btn-xs {
+            padding: .2rem .55rem;
+            font-size: .75rem
+        }
+
+        .btn-row {
+            display: flex;
+            gap: .6rem;
+            flex-wrap: wrap;
+            margin-top: 1rem
+        }
+        /* BADGES */
+
+        .badge {
+            display: inline-block;
+            padding: .15rem .55rem;
+            border-radius: 20px;
+            font-size: .72rem;
+            font-weight: 700
+        }
+
+        .badge-blue {
+            background: #dbeafe;
+            color: #1e40af
+        }
+
+        .badge-green {
+            background: #d1fae5;
+            color: #065f46
+        }
+
+        .badge-red {
+            background: #fee2e2;
+            color: #991b1b
+        }
+
+        .badge-yellow {
+            background: #fef3c7;
+            color: #92400e
+        }
+
+        .badge-gray {
+            background: #f1f5f9;
+            color: var(--gray)
+        }
+
+        .badge-purple {
+            background: #ede9fe;
+            color: #5b21b6
+        }
+        /* MODAL */
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            z-index: 500;
+            align-items: center;
+            justify-content: center
+        }
+
+        .modal-overlay.open {
+            display: flex
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 14px;
+            width: 90%;
+            max-width: 680px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .25)
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .modal-header h3 {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1rem
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--gray);
+            line-height: 1
+        }
+
+        .modal-body {
+            padding: 1.5rem
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: .6rem
+        }
+        /* SEARCH BAR */
+
+        .search-bar {
+            display: flex;
+            gap: .75rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        .search-bar input,
+        .search-bar select {
+            padding: .55rem .9rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: .88rem;
+            background: #fff
+        }
+
+        .search-bar input {
+            flex: 1;
+            min-width: 200px
+        }
+
+        .search-bar input:focus,
+        .search-bar select:focus {
+            outline: none;
+            border-color: var(--primary)
+        }
+        /* EMPTY STATE */
+
+        .empty {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--gray)
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: .75rem
+        }
+
+        .empty p {
+            font-size: .9rem
+        }
+        /* ALERT */
+
+        .alert {
+            padding: .8rem 1.1rem;
+            border-radius: 8px;
+            font-size: .875rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: .5rem;
+            align-items: flex-start
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af
+        }
+
+        .alert-warn {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #065f46
+        }
+        /* DIVIDER */
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.25rem 0
+        }
+        /* TAG */
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: .25rem;
+            padding: .15rem .6rem;
+            border-radius: 5px;
+            font-size: .75rem;
+            font-weight: 600;
+            background: var(--light);
+            color: var(--gray)
+        }
+        /* SECTION TITLE */
+
+        .sec-title {
+            font-family: 'Kanit', sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: .85rem;
+            padding-bottom: .4rem;
+            border-bottom: 2px solid #dbeafe
+        }
+        /* RATE DISPLAY */
+
+        .rate-box {
+            background: linear-gradient(135deg, #1e40af, #2563eb);
+            color: #fff;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: .2rem
+        }
+
+        .rate-box .rate-val {
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700
+        }
+
+        .rate-box .rate-lbl {
+            font-size: .78rem;
+            opacity: .85
+        }
+
+        .rate-box .rate-date {
+            font-size: .72rem;
+            opacity: .65;
+            margin-top: .25rem
+        }
+        /* ACTIVITY */
+
+        .activity-item {
+            display: flex;
+            gap: .85rem;
+            padding: .75rem 0;
+            border-bottom: 1px solid var(--light)
+        }
+
+        .activity-item:last-child {
+            border-bottom: none
+        }
+
+        .activity-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: .35rem
+        }
+
+        .activity-text {
+            font-size: .88rem;
+            flex: 1
+        }
+
+        .activity-time {
+            font-size: .75rem;
+            color: var(--gray);
+            white-space: nowrap
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none
+            }
+            .main {
+                max-width: 100%;
+                padding: 1rem
+            }
+            .form-grid-3 {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<!-- Standard Topbar -->
-<div id="topbar-root" data-title="Datacenter" data-subtitle="ศูนย์กลางข้อมูล — Buyers, Shipments, Products, Routes" data-logo="LN"></div>
+    <!-- Standard Topbar -->
+    <div id="topbar-root" data-title="Datacenter" data-subtitle="ศูนย์กลางข้อมูล — Buyers, Shipments, Products, Routes" data-logo="LN"></div>
 
-<div class="layout">
+    <div class="layout">
 
-<!-- SIDEBAR -->
-<nav class="sidebar">
-  <div class="sidebar-section">ภาพรวม</div>
-  <div class="sidebar-item active" onclick="showPage('dashboard',this)">
-    <span class="icon">🏠</span> Dashboard
-  </div>
-  <div class="sidebar-section">ข้อมูลหลัก</div>
-  <div class="sidebar-item" onclick="showPage('buyers',this)">
-    <span class="icon">🏢</span> ผู้ซื้อ / Buyers
-    <span class="sidebar-badge" id="badge-buyers">0</span>
-  </div>
-  <div class="sidebar-item" onclick="showPage('shipments',this)">
-    <span class="icon">📦</span> ตู้ / Shipments
-    <span class="sidebar-badge" id="badge-shipments">0</span>
-  </div>
-  <div class="sidebar-item" onclick="showPage('products',this)">
-    <span class="icon">🌿</span> สินค้าและราคา
-    <span class="sidebar-badge" id="badge-products">0</span>
-  </div>
-  <div class="sidebar-item" onclick="showPage('routes',this)">
-    <span class="icon">🗺️</span> เส้นทางขนส่ง
-    <span class="sidebar-badge" id="badge-routes">0</span>
-  </div>
-  <div class="sidebar-item" onclick="showPage('partners',this)">
-    <span class="icon">🤝</span> คู่ค้า / Partners
-    <span class="sidebar-badge" id="badge-partners">0</span>
-  </div>
-  <div class="sidebar-section">เอกสาร</div>
-  <div class="sidebar-item" onclick="showPage('docreg',this)">
-    <span class="icon">📋</span> ทะเบียนเอกสาร
-    <span class="sidebar-badge" id="badge-docreg">0</span>
-  </div>
-  <div class="sidebar-section">ระบบ</div>
-  <div class="sidebar-item" onclick="showPage('rates',this)">
-    <span class="icon">💱</span> อัตราแลกเปลี่ยน
-  </div>
-  <div class="sidebar-item" onclick="showPage('company',this)">
-    <span class="icon">⚙️</span> ข้อมูลบริษัท
-  </div>
-  <div class="sidebar-item" onclick="showPage('backup',this)">
-    <span class="icon">💾</span> สำรอง / นำเข้า
-  </div>
-</nav>
+        <!-- SIDEBAR -->
+        <nav class="sidebar">
+            <div class="sidebar-section">ภาพรวม</div>
+            <div class="sidebar-item active" onclick="showPage('dashboard',this)">
+                <span class="icon">🏠</span> Dashboard
+            </div>
+            <div class="sidebar-section">ข้อมูลหลัก</div>
+            <div class="sidebar-item" onclick="showPage('buyers',this)">
+                <span class="icon">🏢</span> ผู้ซื้อ / Buyers
+                <span class="sidebar-badge" id="badge-buyers">0</span>
+            </div>
+            <div class="sidebar-item" onclick="showPage('shipments',this)">
+                <span class="icon">📦</span> ตู้ / Shipments
+                <span class="sidebar-badge" id="badge-shipments">0</span>
+            </div>
+            <div class="sidebar-item" onclick="showPage('products',this)">
+                <span class="icon">🌿</span> สินค้าและราคา
+                <span class="sidebar-badge" id="badge-products">0</span>
+            </div>
+            <div class="sidebar-item" onclick="showPage('routes',this)">
+                <span class="icon">🗺️</span> เส้นทางขนส่ง
+                <span class="sidebar-badge" id="badge-routes">0</span>
+            </div>
+            <div class="sidebar-item" onclick="showPage('partners',this)">
+                <span class="icon">🤝</span> คู่ค้า / Partners
+                <span class="sidebar-badge" id="badge-partners">0</span>
+            </div>
+            <div class="sidebar-section">เอกสาร</div>
+            <div class="sidebar-item" onclick="showPage('docreg',this)">
+                <span class="icon">📋</span> ทะเบียนเอกสาร
+                <span class="sidebar-badge" id="badge-docreg">0</span>
+            </div>
+            <div class="sidebar-item" onclick="showPage('drafts',this)">
+                <span class="icon">📝</span> แบบร่างเอกสาร
+                <span class="sidebar-badge" id="badge-drafts">0</span>
+            </div>
+            <div class="sidebar-section">ระบบ</div>
+            <div class="sidebar-item" onclick="showPage('rates',this)">
+                <span class="icon">💱</span> อัตราแลกเปลี่ยน
+            </div>
+            <div class="sidebar-item" onclick="showPage('company',this)">
+                <span class="icon">⚙️</span> ข้อมูลบริษัท
+            </div>
+            <div class="sidebar-item" onclick="showPage('backup',this)">
+                <span class="icon">💾</span> สำรอง / นำเข้า
+            </div>
+        </nav>
 
-<!-- MAIN -->
-<main class="main">
+        <!-- MAIN -->
+        <main class="main">
 
-<!-- ===== DASHBOARD ===== -->
-<div id="page-dashboard" class="page active">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
-    <div>
-      <h2 style="font-family:'Kanit',sans-serif;font-size:1.4rem">ภาพรวมระบบ</h2>
-      <div style="color:var(--gray);font-size:.88rem" id="dash-date"></div>
-    </div>
-    <div style="display:flex;gap:.5rem">
-      <button class="btn btn-outline btn-sm" onclick="showPage('backup',document.querySelector('.sidebar-item:nth-last-child(1)'))">💾 สำรองข้อมูล</button>
-      <button class="btn btn-primary btn-sm" onclick="showPage('shipments',null)">+ เพิ่ม Shipment</button>
-    </div>
-  </div>
+            <!-- ===== DASHBOARD ===== -->
+            <div id="page-dashboard" class="page active">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+                    <div>
+                        <h2 style="font-family:'Kanit',sans-serif;font-size:1.4rem">ภาพรวมระบบ</h2>
+                        <div style="color:var(--gray);font-size:.88rem" id="dash-date"></div>
+                    </div>
+                    <div style="display:flex;gap:.5rem">
+                        <button class="btn btn-outline btn-sm" onclick="showPage('backup',document.querySelector('.sidebar-item:nth-last-child(1)'))">💾 สำรองข้อมูล</button>
+                        <button class="btn btn-primary btn-sm" onclick="showPage('shipments',null)">+ เพิ่ม Shipment</button>
+                    </div>
+                </div>
 
-  <div class="stats-grid" id="dash-stats"></div>
+                <div class="stats-grid" id="dash-stats"></div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
-    <div class="card">
-      <div class="card-header"><h2>📦 Shipment ล่าสุด</h2></div>
-      <div class="card-body" id="dash-recent-shipments"></div>
-    </div>
-    <div class="card">
-      <div class="card-header"><h2>💱 อัตราแลกเปลี่ยน</h2></div>
-      <div class="card-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem" id="dash-rates"></div>
-        <div style="margin-top:1rem;font-size:.78rem;color:var(--gray)" id="dash-rate-date"></div>
-      </div>
-    </div>
-  </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>📦 Shipment ล่าสุด</h2>
+                        </div>
+                        <div class="card-body" id="dash-recent-shipments"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>💱 อัตราแลกเปลี่ยน</h2>
+                        </div>
+                        <div class="card-body">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem" id="dash-rates"></div>
+                            <div style="margin-top:1rem;font-size:.78rem;color:var(--gray)" id="dash-rate-date"></div>
+                        </div>
+                    </div>
+                </div>
 
-  <div class="card" style="margin-top:0">
-    <div class="card-header"><h2>🕐 กิจกรรมล่าสุด</h2></div>
-    <div class="card-body" id="dash-activity"></div>
-  </div>
-</div>
+                <div class="card" style="margin-top:0">
+                    <div class="card-header">
+                        <h2>🕐 กิจกรรมล่าสุด</h2>
+                    </div>
+                    <div class="card-body" id="dash-activity"></div>
+                </div>
+            </div>
 
-<!-- ===== BUYERS ===== -->
-<div id="page-buyers" class="page">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">🏢 ผู้ซื้อ / Buyers</h2>
-    <button class="btn btn-primary" onclick="openBuyerModal()">+ เพิ่มผู้ซื้อ</button>
-  </div>
-  <div class="search-bar">
-    <input type="text" id="buyer-search" placeholder="🔍 ค้นหาชื่อ / ประเทศ..." oninput="renderBuyers()">
-    <select id="buyer-filter-country" onchange="renderBuyers()">
+            <!-- ===== BUYERS ===== -->
+            <div id="page-buyers" class="page">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+                    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">🏢 ผู้ซื้อ / Buyers</h2>
+                    <button class="btn btn-primary" onclick="openBuyerModal()">+ เพิ่มผู้ซื้อ</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="buyer-search" placeholder="🔍 ค้นหาชื่อ / ประเทศ..." oninput="renderBuyers()">
+                    <select id="buyer-filter-country" onchange="renderBuyers()">
       <option value="">ทุกประเทศ</option>
       <option value="CHINA">จีน</option>
       <option value="THAILAND">ไทย</option>
     </select>
-  </div>
-  <div class="card">
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>รหัส</th><th>ชื่อบริษัท (EN)</th><th>ประเทศ</th><th>ผู้ติดต่อ</th>
-          <th>Tel / Email</th><th>สถานะ</th><th>จัดการ</th>
-        </tr></thead>
-        <tbody id="buyers-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+                </div>
+                <div class="card">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>รหัส</th>
+                                    <th>ชื่อบริษัท (EN)</th>
+                                    <th>ประเทศ</th>
+                                    <th>ผู้ติดต่อ</th>
+                                    <th>Tel / Email</th>
+                                    <th>สถานะ</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="buyers-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-<!-- ===== SHIPMENTS ===== -->
-<div id="page-shipments" class="page">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">📦 ตู้ Container / Shipments</h2>
-    <button class="btn btn-primary" onclick="openShipmentModal()">+ เพิ่ม Shipment</button>
-  </div>
-  <div class="search-bar">
-    <input type="text" id="ship-search" placeholder="🔍 ค้นหา Container / Invoice..." oninput="renderShipments()">
-    <select id="ship-filter-status" onchange="renderShipments()">
+            <!-- ===== SHIPMENTS ===== -->
+            <div id="page-shipments" class="page">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+                    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">📦 ตู้ Container / Shipments</h2>
+                    <button class="btn btn-primary" onclick="openShipmentModal()">+ เพิ่ม Shipment</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="ship-search" placeholder="🔍 ค้นหา Container / Invoice..." oninput="renderShipments()">
+                    <select id="ship-filter-status" onchange="renderShipments()">
       <option value="">ทุกสถานะ</option>
       <option value="preparing">กำลังเตรียม</option>
       <option value="transit">อยู่ระหว่างขนส่ง</option>
       <option value="arrived">ถึงปลายทางแล้ว</option>
       <option value="completed">เสร็จสิ้น</option>
     </select>
-    <select id="ship-filter-year" onchange="renderShipments()">
+                    <select id="ship-filter-year" onchange="renderShipments()">
       <option value="">ทุกปี</option>
       <option value="2025">2025</option>
       <option value="2026">2026</option>
     </select>
-  </div>
-  <div class="card">
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>Container No.</th><th>Invoice No.</th><th>ผู้ซื้อ</th><th>สินค้า</th>
-          <th>จำนวน (CTN)</th><th>N.W. (KGS)</th><th>มูลค่า</th><th>วันที่</th><th>สถานะ</th><th>จัดการ</th>
-        </tr></thead>
-        <tbody id="shipments-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+                </div>
+                <div class="card">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Container No.</th>
+                                    <th>Invoice No.</th>
+                                    <th>ผู้ซื้อ</th>
+                                    <th>สินค้า</th>
+                                    <th>จำนวน (CTN)</th>
+                                    <th>N.W. (KGS)</th>
+                                    <th>มูลค่า</th>
+                                    <th>วันที่</th>
+                                    <th>สถานะ</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shipments-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-<!-- ===== PRODUCTS ===== -->
-<div id="page-products" class="page">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">🌿 สินค้าและราคา</h2>
-    <button class="btn btn-primary" onclick="openProductModal()">+ เพิ่มสินค้า</button>
-  </div>
-  <div class="card">
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>รหัส</th><th>ชื่อสินค้า</th><th>พันธุ์</th><th>HS Code</th>
-          <th>ราคา FOB (USD/KG)</th><th>ราคา CNF (CNY/KG)</th><th>อัปเดตล่าสุด</th><th>จัดการ</th>
-        </tr></thead>
-        <tbody id="products-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+            <!-- ===== PRODUCTS ===== -->
+            <div id="page-products" class="page">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+                    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">🌿 สินค้าและราคา</h2>
+                    <button class="btn btn-primary" onclick="openProductModal()">+ เพิ่มสินค้า</button>
+                </div>
+                <div class="card">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>รหัส</th>
+                                    <th>ชื่อสินค้า</th>
+                                    <th>พันธุ์</th>
+                                    <th>HS Code</th>
+                                    <th>ราคา FOB (USD/KG)</th>
+                                    <th>ราคา CNF (CNY/KG)</th>
+                                    <th>อัปเดตล่าสุด</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-<!-- ===== ROUTES ===== -->
-<div id="page-routes" class="page">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">🗺️ เส้นทางขนส่ง</h2>
-    <button class="btn btn-primary" onclick="openRouteModal()">+ เพิ่มเส้นทาง</button>
-  </div>
-  <div class="card">
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>ชื่อเส้นทาง</th><th>ต้นทาง</th><th>ผ่าน</th><th>ปลายทาง</th>
-          <th>ด่านออก</th><th>ด่านเข้า</th><th>วิธีขนส่ง</th><th>จัดการ</th>
-        </tr></thead>
-        <tbody id="routes-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+            <!-- ===== ROUTES ===== -->
+            <div id="page-routes" class="page">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+                    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">🗺️ เส้นทางขนส่ง</h2>
+                    <button class="btn btn-primary" onclick="openRouteModal()">+ เพิ่มเส้นทาง</button>
+                </div>
+                <div class="card">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ชื่อเส้นทาง</th>
+                                    <th>ต้นทาง</th>
+                                    <th>ผ่าน</th>
+                                    <th>ปลายทาง</th>
+                                    <th>ด่านออก</th>
+                                    <th>ด่านเข้า</th>
+                                    <th>วิธีขนส่ง</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="routes-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-<!-- ===== PARTNERS ===== -->
-<div id="page-partners" class="page">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">🤝 คู่ค้า / Partners</h2>
-    <button class="btn btn-primary" onclick="openPartnerModal()">+ เพิ่มคู่ค้า</button>
-  </div>
-  <div class="search-bar">
-    <input type="text" id="partner-search" placeholder="🔍 ค้นหา..." oninput="renderPartners()">
-    <select id="partner-filter-type" onchange="renderPartners()">
+            <!-- ===== PARTNERS ===== -->
+            <div id="page-partners" class="page">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+                    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">🤝 คู่ค้า / Partners</h2>
+                    <button class="btn btn-primary" onclick="openPartnerModal()">+ เพิ่มคู่ค้า</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="partner-search" placeholder="🔍 ค้นหา..." oninput="renderPartners()">
+                    <select id="partner-filter-type" onchange="renderPartners()">
       <option value="">ทุกประเภท</option>
       <option value="logistics">Logistics</option>
       <option value="buyer">Buyer Agent</option>
@@ -384,28 +980,36 @@ tbody tr:hover td{background:#f8fafc}
       <option value="customs">ตัวแทนศุลกากร</option>
       <option value="other">อื่นๆ</option>
     </select>
-  </div>
-  <div class="card">
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>ชื่อ</th><th>ประเภท</th><th>ประเทศ</th><th>ผู้ติดต่อ</th><th>Tel</th><th>Email</th><th>จัดการ</th>
-        </tr></thead>
-        <tbody id="partners-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+                </div>
+                <div class="card">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ชื่อ</th>
+                                    <th>ประเภท</th>
+                                    <th>ประเทศ</th>
+                                    <th>ผู้ติดต่อ</th>
+                                    <th>Tel</th>
+                                    <th>Email</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="partners-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-<!-- ===== DOC REGISTRY ===== -->
-<div id="page-docreg" class="page">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">📋 ทะเบียนเอกสาร</h2>
-    <button class="btn btn-primary" onclick="openDocRegModal()">+ บันทึกเอกสาร</button>
-  </div>
-  <div class="search-bar">
-    <input type="text" id="docreg-search" placeholder="🔍 ค้นหาเลขเอกสาร / Container..." oninput="renderDocReg()">
-    <select id="docreg-filter-type" onchange="renderDocReg()">
+            <!-- ===== DOC REGISTRY ===== -->
+            <div id="page-docreg" class="page">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+                    <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">📋 ทะเบียนเอกสาร</h2>
+                    <button class="btn btn-primary" onclick="openDocRegModal()">+ บันทึกเอกสาร</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="docreg-search" placeholder="🔍 ค้นหาเลขเอกสาร / Container..." oninput="renderDocReg()">
+                    <select id="docreg-filter-type" onchange="renderDocReg()">
       <option value="">ทุกประเภท</option>
       <option value="invoice">Invoice</option>
       <option value="contract">Sales Contract</option>
@@ -413,495 +1017,742 @@ tbody tr:hover td{background:#f8fafc}
       <option value="co">CO Form E</option>
       <option value="lab">Lab Report</option>
       <option value="carriage">Carriage Agreement</option>
+      <option value="ca">CA / Approval</option>
+      <option value="ecs">ECS Declaration</option>
+      <option value="bl">Bill of Lading</option>
+      <option value="import_permit">Import Permit</option>
+      <option value="customs">Customs Declaration</option>
+      <option value="health_certificate">Health Certificate</option>
+      <option value="import_invoice">Import Invoice</option>
     </select>
-    <select id="docreg-filter-status" onchange="renderDocReg()">
+                    <select id="docreg-filter-status" onchange="renderDocReg()">
       <option value="">ทุกสถานะ</option>
+      <option value="draft">แบบร่าง</option>
       <option value="issued">ออกแล้ว</option>
       <option value="pending">รอดำเนินการ</option>
       <option value="expired">หมดอายุ</option>
     </select>
-  </div>
-  <div class="card">
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>ประเภท</th><th>เลขเอกสาร</th><th>Container No.</th><th>ผู้ซื้อ</th>
-          <th>วันที่ออก</th><th>วันหมดอายุ</th><th>สถานะ</th><th>หมายเหตุ</th><th>จัดการ</th>
-        </tr></thead>
-        <tbody id="docreg-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+                </div>
+                <div class="card">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ประเภท</th>
+                                    <th>เลขเอกสาร</th>
+                                    <th>Container No.</th>
+                                    <th>ผู้ซื้อ</th>
+                                    <th>วันที่ออก</th>
+                                    <th>วันหมดอายุ</th>
+                                    <th>สถานะ</th>
+                                    <th>หมายเหตุ</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docreg-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-<!-- ===== RATES ===== -->
-<div id="page-rates" class="page">
-  <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem;margin-bottom:1.25rem">💱 อัตราแลกเปลี่ยน</h2>
-  <div class="card">
-    <div class="card-header"><h2>ตั้งค่าอัตราแลกเปลี่ยน</h2></div>
-    <div class="card-body">
-      <div class="alert alert-info">ℹ️ ระบุอัตราแลกเปลี่ยนเพื่อใช้คำนวณในเอกสาร Invoice และ Sales Contract</div>
-      <div class="form-grid form-grid-3" style="margin-bottom:1.25rem">
-        <div class="fg">
-          <label>USD → CNY</label>
-          <input type="number" id="rate-usd-cny" step="0.0001" placeholder="เช่น 7.2500">
-        </div>
-        <div class="fg">
-          <label>USD → THB</label>
-          <input type="number" id="rate-usd-thb" step="0.01" placeholder="เช่น 34.50">
-        </div>
-        <div class="fg">
-          <label>CNY → THB</label>
-          <input type="number" id="rate-cny-thb" step="0.001" placeholder="เช่น 4.760">
-        </div>
-      </div>
-      <button class="btn btn-primary" onclick="saveRates()">💾 บันทึกอัตราแลกเปลี่ยน</button>
-      <div class="divider"></div>
-      <div style="font-size:.85rem;color:var(--gray)" id="rate-last-updated"></div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem" id="rate-display"></div>
-    </div>
-  </div>
-</div>
+            <!-- ===== DRAFTS ===== -->
+            <div id="page-drafts" class="page">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+                    <div>
+                        <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem">📝 แบบร่างเอกสาร</h2>
+                        <div style="color:var(--gray);font-size:.9rem">รวมแบบร่างคำขอเอกสารทุกประเภท ไว้สำหรับตรวจเช็คก่อนออกเอกสารจริง</div>
+                    </div>
+                    <button class="btn btn-warning" onclick="openDocRegModal(null,'draft')">+ สร้างแบบร่างใหม่</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="draft-search" placeholder="🔍 ค้นหาเลขเอกสาร / Container..." oninput="renderDrafts()">
+                    <select id="draft-filter-type" onchange="renderDrafts()">
+      <option value="">ทุกประเภท</option>
+      <option value="invoice">Invoice</option>
+      <option value="contract">Sales Contract</option>
+      <option value="pc">Phytosanitary</option>
+      <option value="co">CO Form E</option>
+      <option value="lab">Lab Report</option>
+      <option value="carriage">Carriage Agreement</option>
+      <option value="ca">CA / Approval</option>
+      <option value="ecs">ECS Declaration</option>
+      <option value="bl">Bill of Lading</option>
+      <option value="import_permit">Import Permit</option>
+      <option value="customs">Customs Declaration</option>
+      <option value="health_certificate">Health Certificate</option>
+      <option value="import_invoice">Import Invoice</option>
+    </select>
+                </div>
+                <div class="card">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ประเภท</th>
+                                    <th>เลขเอกสาร</th>
+                                    <th>Container No.</th>
+                                    <th>ผู้ซื้อ</th>
+                                    <th>วันที่บันทึก</th>
+                                    <th>สถานะ</th>
+                                    <th>หมายเหตุ</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="drafts-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-<!-- ===== COMPANY ===== -->
-<div id="page-company" class="page">
-  <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem;margin-bottom:1.25rem">⚙️ ข้อมูลบริษัท</h2>
-  <div class="card">
-    <div class="card-header"><h2>MCK International Trading Co., Ltd.</h2></div>
-    <div class="card-body">
-      <div class="sec-title">ข้อมูลทั่วไป</div>
-      <div class="form-grid form-grid-2" style="margin-bottom:1.25rem">
-        <div class="fg"><label>ชื่อบริษัท (ไทย)</label><input id="co-name-th" type="text"></div>
-        <div class="fg"><label>ชื่อบริษัท (EN)</label><input id="co-name-en" type="text"></div>
-        <div class="fg"><label>ที่อยู่</label><textarea id="co-address"></textarea></div>
-        <div class="fg">
-          <label>Tax ID</label><input id="co-taxid" type="text">
-          <label style="margin-top:.75rem">Tel</label><input id="co-tel" type="text">
-          <label style="margin-top:.75rem">Email</label><input id="co-email" type="text">
-        </div>
-      </div>
-      <div class="sec-title">ใบรับรอง / ทะเบียน</div>
-      <div class="form-grid form-grid-3" style="margin-bottom:1.25rem">
-        <div class="fg"><label>DOA Packing House No.</label><input id="co-doa" type="text"></div>
-        <div class="fg"><label>GMP TAS 9047 (UT…R0)</label><input id="co-gmp47" type="text"></div>
-        <div class="fg"><label>GMP หมดอายุ TAS 9047</label><input id="co-gmp47-exp" type="date"></div>
-        <div class="fg"><label>GMP TAS 9070 (UT…R0)</label><input id="co-gmp70" type="text"></div>
-        <div class="fg"><label>GMP หมดอายุ TAS 9070</label><input id="co-gmp70-exp" type="date"></div>
-        <div class="fg"><label>GAP No.</label><input id="co-gap" type="text"></div>
-        <div class="fg"><label>ผู้มีอำนาจลงนาม (EN)</label><input id="co-signatory" type="text"></div>
-        <div class="fg"><label>ตำแหน่ง</label><input id="co-signatory-title" type="text"></div>
-      </div>
-      <button class="btn btn-primary" onclick="saveCompany()">💾 บันทึกข้อมูลบริษัท</button>
-      <span id="co-save-msg" style="margin-left:1rem;color:var(--success);font-size:.88rem;display:none">✅ บันทึกแล้ว</span>
-    </div>
-  </div>
-</div>
+            <!-- ===== RATES ===== -->
+            <div id="page-rates" class="page">
+                <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem;margin-bottom:1.25rem">💱 อัตราแลกเปลี่ยน</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>ตั้งค่าอัตราแลกเปลี่ยน</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">ℹ️ ระบุอัตราแลกเปลี่ยนเพื่อใช้คำนวณในเอกสาร Invoice และ Sales Contract</div>
+                        <div class="form-grid form-grid-3" style="margin-bottom:1.25rem">
+                            <div class="fg">
+                                <label>USD → CNY</label>
+                                <input type="number" id="rate-usd-cny" step="0.0001" placeholder="เช่น 7.2500">
+                            </div>
+                            <div class="fg">
+                                <label>USD → THB</label>
+                                <input type="number" id="rate-usd-thb" step="0.01" placeholder="เช่น 34.50">
+                            </div>
+                            <div class="fg">
+                                <label>CNY → THB</label>
+                                <input type="number" id="rate-cny-thb" step="0.001" placeholder="เช่น 4.760">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveRates()">💾 บันทึกอัตราแลกเปลี่ยน</button>
+                        <div class="divider"></div>
+                        <div style="font-size:.85rem;color:var(--gray)" id="rate-last-updated"></div>
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem" id="rate-display"></div>
+                    </div>
+                </div>
+            </div>
 
-<!-- ===== BACKUP ===== -->
-<div id="page-backup" class="page">
-  <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem;margin-bottom:1.25rem">💾 สำรอง / นำเข้าข้อมูล</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
-    <div class="card">
-      <div class="card-header"><h2>📤 Export ข้อมูล</h2></div>
-      <div class="card-body">
-        <p style="font-size:.88rem;color:var(--gray);margin-bottom:1rem">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ JSON เพื่อสำรองข้อมูลหรือโอนย้าย</p>
-        <button class="btn btn-success" onclick="exportData()">⬇️ ดาวน์โหลด JSON</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><h2>📥 Import ข้อมูล</h2></div>
-      <div class="card-body">
-        <p style="font-size:.88rem;color:var(--gray);margin-bottom:1rem">นำเข้าข้อมูลจากไฟล์ JSON (จะเขียนทับข้อมูลปัจจุบัน)</p>
-        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
-        <button class="btn btn-warning" onclick="document.getElementById('import-file').click()">⬆️ เลือกไฟล์ JSON</button>
-      </div>
-    </div>
-  </div>
-  <div class="card" style="margin-top:0">
-    <div class="card-header"><h2>🗑️ ล้างข้อมูล</h2></div>
-    <div class="card-body">
-      <div class="alert alert-warn">⚠️ การล้างข้อมูลไม่สามารถกู้คืนได้ ควร Export สำรองไว้ก่อน</div>
-      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" onclick="clearSection('buyers')">ล้าง Buyers</button>
-        <button class="btn btn-ghost btn-sm" onclick="clearSection('shipments')">ล้าง Shipments</button>
-        <button class="btn btn-ghost btn-sm" onclick="clearSection('docreg')">ล้าง ทะเบียนเอกสาร</button>
-        <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑️ ล้างข้อมูลทั้งหมด</button>
-      </div>
-    </div>
-  </div>
-</div>
+            <!-- ===== COMPANY ===== -->
+            <div id="page-company" class="page">
+                <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem;margin-bottom:1.25rem">⚙️ ข้อมูลบริษัท</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>MCK International Trading Co., Ltd.</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="sec-title">ข้อมูลทั่วไป</div>
+                        <div class="form-grid form-grid-2" style="margin-bottom:1.25rem">
+                            <div class="fg"><label>ชื่อบริษัท (ไทย)</label><input id="co-name-th" type="text"></div>
+                            <div class="fg"><label>ชื่อบริษัท (EN)</label><input id="co-name-en" type="text"></div>
+                            <div class="fg"><label>ที่อยู่</label><textarea id="co-address"></textarea></div>
+                            <div class="fg">
+                                <label>Tax ID</label><input id="co-taxid" type="text">
+                                <label style="margin-top:.75rem">Tel</label><input id="co-tel" type="text">
+                                <label style="margin-top:.75rem">Email</label><input id="co-email" type="text">
+                            </div>
+                        </div>
+                        <div class="sec-title">ใบรับรอง / ทะเบียน</div>
+                        <div class="form-grid form-grid-3" style="margin-bottom:1.25rem">
+                            <div class="fg"><label>DOA Packing House No.</label><input id="co-doa" type="text"></div>
+                            <div class="fg"><label>GMP TAS 9047 (UT…R0)</label><input id="co-gmp47" type="text"></div>
+                            <div class="fg"><label>GMP หมดอายุ TAS 9047</label><input id="co-gmp47-exp" type="date"></div>
+                            <div class="fg"><label>GMP TAS 9070 (UT…R0)</label><input id="co-gmp70" type="text"></div>
+                            <div class="fg"><label>GMP หมดอายุ TAS 9070</label><input id="co-gmp70-exp" type="date"></div>
+                            <div class="fg"><label>GAP No.</label><input id="co-gap" type="text"></div>
+                            <div class="fg"><label>ผู้มีอำนาจลงนาม (EN)</label><input id="co-signatory" type="text"></div>
+                            <div class="fg"><label>ตำแหน่ง</label><input id="co-signatory-title" type="text"></div>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveCompany()">💾 บันทึกข้อมูลบริษัท</button>
+                        <span id="co-save-msg" style="margin-left:1rem;color:var(--success);font-size:.88rem;display:none">✅ บันทึกแล้ว</span>
+                    </div>
+                </div>
+            </div>
 
-</main><!-- /main -->
-</div><!-- /layout -->
+            <!-- ===== BACKUP ===== -->
+            <div id="page-backup" class="page">
+                <h2 style="font-family:'Kanit',sans-serif;font-size:1.3rem;margin-bottom:1.25rem">💾 สำรอง / นำเข้าข้อมูล</h2>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>📤 Export ข้อมูล</h2>
+                        </div>
+                        <div class="card-body">
+                            <p style="font-size:.88rem;color:var(--gray);margin-bottom:1rem">ดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ JSON เพื่อสำรองข้อมูลหรือโอนย้าย</p>
+                            <button class="btn btn-success" onclick="exportData()">⬇️ ดาวน์โหลด JSON</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>📥 Import ข้อมูล</h2>
+                        </div>
+                        <div class="card-body">
+                            <p style="font-size:.88rem;color:var(--gray);margin-bottom:1rem">นำเข้าข้อมูลจากไฟล์ JSON (จะเขียนทับข้อมูลปัจจุบัน)</p>
+                            <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+                            <button class="btn btn-warning" onclick="document.getElementById('import-file').click()">⬆️ เลือกไฟล์ JSON</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top:0">
+                    <div class="card-header">
+                        <h2>🗑️ ล้างข้อมูล</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warn">⚠️ การล้างข้อมูลไม่สามารถกู้คืนได้ ควร Export สำรองไว้ก่อน</div>
+                        <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+                            <button class="btn btn-ghost btn-sm" onclick="clearSection('buyers')">ล้าง Buyers</button>
+                            <button class="btn btn-ghost btn-sm" onclick="clearSection('shipments')">ล้าง Shipments</button>
+                            <button class="btn btn-ghost btn-sm" onclick="clearSection('docreg')">ล้าง ทะเบียนเอกสาร</button>
+                            <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑️ ล้างข้อมูลทั้งหมด</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-<!-- ===== MODALS ===== -->
-
-<!-- Buyer Modal -->
-<div class="modal-overlay" id="modal-buyer">
-  <div class="modal">
-    <div class="modal-header">
-      <h3 id="buyer-modal-title">เพิ่มผู้ซื้อ</h3>
-      <button class="modal-close" onclick="closeModal('modal-buyer')">✕</button>
+        </main>
+        <!-- /main -->
     </div>
-    <div class="modal-body">
-      <input type="hidden" id="buyer-edit-id">
-      <div class="form-grid form-grid-2">
-        <div class="fg"><label>รหัส <span class="req">*</span></label><input id="b-id" placeholder="เช่น BUY-001"></div>
-        <div class="fg"><label>ประเทศ</label>
-          <select id="b-country">
+    <!-- /layout -->
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Buyer Modal -->
+    <div class="modal-overlay" id="modal-buyer">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="buyer-modal-title">เพิ่มผู้ซื้อ</h3>
+                <button class="modal-close" onclick="closeModal('modal-buyer')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="buyer-edit-id">
+                <div class="form-grid form-grid-2">
+                    <div class="fg"><label>รหัส <span class="req">*</span></label><input id="b-id" placeholder="เช่น BUY-001"></div>
+                    <div class="fg"><label>ประเทศ</label>
+                        <select id="b-country">
             <option value="CHINA">จีน (China)</option>
             <option value="THAILAND">ไทย (Thailand)</option>
             <option value="OTHER">อื่นๆ</option>
           </select>
+                    </div>
+                    <div class="fg"><label>ชื่อบริษัท (EN) <span class="req">*</span></label><input id="b-name-en" placeholder="Company name in English"></div>
+                    <div class="fg"><label>ชื่อบริษัท (TH/CN)</label><input id="b-name-th" placeholder="ชื่อภาษาไทย/จีน"></div>
+                    <div class="fg" style="grid-column:1/-1"><label>ที่อยู่</label><textarea id="b-address" placeholder="ที่อยู่เต็ม..."></textarea></div>
+                    <div class="fg"><label>เมือง/รัฐ</label><input id="b-city"></div>
+                    <div class="fg"><label>รหัสไปรษณีย์</label><input id="b-zip"></div>
+                    <div class="fg"><label>ผู้ติดต่อ</label><input id="b-contact"></div>
+                    <div class="fg"><label>โทรศัพท์</label><input id="b-tel"></div>
+                    <div class="fg"><label>Fax</label><input id="b-fax"></div>
+                    <div class="fg"><label>Email</label><input id="b-email" type="email"></div>
+                    <div class="fg"><label>Tax ID / Business Reg.</label><input id="b-taxid"></div>
+                    <div class="fg"><label>GAP No.</label><input id="b-gap" placeholder="เช่น AC 03-9001-86-111-002670"></div>
+                    <div class="fg"><label>GMP Certificate</label><input id="b-gmp" placeholder="เช่น UT242707R0"></div>
+                    <div class="fg"><label>GMP Expiry</label><input id="b-gmp-exp" type="date"></div>
+                    <div class="fg"><label>มกษ / Standard</label><input id="b-muks" placeholder="เช่น มกษ 1030-2560"></div>
+                    <div class="fg"><label>CA / Approval No.</label><input id="b-ca" placeholder="เลข CA"></div>
+                    <div class="fg" style="grid-column:1/-1"><label>ECS Reference</label><input id="b-ecs"></div>
+                    <div class="fg" style="grid-column:1/-1"><label>หมายเหตุ</label><textarea id="b-notes"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-buyer')">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="saveBuyer()">💾 บันทึก</button>
+            </div>
         </div>
-        <div class="fg"><label>ชื่อบริษัท (EN) <span class="req">*</span></label><input id="b-name-en" placeholder="Company name in English"></div>
-        <div class="fg"><label>ชื่อบริษัท (TH/CN)</label><input id="b-name-th" placeholder="ชื่อภาษาไทย/จีน"></div>
-        <div class="fg" style="grid-column:1/-1"><label>ที่อยู่</label><textarea id="b-address" placeholder="ที่อยู่เต็ม..."></textarea></div>
-        <div class="fg"><label>เมือง/รัฐ</label><input id="b-city"></div>
-        <div class="fg"><label>รหัสไปรษณีย์</label><input id="b-zip"></div>
-        <div class="fg"><label>ผู้ติดต่อ</label><input id="b-contact"></div>
-        <div class="fg"><label>โทรศัพท์</label><input id="b-tel"></div>
-        <div class="fg"><label>Fax</label><input id="b-fax"></div>
-        <div class="fg"><label>Email</label><input id="b-email" type="email"></div>
-        <div class="fg"><label>Tax ID / Business Reg.</label><input id="b-taxid"></div>
-        <div class="fg" style="grid-column:1/-1"><label>หมายเหตุ</label><textarea id="b-notes"></textarea></div>
-      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-buyer')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveBuyer()">💾 บันทึก</button>
-    </div>
-  </div>
-</div>
 
-<!-- Shipment Modal -->
-<div class="modal-overlay" id="modal-shipment">
-  <div class="modal" style="max-width:800px">
-    <div class="modal-header">
-      <h3 id="ship-modal-title">เพิ่ม Shipment</h3>
-      <button class="modal-close" onclick="closeModal('modal-shipment')">✕</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="ship-edit-id">
-      <div class="sec-title">ข้อมูลหลัก</div>
-      <div class="form-grid form-grid-3">
-        <div class="fg"><label>Container No. <span class="req">*</span></label><input id="s-container" placeholder="YMLU2333371"></div>
-        <div class="fg"><label>Invoice No. <span class="req">*</span></label><input id="s-invoice" placeholder="M-PGIT25N128"></div>
-        <div class="fg"><label>Contract No.</label><input id="s-contract" placeholder="M-SAC25-004"></div>
-        <div class="fg"><label>ผู้ซื้อ <span class="req">*</span></label>
-          <select id="s-buyer-id"><option value="">-- เลือกผู้ซื้อ --</option></select>
-        </div>
-        <div class="fg"><label>วันที่ส่งออก</label><input id="s-date" type="date"></div>
-        <div class="fg"><label>สถานะ</label>
-          <select id="s-status">
+    <!-- Shipment Modal -->
+    <div class="modal-overlay" id="modal-shipment">
+        <div class="modal" style="max-width:800px">
+            <div class="modal-header">
+                <h3 id="ship-modal-title">เพิ่ม Shipment</h3>
+                <button class="modal-close" onclick="closeModal('modal-shipment')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="ship-edit-id">
+                <div class="sec-title">ข้อมูลหลัก</div>
+                <div class="form-grid form-grid-3">
+                    <div class="fg"><label>Container No. <span class="req">*</span></label><input id="s-container" placeholder="YMLU2333371"></div>
+                    <div class="fg"><label>Invoice No. <span class="req">*</span></label><input id="s-invoice" placeholder="M-PGIT25N128"></div>
+                    <div class="fg"><label>Contract No.</label><input id="s-contract" placeholder="M-SAC25-004"></div>
+                    <div class="fg"><label>ผู้ซื้อ <span class="req">*</span></label>
+                        <select id="s-buyer-id"><option value="">-- เลือกผู้ซื้อ --</option></select>
+                    </div>
+                    <div class="fg"><label>วันที่ส่งออก</label><input id="s-date" type="date"></div>
+                    <div class="fg"><label>สถานะ</label>
+                        <select id="s-status">
             <option value="preparing">กำลังเตรียม</option>
             <option value="transit">อยู่ระหว่างขนส่ง</option>
             <option value="arrived">ถึงปลายทางแล้ว</option>
             <option value="completed">เสร็จสิ้น</option>
           </select>
-        </div>
-      </div>
-      <div class="sec-title" style="margin-top:1rem">สินค้า</div>
-      <div class="form-grid form-grid-3">
-        <div class="fg"><label>สินค้า</label><input id="s-product" value="FRESH DURIAN"></div>
-        <div class="fg"><label>จำนวน (Cartons)</label><input id="s-cartons" type="number"></div>
-        <div class="fg"><label>N.W. (KGS)</label><input id="s-nw" type="number" step="0.01"></div>
-        <div class="fg"><label>G.W. (KGS)</label><input id="s-gw" type="number" step="0.01"></div>
-        <div class="fg"><label>ราคาต่อหน่วย</label><input id="s-price" type="number" step="0.01"></div>
-        <div class="fg"><label>สกุลเงิน / เงื่อนไข</label>
-          <select id="s-currency">
+                    </div>
+                </div>
+                <div class="sec-title" style="margin-top:1rem">สินค้า</div>
+                <div class="form-grid form-grid-3">
+                    <div class="fg"><label>สินค้า</label><input id="s-product" value="FRESH DURIAN"></div>
+                    <div class="fg"><label>จำนวน (Cartons)</label><input id="s-cartons" type="number"></div>
+                    <div class="fg"><label>N.W. (KGS)</label><input id="s-nw" type="number" step="0.01"></div>
+                    <div class="fg"><label>G.W. (KGS)</label><input id="s-gw" type="number" step="0.01"></div>
+                    <div class="fg"><label>ราคาต่อหน่วย</label><input id="s-price" type="number" step="0.01"></div>
+                    <div class="fg"><label>สกุลเงิน / เงื่อนไข</label>
+                        <select id="s-currency">
             <option value="USD FOB">USD — FOB</option>
             <option value="CNY CNF">CNY — CNF</option>
           </select>
+                    </div>
+                </div>
+                <div class="sec-title" style="margin-top:1rem">เส้นทาง</div>
+                <div class="form-grid form-grid-2">
+                    <div class="fg"><label>ด่านออก (Port of Loading)</label><input id="s-port-load" value="NAKHON PHANOM, THAILAND"></div>
+                    <div class="fg"><label>ด่านปลายทาง (Port of Discharge)</label><input id="s-port-dest" value="YOUYIGUAN, CHINA"></div>
+                </div>
+                <div class="fg" style="margin-top:.75rem"><label>หมายเหตุ</label><textarea id="s-notes"></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-shipment')">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="saveShipment()">💾 บันทึก</button>
+            </div>
         </div>
-      </div>
-      <div class="sec-title" style="margin-top:1rem">เส้นทาง</div>
-      <div class="form-grid form-grid-2">
-        <div class="fg"><label>ด่านออก (Port of Loading)</label><input id="s-port-load" value="NAKHON PHANOM, THAILAND"></div>
-        <div class="fg"><label>ด่านปลายทาง (Port of Discharge)</label><input id="s-port-dest" value="YOUYIGUAN, CHINA"></div>
-      </div>
-      <div class="fg" style="margin-top:.75rem"><label>หมายเหตุ</label><textarea id="s-notes"></textarea></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-shipment')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveShipment()">💾 บันทึก</button>
-    </div>
-  </div>
-</div>
 
-<!-- Product Modal -->
-<div class="modal-overlay" id="modal-product">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>สินค้าและราคา</h3>
-      <button class="modal-close" onclick="closeModal('modal-product')">✕</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="prod-edit-id">
-      <div class="form-grid form-grid-2">
-        <div class="fg"><label>รหัสสินค้า <span class="req">*</span></label><input id="p-id" placeholder="PRD-001"></div>
-        <div class="fg"><label>HS Code</label><input id="p-hs" value="0810.60"></div>
-        <div class="fg"><label>ชื่อสินค้า (EN) <span class="req">*</span></label><input id="p-name-en" placeholder="FRESH DURIAN MONTHONG"></div>
-        <div class="fg"><label>ชื่อสินค้า (TH)</label><input id="p-name-th" placeholder="ทุเรียนสด มูซานคิง"></div>
-        <div class="fg"><label>พันธุ์ (Variety)</label><input id="p-variety" placeholder="AB / D / B / SN9823..."></div>
-        <div class="fg"><label>หน่วย</label><input id="p-unit" value="KGM."></div>
-        <div class="fg"><label>ราคา FOB (USD/KG)</label><input id="p-price-fob" type="number" step="0.01"></div>
-        <div class="fg"><label>ราคา CNF Youyiguan (CNY/KG)</label><input id="p-price-cnf" type="number" step="0.01"></div>
-        <div class="fg"><label>น.น. ต่อกล่อง N.W. (KG)</label><input id="p-nw-box" type="number" step="0.1"></div>
-        <div class="fg"><label>น.น. ต่อกล่อง G.W. (KG)</label><input id="p-gw-box" type="number" step="0.1"></div>
-        <div class="fg" style="grid-column:1/-1"><label>หมายเหตุ</label><textarea id="p-notes"></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-product')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveProduct()">💾 บันทึก</button>
-    </div>
-  </div>
-</div>
-
-<!-- Route Modal -->
-<div class="modal-overlay" id="modal-route">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>เส้นทางขนส่ง</h3>
-      <button class="modal-close" onclick="closeModal('modal-route')">✕</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="route-edit-id">
-      <div class="form-grid form-grid-2">
-        <div class="fg"><label>ชื่อเส้นทาง <span class="req">*</span></label><input id="r-name"></div>
-        <div class="fg"><label>วิธีขนส่ง</label><input id="r-transport" value="BY TRUCK (ROAD TRANSPORT)"></div>
-        <div class="fg"><label>ต้นทาง (From)</label><input id="r-from" value="CHUMPHON, THAILAND"></div>
-        <div class="fg"><label>ด่านออก (Port of Loading)</label><input id="r-port-load" value="NAKHON PHANOM, THAILAND"></div>
-        <div class="fg"><label>ทางผ่าน (Via)</label><input id="r-via" placeholder="THAKHEK, LAOS / QUANG BINH, VIETNAM"></div>
-        <div class="fg"><label>ด่านเข้า (Point of Entry)</label><input id="r-port-entry" value="YOUYIGUAN, CHINA"></div>
-        <div class="fg"><label>ปลายทาง (To)</label><input id="r-to" value="CHINA"></div>
-        <div class="fg" style="grid-column:1/-1">
-          <label>เส้นทางเต็ม (Full Route)</label>
-          <textarea id="r-full">CHUMPHON - NAKHON PHANOM (THAILAND) - THAKHEK, LAOS - CHALO - HA TINH - THANH HOA - HA NOI - LANG SON (VIETNAM) - YOUYIGUAN, CHINA</textarea>
+    <!-- Product Modal -->
+    <div class="modal-overlay" id="modal-product">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>สินค้าและราคา</h3>
+                <button class="modal-close" onclick="closeModal('modal-product')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="prod-edit-id">
+                <div class="form-grid form-grid-2">
+                    <div class="fg"><label>รหัสสินค้า <span class="req">*</span></label><input id="p-id" placeholder="PRD-001"></div>
+                    <div class="fg"><label>HS Code</label><input id="p-hs" value="0810.60"></div>
+                    <div class="fg"><label>ชื่อสินค้า (EN) <span class="req">*</span></label><input id="p-name-en" placeholder="FRESH DURIAN MONTHONG"></div>
+                    <div class="fg"><label>ชื่อสินค้า (TH)</label><input id="p-name-th" placeholder="ทุเรียนสด มูซานคิง"></div>
+                    <div class="fg"><label>พันธุ์ (Variety)</label><input id="p-variety" placeholder="AB / D / B / SN9823..."></div>
+                    <div class="fg"><label>หน่วย</label><input id="p-unit" value="KGM."></div>
+                    <div class="fg"><label>ราคา FOB (USD/KG)</label><input id="p-price-fob" type="number" step="0.01"></div>
+                    <div class="fg"><label>ราคา CNF Youyiguan (CNY/KG)</label><input id="p-price-cnf" type="number" step="0.01"></div>
+                    <div class="fg"><label>น.น. ต่อกล่อง N.W. (KG)</label><input id="p-nw-box" type="number" step="0.1"></div>
+                    <div class="fg"><label>น.น. ต่อกล่อง G.W. (KG)</label><input id="p-gw-box" type="number" step="0.1"></div>
+                    <div class="fg" style="grid-column:1/-1"><label>หมายเหตุ</label><textarea id="p-notes"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-product')">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="saveProduct()">💾 บันทึก</button>
+            </div>
         </div>
-        <div class="fg" style="grid-column:1/-1"><label>หมายเหตุ</label><textarea id="r-notes"></textarea></div>
-      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-route')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveRoute()">💾 บันทึก</button>
-    </div>
-  </div>
-</div>
 
-<!-- Partner Modal -->
-<div class="modal-overlay" id="modal-partner">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>คู่ค้า / Partner</h3>
-      <button class="modal-close" onclick="closeModal('modal-partner')">✕</button>
+    <!-- Route Modal -->
+    <div class="modal-overlay" id="modal-route">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>เส้นทางขนส่ง</h3>
+                <button class="modal-close" onclick="closeModal('modal-route')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="route-edit-id">
+                <div class="form-grid form-grid-2">
+                    <div class="fg"><label>ชื่อเส้นทาง <span class="req">*</span></label><input id="r-name"></div>
+                    <div class="fg"><label>วิธีขนส่ง</label><input id="r-transport" value="BY TRUCK (ROAD TRANSPORT)"></div>
+                    <div class="fg"><label>ต้นทาง (From)</label><input id="r-from" value="CHUMPHON, THAILAND"></div>
+                    <div class="fg"><label>ด่านออก (Port of Loading)</label><input id="r-port-load" value="NAKHON PHANOM, THAILAND"></div>
+                    <div class="fg"><label>ทางผ่าน (Via)</label><input id="r-via" placeholder="THAKHEK, LAOS / QUANG BINH, VIETNAM"></div>
+                    <div class="fg"><label>ด่านเข้า (Point of Entry)</label><input id="r-port-entry" value="YOUYIGUAN, CHINA"></div>
+                    <div class="fg"><label>ปลายทาง (To)</label><input id="r-to" value="CHINA"></div>
+                    <div class="fg" style="grid-column:1/-1">
+                        <label>เส้นทางเต็ม (Full Route)</label>
+                        <textarea id="r-full">CHUMPHON - NAKHON PHANOM (THAILAND) - THAKHEK, LAOS - CHALO - HA TINH - THANH HOA - HA NOI - LANG SON (VIETNAM) - YOUYIGUAN, CHINA</textarea>
+                    </div>
+                    <div class="fg" style="grid-column:1/-1"><label>หมายเหตุ</label><textarea id="r-notes"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-route')">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="saveRoute()">💾 บันทึก</button>
+            </div>
+        </div>
     </div>
-    <div class="modal-body">
-      <input type="hidden" id="partner-edit-id">
-      <div class="form-grid form-grid-2">
-        <div class="fg"><label>ชื่อ <span class="req">*</span></label><input id="pt-name"></div>
-        <div class="fg"><label>ประเภท</label>
-          <select id="pt-type">
+
+    <!-- Partner Modal -->
+    <div class="modal-overlay" id="modal-partner">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>คู่ค้า / Partner</h3>
+                <button class="modal-close" onclick="closeModal('modal-partner')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="partner-edit-id">
+                <div class="form-grid form-grid-2">
+                    <div class="fg"><label>ชื่อ <span class="req">*</span></label><input id="pt-name"></div>
+                    <div class="fg"><label>ประเภท</label>
+                        <select id="pt-type">
             <option value="logistics">Logistics</option>
             <option value="buyer">Buyer Agent</option>
             <option value="lab">ห้องแล็บ</option>
             <option value="customs">ตัวแทนศุลกากร</option>
             <option value="other">อื่นๆ</option>
           </select>
+                    </div>
+                    <div class="fg" style="grid-column:1/-1"><label>ที่อยู่</label><textarea id="pt-address"></textarea></div>
+                    <div class="fg"><label>ประเทศ</label><input id="pt-country" value="THAILAND"></div>
+                    <div class="fg"><label>ผู้ติดต่อ</label><input id="pt-contact"></div>
+                    <div class="fg"><label>Tel</label><input id="pt-tel"></div>
+                    <div class="fg"><label>Email</label><input id="pt-email" type="email"></div>
+                    <div class="fg" style="grid-column:1/-1"><label>หมายเหตุ</label><textarea id="pt-notes"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-partner')">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="savePartner()">💾 บันทึก</button>
+            </div>
         </div>
-        <div class="fg" style="grid-column:1/-1"><label>ที่อยู่</label><textarea id="pt-address"></textarea></div>
-        <div class="fg"><label>ประเทศ</label><input id="pt-country" value="THAILAND"></div>
-        <div class="fg"><label>ผู้ติดต่อ</label><input id="pt-contact"></div>
-        <div class="fg"><label>Tel</label><input id="pt-tel"></div>
-        <div class="fg"><label>Email</label><input id="pt-email" type="email"></div>
-        <div class="fg" style="grid-column:1/-1"><label>หมายเหตุ</label><textarea id="pt-notes"></textarea></div>
-      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-partner')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="savePartner()">💾 บันทึก</button>
-    </div>
-  </div>
-</div>
 
-<!-- DocReg Modal -->
-<div class="modal-overlay" id="modal-docreg">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>บันทึกเอกสาร</h3>
-      <button class="modal-close" onclick="closeModal('modal-docreg')">✕</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="dr-edit-id">
-      <div class="form-grid form-grid-2">
-        <div class="fg"><label>ประเภทเอกสาร <span class="req">*</span></label>
-          <select id="dr-type">
+    <!-- DocReg Modal -->
+    <div class="modal-overlay" id="modal-docreg">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>บันทึกเอกสาร</h3>
+                <button class="modal-close" onclick="closeModal('modal-docreg')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="dr-edit-id">
+                <div class="form-grid form-grid-2">
+                    <div class="fg"><label>ประเภทเอกสาร <span class="req">*</span></label>
+                        <select id="dr-type">
             <option value="invoice">Invoice / Packing List</option>
             <option value="contract">Sales Contract</option>
             <option value="pc">Phytosanitary Certificate (PC)</option>
             <option value="co">CO Form E</option>
             <option value="lab">Lab Test Report</option>
             <option value="carriage">Carriage Agreement</option>
+            <option value="ca">CA / Certificate of Approval</option>
+            <option value="ecs">ECS Declaration</option>
+            <option value="bl">Bill of Lading</option>
+            <option value="import_permit">Import Permit</option>
+            <option value="customs">Customs Declaration</option>
+            <option value="health_certificate">Health Certificate</option>
+            <option value="import_invoice">Import Invoice</option>
           </select>
-        </div>
-        <div class="fg"><label>เลขเอกสาร <span class="req">*</span></label><input id="dr-docno" placeholder="เช่น TH6809027709"></div>
-        <div class="fg"><label>Container No.</label><input id="dr-container" placeholder="YMLU2333371"></div>
-        <div class="fg"><label>ผู้ซื้อ</label>
-          <select id="dr-buyer-id"><option value="">-- เลือกผู้ซื้อ --</option></select>
-        </div>
-        <div class="fg"><label>วันที่ออกเอกสาร</label><input id="dr-issued" type="date"></div>
-        <div class="fg"><label>วันหมดอายุ</label><input id="dr-expiry" type="date"></div>
-        <div class="fg"><label>สถานะ</label>
-          <select id="dr-status">
+                    </div>
+                    <div class="fg"><label>เลขเอกสาร <span class="req">*</span></label><input id="dr-docno" placeholder="เช่น TH6809027709"></div>
+                    <div class="fg"><label>Container No.</label><input id="dr-container" placeholder="YMLU2333371"></div>
+                    <div class="fg"><label>ผู้ซื้อ</label>
+                        <select id="dr-buyer-id"><option value="">-- เลือกผู้ซื้อ --</option></select>
+                    </div>
+                    <div class="fg"><label>วันที่ออกเอกสาร</label><input id="dr-issued" type="date"></div>
+                    <div class="fg"><label>วันหมดอายุ</label><input id="dr-expiry" type="date"></div>
+                    <div class="fg"><label>สถานะ</label>
+                        <select id="dr-status">
+            <option value="draft">แบบร่าง</option>
             <option value="issued">ออกแล้ว</option>
             <option value="pending">รอดำเนินการ</option>
             <option value="expired">หมดอายุ</option>
           </select>
+                    </div>
+                    <div class="fg"><label>ECS Reference</label><input id="dr-ecs" placeholder="ECS ref"></div>
+                    <div class="fg"><label>CA / Approval</label><input id="dr-ca" placeholder="CA no."></div>
+                    <div class="fg" style="grid-column:1/-1"><label>หมายเหตุ</label><textarea id="dr-notes"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-docreg')">ยกเลิก</button>
+                <button class="btn btn-warning" onclick="saveDocReg(true)">💾 บันทึกแบบร่าง</button>
+                <button class="btn btn-primary" onclick="saveDocReg(false)">💾 บันทึก</button>
+            </div>
         </div>
-        <div class="fg" style="grid-column:1/-1"><label>หมายเหตุ</label><textarea id="dr-notes"></textarea></div>
-      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-docreg')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveDocReg()">💾 บันทึก</button>
-    </div>
-  </div>
-</div>
 
-<!-- ===== JAVASCRIPT ===== -->
-<script>
-// ── STORAGE KEYS ──
-const KEYS = {
-  buyers:'mck_buyers', shipments:'mck_shipments', products:'mck_products',
-  routes:'mck_routes', partners:'mck_partners', docreg:'mck_docreg',
-  rates:'mck_rates', company:'mck_company', activity:'mck_activity'
-};
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ── STORAGE KEYS ──
+        const KEYS = {
+            buyers: 'mck_buyers',
+            shipments: 'mck_shipments',
+            products: 'mck_products',
+            routes: 'mck_routes',
+            partners: 'mck_partners',
+            docreg: 'mck_docreg',
+            rates: 'mck_rates',
+            company: 'mck_company',
+            activity: 'mck_activity'
+        };
 
-// ── LOAD / SAVE ──
-const load = k => JSON.parse(localStorage.getItem(k)||'[]');
-const loadObj = k => JSON.parse(localStorage.getItem(k)||'{}');
-const save = (k,v) => localStorage.setItem(k, JSON.stringify(v));
-const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+        // ── LOAD / SAVE ──
+        const load = k => JSON.parse(localStorage.getItem(k) || '[]');
+        const loadObj = k => JSON.parse(localStorage.getItem(k) || '{}');
+        const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+        const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
-// ── ACTIVITY LOG ──
-function logActivity(text, color='#2563eb'){
-  const acts = load(KEYS.activity);
-  acts.unshift({text, color, time:new Date().toLocaleString('th-TH')});
-  save(KEYS.activity, acts.slice(0,50));
-}
+        // ── ACTIVITY LOG ──
+        function logActivity(text, color = '#2563eb') {
+            const acts = load(KEYS.activity);
+            acts.unshift({
+                text,
+                color,
+                time: new Date().toLocaleString('th-TH')
+            });
+            save(KEYS.activity, acts.slice(0, 50));
+        }
 
-// ── INITIAL DATA ──
-function seedData(){
-  if(!load(KEYS.buyers).length){
-    save(KEYS.buyers,[
-      {id:'BUY-001',name_en:'PINGXIANG GUANGTENG IMPORT AND EXPORT TRADING CO., LTD',name_th:'',
-       address:'SHOP 1012, BUILDING 3, KAFENG COMPREHENSIVE SERVICE CITY, YOUYI TOWN, PINGXIANG CITY, CHONGZUO CITY, GUANGXI ZHUANG AUTONOMOUS REGION',
-       city:'PINGXIANG',country:'CHINA',contact:'',tel:'',fax:'',email:'',taxid:'',notes:'',created:Date.now()},
-      {id:'BUY-002',name_en:'SHENZHEN ASIA GLOBAL LOGISTICS CO.,LTD',name_th:'',
-       address:'816, BUILDING 1, NO. 101, LIANYUN ROAD, XINMU COMMUNITY, PINGHU STREET, LONGGANG DISTRICT, SHENZHEN',
-       city:'SHENZHEN',country:'CHINA',contact:'',tel:'',fax:'',email:'',taxid:'',notes:'',created:Date.now()}
-    ]);
-  }
-  if(!load(KEYS.products).length){
-    save(KEYS.products,[
-      {id:'PRD-001',name_en:'FRESH DURIAN MONTHONG(AB)',name_th:'ทุเรียนสด หมอนทอง (AB)',variety:'AB',hs:'0810.60',unit:'KGM.',price_fob:2,price_cnf:31.45,nw_box:9,gw_box:10.5,notes:'',updated:Date.now()},
-      {id:'PRD-002',name_en:'FRESH DURIAN MONTHONG(D)',name_th:'ทุเรียนสด หมอนทอง (D)',variety:'D',hs:'0810.60',unit:'KGM.',price_fob:1.7,price_cnf:20.22,nw_box:7,gw_box:8.5,notes:'',updated:Date.now()},
-      {id:'PRD-003',name_en:'FRESH DURIAN MONTHONG(B)',name_th:'ทุเรียนสด หมอนทอง (B)',variety:'B',hs:'0810.60',unit:'KGM.',price_fob:1.8,price_cnf:23.33,nw_box:9,gw_box:10.5,notes:'',updated:Date.now()},
-      {id:'PRD-004',name_en:'FRESH DURIAN SN9823',name_th:'ทุเรียนสด SN9823',variety:'SN9823',hs:'0810.60',unit:'KGM.',price_fob:2,price_cnf:0,nw_box:18.75,gw_box:20.83,notes:'FOB format',updated:Date.now()}
-    ]);
-  }
-  if(!load(KEYS.routes).length){
-    save(KEYS.routes,[
-      {id:'RT-001',name:'ชุมพร → นครพนม → จีน (Youyiguan)',from:'CHUMPHON, THAILAND',
-       port_load:'NAKHON PHANOM, THAILAND',via:'THAKHEK, LAOS / QUANG BINH, VIETNAM',
-       port_entry:'YOUYIGUAN, CHINA',to:'CHINA',transport:'BY TRUCK (ROAD TRANSPORT)',
-       full:'CHUMPHON, THAILAND - NAKHON PHANOM (THAILAND) - THAKHEK, LAOS - CHALO - HA TINH - THANH HOA - HA NOI - LANG SON (VIETNAM) - YOUYIGUAN, CHINA',
-       notes:'Standard route for durian export'}
-    ]);
-  }
-  if(!load(KEYS.partners).length){
-    save(KEYS.partners,[
-      {id:'PT-001',name:'AMARC (Asia Medical and Agricultural Laboratory)',type:'lab',
-       address:'361 Soi Ladprao 122, Ladprao Road, Bangkok 10310',country:'THAILAND',
-       contact:'Miss Ratcharin Kanjanarat',tel:'02-516-2422',email:'contact@amarc.co.th',notes:'Accredited lab ISO/IEC 17025'},
-      {id:'PT-002',name:'UIC Certification Services Co., Ltd.',type:'other',
-       address:'368/73 Patio Village Ramintra 1, Watcharapol Road, Tharang, Bangkhen, Bangkok 10220',
-       country:'THAILAND',contact:'',tel:'6681-8245607',email:'',notes:'GMP Certification TAS9047/9070'}
-    ]);
-  }
-  if(!loadObj(KEYS.rates).usd_cny){
-    save(KEYS.rates,{usd_cny:7.25,usd_thb:34.50,cny_thb:4.76,updated:new Date().toLocaleDateString('th-TH')});
-  }
-  if(!loadObj(KEYS.company).name_en){
-    save(KEYS.company,{
-      name_th:'โลจิสติกส์ บาย นำค้าง',
-      name_en:'Logistics by namkhang',
-      address:'71/2 MOO 7 NA KHA, LANG SUAN, CHUMPHON 86110 THAILAND',
-      taxid:'0865562000931',tel:'0621955365',email:'jingyikoyii@gmail.com',
-      doa:'DOA 59000 10 013565',gmp47:'UT242707R0',gmp47_exp:'2027-12-04',
-      gmp70:'UT242708R0',gmp70_exp:'2027-12-04',gap:'AC 03-9001-86-111-002670',
-      signatory:'MISS PHAKTHINAN THANASOPHONPAISIT',signatory_title:'AUTHORIZED SIGNATORY'
-    });
-  }
-}
+        // ── INITIAL DATA ──
+        function seedData() {
+            if (!load(KEYS.buyers).length) {
+                save(KEYS.buyers, [{
+                    id: 'BUY-001',
+                    name_en: 'PINGXIANG GUANGTENG IMPORT AND EXPORT TRADING CO., LTD',
+                    name_th: '',
+                    address: 'SHOP 1012, BUILDING 3, KAFENG COMPREHENSIVE SERVICE CITY, YOUYI TOWN, PINGXIANG CITY, CHONGZUO CITY, GUANGXI ZHUANG AUTONOMOUS REGION',
+                    city: 'PINGXIANG',
+                    country: 'CHINA',
+                    contact: '',
+                    tel: '',
+                    fax: '',
+                    email: '',
+                    taxid: '',
+                    notes: '',
+                    created: Date.now()
+                }, {
+                    id: 'BUY-002',
+                    name_en: 'SHENZHEN ASIA GLOBAL LOGISTICS CO.,LTD',
+                    name_th: '',
+                    address: '816, BUILDING 1, NO. 101, LIANYUN ROAD, XINMU COMMUNITY, PINGHU STREET, LONGGANG DISTRICT, SHENZHEN',
+                    city: 'SHENZHEN',
+                    country: 'CHINA',
+                    contact: '',
+                    tel: '',
+                    fax: '',
+                    email: '',
+                    taxid: '',
+                    notes: '',
+                    created: Date.now()
+                }]);
+            }
+            if (!load(KEYS.products).length) {
+                save(KEYS.products, [{
+                    id: 'PRD-001',
+                    name_en: 'FRESH DURIAN MONTHONG(AB)',
+                    name_th: 'ทุเรียนสด หมอนทอง (AB)',
+                    variety: 'AB',
+                    hs: '0810.60',
+                    unit: 'KGM.',
+                    price_fob: 2,
+                    price_cnf: 31.45,
+                    nw_box: 9,
+                    gw_box: 10.5,
+                    notes: '',
+                    updated: Date.now()
+                }, {
+                    id: 'PRD-002',
+                    name_en: 'FRESH DURIAN MONTHONG(D)',
+                    name_th: 'ทุเรียนสด หมอนทอง (D)',
+                    variety: 'D',
+                    hs: '0810.60',
+                    unit: 'KGM.',
+                    price_fob: 1.7,
+                    price_cnf: 20.22,
+                    nw_box: 7,
+                    gw_box: 8.5,
+                    notes: '',
+                    updated: Date.now()
+                }, {
+                    id: 'PRD-003',
+                    name_en: 'FRESH DURIAN MONTHONG(B)',
+                    name_th: 'ทุเรียนสด หมอนทอง (B)',
+                    variety: 'B',
+                    hs: '0810.60',
+                    unit: 'KGM.',
+                    price_fob: 1.8,
+                    price_cnf: 23.33,
+                    nw_box: 9,
+                    gw_box: 10.5,
+                    notes: '',
+                    updated: Date.now()
+                }, {
+                    id: 'PRD-004',
+                    name_en: 'FRESH DURIAN SN9823',
+                    name_th: 'ทุเรียนสด SN9823',
+                    variety: 'SN9823',
+                    hs: '0810.60',
+                    unit: 'KGM.',
+                    price_fob: 2,
+                    price_cnf: 0,
+                    nw_box: 18.75,
+                    gw_box: 20.83,
+                    notes: 'FOB format',
+                    updated: Date.now()
+                }]);
+            }
+            if (!load(KEYS.routes).length) {
+                save(KEYS.routes, [{
+                    id: 'RT-001',
+                    name: 'ชุมพร → นครพนม → จีน (Youyiguan)',
+                    from: 'CHUMPHON, THAILAND',
+                    port_load: 'NAKHON PHANOM, THAILAND',
+                    via: 'THAKHEK, LAOS / QUANG BINH, VIETNAM',
+                    port_entry: 'YOUYIGUAN, CHINA',
+                    to: 'CHINA',
+                    transport: 'BY TRUCK (ROAD TRANSPORT)',
+                    full: 'CHUMPHON, THAILAND - NAKHON PHANOM (THAILAND) - THAKHEK, LAOS - CHALO - HA TINH - THANH HOA - HA NOI - LANG SON (VIETNAM) - YOUYIGUAN, CHINA',
+                    notes: 'Standard route for durian export'
+                }]);
+            }
+            if (!load(KEYS.partners).length) {
+                save(KEYS.partners, [{
+                    id: 'PT-001',
+                    name: 'AMARC (Asia Medical and Agricultural Laboratory)',
+                    type: 'lab',
+                    address: '361 Soi Ladprao 122, Ladprao Road, Bangkok 10310',
+                    country: 'THAILAND',
+                    contact: 'Miss Ratcharin Kanjanarat',
+                    tel: '02-516-2422',
+                    email: 'contact@amarc.co.th',
+                    notes: 'Accredited lab ISO/IEC 17025'
+                }, {
+                    id: 'PT-002',
+                    name: 'UIC Certification Services Co., Ltd.',
+                    type: 'other',
+                    address: '368/73 Patio Village Ramintra 1, Watcharapol Road, Tharang, Bangkhen, Bangkok 10220',
+                    country: 'THAILAND',
+                    contact: '',
+                    tel: '6681-8245607',
+                    email: '',
+                    notes: 'GMP Certification TAS9047/9070'
+                }]);
+            }
+            if (!loadObj(KEYS.rates).usd_cny) {
+                save(KEYS.rates, {
+                    usd_cny: 7.25,
+                    usd_thb: 34.50,
+                    cny_thb: 4.76,
+                    updated: new Date().toLocaleDateString('th-TH')
+                });
+            }
+            if (!loadObj(KEYS.company).name_en) {
+                save(KEYS.company, {
+                    name_th: 'โลจิสติกส์ บาย นำค้าง',
+                    name_en: 'Logistics by namkhang',
+                    address: '71/2 MOO 7 NA KHA, LANG SUAN, CHUMPHON 86110 THAILAND',
+                    taxid: '0865562000931',
+                    tel: '0621955365',
+                    email: 'jingyikoyii@gmail.com',
+                    doa: 'DOA 59000 10 013565',
+                    gmp47: 'UT242707R0',
+                    gmp47_exp: '2027-12-04',
+                    gmp70: 'UT242708R0',
+                    gmp70_exp: '2027-12-04',
+                    gap: 'AC 03-9001-86-111-002670',
+                    signatory: 'MISS PHAKTHINAN THANASOPHONPAISIT',
+                    signatory_title: 'AUTHORIZED SIGNATORY'
+                });
+            }
+        }
 
-// ── PAGE NAV ──
-function showPage(name, el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  if(el) el.classList.add('active');
-  // render
-  const renders={dashboard:renderDashboard,buyers:renderBuyers,shipments:renderShipments,
-    products:renderProducts,routes:renderRoutes,partners:renderPartners,
-    docreg:renderDocReg,rates:renderRates,company:renderCompany};
-  if(renders[name]) renders[name]();
-}
+        // ── PAGE NAV ──
+        function showPage(name, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('page-' + name).classList.add('active');
+            if (el) el.classList.add('active');
+            // render
+            const renders = {
+                dashboard: renderDashboard,
+                buyers: renderBuyers,
+                shipments: renderShipments,
+                products: renderProducts,
+                routes: renderRoutes,
+                partners: renderPartners,
+                docreg: renderDocReg,
+                drafts: renderDrafts,
+                rates: renderRates,
+                company: renderCompany
+            };
+            if (renders[name]) renders[name]();
+        }
 
-// ── BADGES ──
-function updateBadges(){
-  const sets=[['buyers','buyers'],['shipments','shipments'],['products','products'],
-              ['routes','routes'],['partners','partners'],['docreg','docreg']];
-  sets.forEach(([k,id])=>{
-    const el=document.getElementById('badge-'+id);
-    if(el) el.textContent=load(KEYS[k]).length;
-  });
-}
+        // ── BADGES ──
+        function updateBadges() {
+            const sets = [
+                ['buyers', 'buyers'],
+                ['shipments', 'shipments'],
+                ['products', 'products'],
+                ['routes', 'routes'],
+                ['partners', 'partners'],
+                ['docreg', 'docreg'],
+                ['drafts', 'drafts']
+            ];
+            sets.forEach(([k, id]) => {
+                const el = document.getElementById('badge-' + id);
+                if (!el) return;
+                if (id === 'drafts') el.textContent = load(KEYS.docreg).filter(d => d.status === 'draft').length;
+                else el.textContent = load(KEYS[k]).length;
+            });
+        }
 
-// ── MODAL ──
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
-document.addEventListener('click',e=>{
-  if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
-});
+        // ── MODAL ──
+        function openModal(id) {
+            document.getElementById(id).classList.add('open')
+        }
 
-// ── STATUS BADGE ──
-const statusBadge = s => ({
-  preparing:'<span class="badge badge-yellow">กำลังเตรียม</span>',
-  transit:'<span class="badge badge-blue">อยู่ระหว่างขนส่ง</span>',
-  arrived:'<span class="badge badge-purple">ถึงปลายทาง</span>',
-  completed:'<span class="badge badge-green">เสร็จสิ้น</span>',
-  issued:'<span class="badge badge-green">ออกแล้ว</span>',
-  pending:'<span class="badge badge-yellow">รอดำเนินการ</span>',
-  expired:'<span class="badge badge-red">หมดอายุ</span>',
-}[s]||`<span class="badge badge-gray">${s}</span>`);
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open')
+        }
+        document.addEventListener('click', e => {
+            if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+        });
 
-const docTypeLabel = t=>({invoice:'Invoice/PL',contract:'Sales Contract',
-  pc:'PC',co:'CO Form E',lab:'Lab Report',carriage:'Carriage Agr.'}[t]||t);
+        // ── STATUS BADGE ──
+        const statusBadge = s => ({
+            preparing: '<span class="badge badge-yellow">กำลังเตรียม</span>',
+            transit: '<span class="badge badge-blue">อยู่ระหว่างขนส่ง</span>',
+            arrived: '<span class="badge badge-purple">ถึงปลายทาง</span>',
+            completed: '<span class="badge badge-green">เสร็จสิ้น</span>',
+            draft: '<span class="badge badge-yellow">แบบร่าง</span>',
+            issued: '<span class="badge badge-green">ออกแล้ว</span>',
+            pending: '<span class="badge badge-yellow">รอดำเนินการ</span>',
+            expired: '<span class="badge badge-red">หมดอายุ</span>',
+        }[s] || `<span class="badge badge-gray">${s}</span>`);
 
-// ── DASHBOARD ──
-function renderDashboard(){
-  document.getElementById('dash-date').textContent=
-    'วันที่ '+new Date().toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+        const docTypeLabel = t => ({
+            invoice: 'Invoice/PL',
+            contract: 'Sales Contract',
+            pc: 'PC',
+            co: 'CO Form E',
+            lab: 'Lab Report',
+            carriage: 'Carriage Agr.',
+            ca: 'CA / Approval',
+            ecs: 'ECS Declaration',
+            bl: 'Bill of Lading',
+            import_permit: 'Import Permit',
+            customs: 'Customs Declaration',
+            health_certificate: 'Health Certificate',
+            import_invoice: 'Import Invoice'
+        }[t] || t);
 
-  const buyers=load(KEYS.buyers), ships=load(KEYS.shipments),
-        docs=load(KEYS.docreg), products=load(KEYS.products);
+        // ── DASHBOARD ──
+        function renderDashboard() {
+            document.getElementById('dash-date').textContent =
+                'วันที่ ' + new Date().toLocaleDateString('th-TH', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
 
-  const active=ships.filter(s=>s.status==='transit').length;
-  const totalNW=ships.reduce((a,s)=>a+(parseFloat(s.nw)||0),0);
+            const buyers = load(KEYS.buyers),
+                ships = load(KEYS.shipments),
+                docs = load(KEYS.docreg),
+                products = load(KEYS.products);
 
-  document.getElementById('dash-stats').innerHTML=`
+            const active = ships.filter(s => s.status === 'transit').length;
+            const totalNW = ships.reduce((a, s) => a + (parseFloat(s.nw) || 0), 0);
+
+            document.getElementById('dash-stats').innerHTML = `
     <div class="stat"><div class="stat-val">${ships.length}</div><div class="stat-lbl">Shipment ทั้งหมด</div></div>
     <div class="stat green"><div class="stat-val">${active}</div><div class="stat-lbl">กำลังขนส่ง</div></div>
     <div class="stat cyan"><div class="stat-val">${buyers.length}</div><div class="stat-lbl">ผู้ซื้อทั้งหมด</div></div>
@@ -910,52 +1761,56 @@ function renderDashboard(){
     <div class="stat green"><div class="stat-val">${(totalNW/1000).toFixed(1)}t</div><div class="stat-lbl">น.น.รวม (ตัน)</div></div>
   `;
 
-  // Recent shipments
-  const recent=ships.slice(-5).reverse();
-  document.getElementById('dash-recent-shipments').innerHTML = recent.length
-    ? recent.map(s=>`<div class="activity-item">
+            // Recent shipments
+            const recent = ships.slice(-5).reverse();
+            document.getElementById('dash-recent-shipments').innerHTML = recent.length ?
+                recent.map(s => `<div class="activity-item">
         <div class="activity-dot" style="background:#2563eb"></div>
         <div class="activity-text"><strong>${s.container}</strong> — ${s.invoice||'-'}<br>
           <span style="font-size:.78rem;color:var(--gray)">${s.product||'FRESH DURIAN'} · ${s.cartons||0} CTN</span>
         </div>
         <div>${statusBadge(s.status)}</div>
-      </div>`).join('')
-    : '<div class="empty"><div class="empty-icon">📦</div><p>ยังไม่มี Shipment</p></div>';
+      </div>`).join('') :
+                '<div class="empty"><div class="empty-icon">📦</div><p>ยังไม่มี Shipment</p></div>';
 
-  // Rates
-  const rates=loadObj(KEYS.rates);
-  document.getElementById('dash-rates').innerHTML=`
+            // Rates
+            const rates = loadObj(KEYS.rates);
+            document.getElementById('dash-rates').innerHTML = `
     <div class="rate-box"><div class="rate-lbl">USD → CNY</div><div class="rate-val">${rates.usd_cny||'—'}</div></div>
     <div class="rate-box" style="background:linear-gradient(135deg,#059669,#10b981)">
       <div class="rate-lbl">USD → THB</div><div class="rate-val">${rates.usd_thb||'—'}</div></div>
     <div class="rate-box" style="background:linear-gradient(135deg,#d97706,#f59e0b)">
       <div class="rate-lbl">CNY → THB</div><div class="rate-val">${rates.cny_thb||'—'}</div></div>
   `;
-  document.getElementById('dash-rate-date').textContent = rates.updated ? 'อัปเดต: '+rates.updated : '';
+            document.getElementById('dash-rate-date').textContent = rates.updated ? 'อัปเดต: ' + rates.updated : '';
 
-  // Activity
-  const acts=load(KEYS.activity);
-  document.getElementById('dash-activity').innerHTML = acts.length
-    ? acts.slice(0,8).map(a=>`<div class="activity-item">
+            // Activity
+            const acts = load(KEYS.activity);
+            document.getElementById('dash-activity').innerHTML = acts.length ?
+                acts.slice(0, 8).map(a => `<div class="activity-item">
         <div class="activity-dot" style="background:${a.color||'#2563eb'}"></div>
         <div class="activity-text">${a.text}</div>
         <div class="activity-time">${a.time}</div>
-      </div>`).join('')
-    : '<div class="empty"><p>ยังไม่มีกิจกรรม</p></div>';
-}
+      </div>`).join('') :
+                '<div class="empty"><p>ยังไม่มีกิจกรรม</p></div>';
+        }
 
-// ── BUYERS ──
-function renderBuyers(){
-  const q=(document.getElementById('buyer-search')||{value:''}).value.toLowerCase();
-  const fc=(document.getElementById('buyer-filter-country')||{value:''}).value;
-  let data=load(KEYS.buyers).filter(b=>{
-    const m=!q||(b.name_en||'').toLowerCase().includes(q)||(b.name_th||'').toLowerCase().includes(q)||(b.country||'').toLowerCase().includes(q);
-    const c=!fc||b.country===fc;
-    return m&&c;
-  });
-  const tb=document.getElementById('buyers-tbody');
-  if(!tb)return;
-  tb.innerHTML=data.length ? data.map(b=>`<tr>
+        // ── BUYERS ──
+        function renderBuyers() {
+            const q = (document.getElementById('buyer-search') || {
+                value: ''
+            }).value.toLowerCase();
+            const fc = (document.getElementById('buyer-filter-country') || {
+                value: ''
+            }).value;
+            let data = load(KEYS.buyers).filter(b => {
+                const m = !q || (b.name_en || '').toLowerCase().includes(q) || (b.name_th || '').toLowerCase().includes(q) || (b.country || '').toLowerCase().includes(q);
+                const c = !fc || b.country === fc;
+                return m && c;
+            });
+            const tb = document.getElementById('buyers-tbody');
+            if (!tb) return;
+            tb.innerHTML = data.length ? data.map(b => `<tr>
     <td><code style="font-size:.78rem">${b.id}</code></td>
     <td><strong>${b.name_en}</strong>${b.name_th?'<br><span style="font-size:.78rem;color:var(--gray)">'+b.name_th+'</span>':''}</td>
     <td><span class="badge badge-blue">${b.country||'—'}</span></td>
@@ -967,94 +1822,155 @@ function renderBuyers(){
       <button class="btn btn-danger btn-xs" onclick="deleteBuyer('${b.id}')">🗑️</button>
     </td>
   </tr>`).join('') : '<tr><td colspan="7"><div class="empty"><div class="empty-icon">🏢</div><p>ไม่พบข้อมูลผู้ซื้อ</p></div></td></tr>';
-  updateBadges();
-}
+            updateBadges();
+        }
 
-function openBuyerModal(id=null){
-  document.getElementById('buyer-edit-id').value='';
-  ['id','name-en','name-th','address','city','zip','contact','tel','fax','email','taxid','notes']
-    .forEach(f=>{const el=document.getElementById('b-'+f);if(el)el.value=''});
-  document.getElementById('b-country').value='CHINA';
-  if(id){
-    const b=load(KEYS.buyers).find(x=>x.id===id);
-    if(!b)return;
-    document.getElementById('buyer-edit-id').value=id;
-    document.getElementById('b-id').value=b.id;
-    document.getElementById('b-id').disabled=true;
-    document.getElementById('b-name-en').value=b.name_en||'';
-    document.getElementById('b-name-th').value=b.name_th||'';
-    document.getElementById('b-address').value=b.address||'';
-    document.getElementById('b-city').value=b.city||'';
-    document.getElementById('b-zip').value=b.zip||'';
-    document.getElementById('b-country').value=b.country||'CHINA';
-    document.getElementById('b-contact').value=b.contact||'';
-    document.getElementById('b-tel').value=b.tel||'';
-    document.getElementById('b-fax').value=b.fax||'';
-    document.getElementById('b-email').value=b.email||'';
-    document.getElementById('b-taxid').value=b.taxid||'';
-    document.getElementById('b-notes').value=b.notes||'';
-    document.getElementById('buyer-modal-title').textContent='แก้ไขผู้ซื้อ';
-  } else {
-    document.getElementById('b-id').disabled=false;
-    document.getElementById('buyer-modal-title').textContent='เพิ่มผู้ซื้อ';
-  }
-  openModal('modal-buyer');
-}
-function editBuyer(id){openBuyerModal(id)}
-function saveBuyer(){
-  const editId=document.getElementById('buyer-edit-id').value;
-  const id=document.getElementById('b-id').value.trim();
-  const name_en=document.getElementById('b-name-en').value.trim();
-  if(!id||!name_en){alert('กรุณากรอก รหัส และ ชื่อบริษัท');return}
-  const data=load(KEYS.buyers);
-  const obj={id,name_en,name_th:document.getElementById('b-name-th').value,
-    address:document.getElementById('b-address').value,city:document.getElementById('b-city').value,
-    zip:document.getElementById('b-zip').value,country:document.getElementById('b-country').value,
-    contact:document.getElementById('b-contact').value,tel:document.getElementById('b-tel').value,
-    fax:document.getElementById('b-fax').value,email:document.getElementById('b-email').value,
-    taxid:document.getElementById('b-taxid').value,notes:document.getElementById('b-notes').value,
-    consignee:document.getElementById('b-consignee').value, currency:document.getElementById('b-currency').value,
-    created:editId?undefined:Date.now()};
-  if(editId){const idx=data.findIndex(x=>x.id===editId);if(idx>=0)data[idx]={...data[idx],...obj}}
-  else{if(data.find(x=>x.id===id)){alert('รหัสซ้ำ');return}data.push(obj)}
-  save(KEYS.buyers,data);
-  logActivity(`${editId?'แก้ไข':'เพิ่ม'}ผู้ซื้อ: ${name_en}`,'#10b981');
-  closeModal('modal-buyer');renderBuyers();updateBadges();
-}
-function deleteBuyer(id){
-  if(!confirm('ลบผู้ซื้อนี้?'))return;
-  save(KEYS.buyers,load(KEYS.buyers).filter(b=>b.id!==id));
-  logActivity('ลบผู้ซื้อ: '+id,'#ef4444');renderBuyers();updateBadges();
-}
+        function openBuyerModal(id = null) {
+            document.getElementById('buyer-edit-id').value = '';
+            ['id', 'name-en', 'name-th', 'address', 'city', 'zip', 'contact', 'tel', 'fax', 'email', 'taxid', 'gap', 'gmp', 'gmp-exp', 'muks', 'ca', 'ecs', 'gap', 'gmp', 'gmp-exp', 'muks', 'ca', 'ecs', 'notes']
+            .forEach(f => {
+                const el = document.getElementById('b-' + f);
+                if (el) el.value = ''
+            });
+            document.getElementById('b-country').value = 'CHINA';
+            if (id) {
+                const b = load(KEYS.buyers).find(x => x.id === id);
+                if (!b) return;
+                document.getElementById('buyer-edit-id').value = id;
+                document.getElementById('b-id').value = b.id;
+                document.getElementById('b-id').disabled = true;
+                document.getElementById('b-name-en').value = b.name_en || '';
+                document.getElementById('b-name-th').value = b.name_th || '';
+                document.getElementById('b-address').value = b.address || '';
+                document.getElementById('b-city').value = b.city || '';
+                document.getElementById('b-zip').value = b.zip || '';
+                document.getElementById('b-country').value = b.country || 'CHINA';
+                document.getElementById('b-contact').value = b.contact || '';
+                document.getElementById('b-tel').value = b.tel || '';
+                document.getElementById('b-fax').value = b.fax || '';
+                document.getElementById('b-email').value = b.email || '';
+                document.getElementById('b-taxid').value = b.taxid || '';
+                document.getElementById('b-gap').value = b.gap || '';
+                document.getElementById('b-gmp').value = b.gmp || '';
+                document.getElementById('b-gmp-exp').value = b.gmp_exp || '';
+                document.getElementById('b-muks').value = b.muks || '';
+                document.getElementById('b-ca').value = b.ca || '';
+                document.getElementById('b-ecs').value = b.ecs || '';
+                document.getElementById('b-gap').value = b.gap || '';
+                document.getElementById('b-gmp').value = b.gmp || '';
+                document.getElementById('b-gmp-exp').value = b.gmp_exp || '';
+                document.getElementById('b-muks').value = b.muks || '';
+                document.getElementById('b-ca').value = b.ca || '';
+                document.getElementById('b-ecs').value = b.ecs || '';
+                document.getElementById('b-notes').value = b.notes || '';
+                document.getElementById('buyer-modal-title').textContent = 'แก้ไขผู้ซื้อ';
+            } else {
+                document.getElementById('b-id').disabled = false;
+                document.getElementById('buyer-modal-title').textContent = 'เพิ่มผู้ซื้อ';
+            }
+            openModal('modal-buyer');
+        }
 
-// ── SHIPMENTS ──
-function populateBuyerSelects(){
-  const buyers=load(KEYS.buyers);
-  ['s-buyer-id','dr-buyer-id'].forEach(sid=>{
-    const sel=document.getElementById(sid);
-    if(!sel)return;
-    const cur=sel.value;
-    sel.innerHTML='<option value="">-- เลือกผู้ซื้อ --</option>';
-    buyers.forEach(b=>sel.insertAdjacentHTML('beforeend',`<option value="${b.id}">${b.name_en}</option>`));
-    sel.value=cur;
-  });
-}
-function renderShipments(){
-  const q=(document.getElementById('ship-search')||{value:''}).value.toLowerCase();
-  const fs=(document.getElementById('ship-filter-status')||{value:''}).value;
-  const fy=(document.getElementById('ship-filter-year')||{value:''}).value;
-  const buyers=load(KEYS.buyers);
-  let data=load(KEYS.shipments).filter(s=>{
-    const m=!q||(s.container||'').toLowerCase().includes(q)||(s.invoice||'').toLowerCase().includes(q);
-    const st=!fs||s.status===fs;
-    const yr=!fy||!(s.date)||s.date.startsWith(fy);
-    return m&&st&&yr;
-  });
-  const tb=document.getElementById('shipments-tbody');if(!tb)return;
-  tb.innerHTML=data.length?data.slice().reverse().map(s=>{
-    const buyer=buyers.find(b=>b.id===s.buyer_id);
-    const amt=((parseFloat(s.nw)||0)*(parseFloat(s.price)||0)).toFixed(2);
-    return`<tr>
+        function editBuyer(id) {
+            openBuyerModal(id)
+        }
+
+        function saveBuyer() {
+            const editId = document.getElementById('buyer-edit-id').value;
+            const id = document.getElementById('b-id').value.trim();
+            const name_en = document.getElementById('b-name-en').value.trim();
+            if (!id || !name_en) {
+                alert('กรุณากรอก รหัส และ ชื่อบริษัท');
+                return
+            }
+            const data = load(KEYS.buyers);
+            const obj = {
+                id,
+                name_en,
+                name_th: document.getElementById('b-name-th').value,
+                address: document.getElementById('b-address').value,
+                city: document.getElementById('b-city').value,
+                zip: document.getElementById('b-zip').value,
+                country: document.getElementById('b-country').value,
+                contact: document.getElementById('b-contact').value,
+                tel: document.getElementById('b-tel').value,
+                fax: document.getElementById('b-fax').value,
+                email: document.getElementById('b-email').value,
+                taxid: document.getElementById('b-taxid').value,
+                gap: document.getElementById('b-gap').value,
+                gmp: document.getElementById('b-gmp').value,
+                gmp_exp: document.getElementById('b-gmp-exp').value,
+                muks: document.getElementById('b-muks').value,
+                ca: document.getElementById('b-ca').value,
+                ecs: document.getElementById('b-ecs').value,
+                notes: document.getElementById('b-notes').value,
+                consignee: document.getElementById('b-consignee').value,
+                currency: document.getElementById('b-currency').value,
+                created: editId ? undefined : Date.now()
+            };
+            if (editId) {
+                const idx = data.findIndex(x => x.id === editId);
+                if (idx >= 0) data[idx] = {...data[idx],
+                    ...obj
+                }
+            } else {
+                if (data.find(x => x.id === id)) {
+                    alert('รหัสซ้ำ');
+                    return
+                }
+                data.push(obj)
+            }
+            save(KEYS.buyers, data);
+            logActivity(`${editId?'แก้ไข':'เพิ่ม'}ผู้ซื้อ: ${name_en}`, '#10b981');
+            closeModal('modal-buyer');
+            renderBuyers();
+            updateBadges();
+        }
+
+        function deleteBuyer(id) {
+            if (!confirm('ลบผู้ซื้อนี้?')) return;
+            save(KEYS.buyers, load(KEYS.buyers).filter(b => b.id !== id));
+            logActivity('ลบผู้ซื้อ: ' + id, '#ef4444');
+            renderBuyers();
+            updateBadges();
+        }
+
+        // ── SHIPMENTS ──
+        function populateBuyerSelects() {
+            const buyers = load(KEYS.buyers);
+            ['s-buyer-id', 'dr-buyer-id'].forEach(sid => {
+                const sel = document.getElementById(sid);
+                if (!sel) return;
+                const cur = sel.value;
+                sel.innerHTML = '<option value="">-- เลือกผู้ซื้อ --</option>';
+                buyers.forEach(b => sel.insertAdjacentHTML('beforeend', `<option value="${b.id}">${b.name_en}</option>`));
+                sel.value = cur;
+            });
+        }
+
+        function renderShipments() {
+            const q = (document.getElementById('ship-search') || {
+                value: ''
+            }).value.toLowerCase();
+            const fs = (document.getElementById('ship-filter-status') || {
+                value: ''
+            }).value;
+            const fy = (document.getElementById('ship-filter-year') || {
+                value: ''
+            }).value;
+            const buyers = load(KEYS.buyers);
+            let data = load(KEYS.shipments).filter(s => {
+                const m = !q || (s.container || '').toLowerCase().includes(q) || (s.invoice || '').toLowerCase().includes(q);
+                const st = !fs || s.status === fs;
+                const yr = !fy || !(s.date) || s.date.startsWith(fy);
+                return m && st && yr;
+            });
+            const tb = document.getElementById('shipments-tbody');
+            if (!tb) return;
+            tb.innerHTML = data.length ? data.slice().reverse().map(s => {
+                const buyer = buyers.find(b => b.id === s.buyer_id);
+                const amt = ((parseFloat(s.nw) || 0) * (parseFloat(s.price) || 0)).toFixed(2);
+                return `<tr>
       <td><strong>${s.container||'—'}</strong></td>
       <td><code style="font-size:.78rem">${s.invoice||'—'}</code></td>
       <td style="max-width:180px;font-size:.8rem">${buyer?buyer.name_en:'—'}</td>
@@ -1069,72 +1985,103 @@ function renderShipments(){
         <button class="btn btn-danger btn-xs" onclick="deleteShipment('${s.id}')">🗑️</button>
       </td>
     </tr>`;
-  }).join(''):'<tr><td colspan="10"><div class="empty"><div class="empty-icon">📦</div><p>ยังไม่มีข้อมูล Shipment</p></div></td></tr>';
-  updateBadges();
-}
-function openShipmentModal(id=null){
-  populateBuyerSelects();
-  document.getElementById('ship-edit-id').value='';
-  ['container','invoice','contract','product','cartons','nw','gw','price','port-load','port-dest','notes']
-    .forEach(f=>{const el=document.getElementById('s-'+f);if(el)el.value=''});
-  document.getElementById('s-product').value='FRESH DURIAN MONTHONG(AB)'; // Default product
-  document.getElementById('s-port-load').value='NAKHON PHANOM, THAILAND';
-  document.getElementById('s-port-dest').value='YOUYIGUAN, CHINA';
-  document.getElementById('s-status').value='preparing';
-  document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
-  if(id){
-    const s=load(KEYS.shipments).find(x=>x.id===id);if(!s)return;
-    document.getElementById('ship-edit-id').value=id;
-    document.getElementById('s-container').value=s.container||'';
-    document.getElementById('s-invoice').value=s.invoice||'';
-    document.getElementById('s-contract').value=s.contract||'';
-    document.getElementById('s-buyer-id').value=s.buyer_id||'';
-    document.getElementById('s-date').value=s.date||'';
-    document.getElementById('s-status').value=s.status||'preparing';
-    document.getElementById('s-product').value=s.product||'FRESH DURIAN';
-    document.getElementById('s-cartons').value=s.cartons||'';
-    document.getElementById('s-nw').value=s.nw||'';
-    document.getElementById('s-gw').value=s.gw||'';
-    document.getElementById('s-price').value=s.price||'';
-    document.getElementById('s-currency').value=s.currency||'USD FOB';
-    document.getElementById('s-port-load').value=s.port_load||'';
-    document.getElementById('s-port-dest').value=s.port_dest||'';
-    document.getElementById('s-notes').value=s.notes||'';
-    document.getElementById('ship-modal-title').textContent='แก้ไข Shipment';
-  } else document.getElementById('ship-modal-title').textContent='เพิ่ม Shipment';
-  openModal('modal-shipment');
-}
-function editShipment(id){openShipmentModal(id)}
-function saveShipment(){
-  const editId=document.getElementById('ship-edit-id').value;
-  const container=document.getElementById('s-container').value.trim().toUpperCase();
-  const invoice=document.getElementById('s-invoice').value.trim();
-  if(!container){alert('กรุณากรอก Container No.');return}
-  const data=load(KEYS.shipments);
-  const obj={id:editId||uid(),container,invoice,contract:document.getElementById('s-contract').value,
-    buyer_id:document.getElementById('s-buyer-id').value,date:document.getElementById('s-date').value,
-    status:document.getElementById('s-status').value,product:document.getElementById('s-product').value,
-    cartons:document.getElementById('s-cartons').value,nw:document.getElementById('s-nw').value,
-    gw:document.getElementById('s-gw').value,price:document.getElementById('s-price').value,
-    currency:document.getElementById('s-currency').value,port_load:document.getElementById('s-port-load').value,
-    port_dest:document.getElementById('s-port-dest').value,notes:document.getElementById('s-notes').value};
-  if(editId){const idx=data.findIndex(x=>x.id===editId);if(idx>=0)data[idx]=obj}
-  else data.push(obj);
-  save(KEYS.shipments,data);
-  logActivity(`${editId?'แก้ไข':'เพิ่ม'} Shipment: ${container} (${invoice})`,'#2563eb');
-  closeModal('modal-shipment');renderShipments();updateBadges();
-}
-function deleteShipment(id){
-  if(!confirm('ลบ Shipment นี้?'))return;
-  save(KEYS.shipments,load(KEYS.shipments).filter(s=>s.id!==id));
-  logActivity('ลบ Shipment: '+id,'#ef4444');renderShipments();updateBadges();
-}
+            }).join('') : '<tr><td colspan="10"><div class="empty"><div class="empty-icon">📦</div><p>ยังไม่มีข้อมูล Shipment</p></div></td></tr>';
+            updateBadges();
+        }
 
-// ── PRODUCTS ──
-function renderProducts(){
-  const data=load(KEYS.products);
-  const tb=document.getElementById('products-tbody');if(!tb)return;
-  tb.innerHTML=data.length?data.map(p=>`<tr>
+        function openShipmentModal(id = null) {
+            populateBuyerSelects();
+            document.getElementById('ship-edit-id').value = '';
+            ['container', 'invoice', 'contract', 'product', 'cartons', 'nw', 'gw', 'price', 'port-load', 'port-dest', 'notes']
+            .forEach(f => {
+                const el = document.getElementById('s-' + f);
+                if (el) el.value = ''
+            });
+            document.getElementById('s-product').value = 'FRESH DURIAN MONTHONG(AB)'; // Default product
+            document.getElementById('s-port-load').value = 'NAKHON PHANOM, THAILAND';
+            document.getElementById('s-port-dest').value = 'YOUYIGUAN, CHINA';
+            document.getElementById('s-status').value = 'preparing';
+            document.getElementById('s-date').value = new Date().toISOString().split('T')[0];
+            if (id) {
+                const s = load(KEYS.shipments).find(x => x.id === id);
+                if (!s) return;
+                document.getElementById('ship-edit-id').value = id;
+                document.getElementById('s-container').value = s.container || '';
+                document.getElementById('s-invoice').value = s.invoice || '';
+                document.getElementById('s-contract').value = s.contract || '';
+                document.getElementById('s-buyer-id').value = s.buyer_id || '';
+                document.getElementById('s-date').value = s.date || '';
+                document.getElementById('s-status').value = s.status || 'preparing';
+                document.getElementById('s-product').value = s.product || 'FRESH DURIAN';
+                document.getElementById('s-cartons').value = s.cartons || '';
+                document.getElementById('s-nw').value = s.nw || '';
+                document.getElementById('s-gw').value = s.gw || '';
+                document.getElementById('s-price').value = s.price || '';
+                document.getElementById('s-currency').value = s.currency || 'USD FOB';
+                document.getElementById('s-port-load').value = s.port_load || '';
+                document.getElementById('s-port-dest').value = s.port_dest || '';
+                document.getElementById('s-notes').value = s.notes || '';
+                document.getElementById('ship-modal-title').textContent = 'แก้ไข Shipment';
+            } else document.getElementById('ship-modal-title').textContent = 'เพิ่ม Shipment';
+            openModal('modal-shipment');
+        }
+
+        function editShipment(id) {
+            openShipmentModal(id)
+        }
+
+        function saveShipment() {
+            const editId = document.getElementById('ship-edit-id').value;
+            const container = document.getElementById('s-container').value.trim().toUpperCase();
+            const invoice = document.getElementById('s-invoice').value.trim();
+            if (!container) {
+                alert('กรุณากรอก Container No.');
+                return
+            }
+            const data = load(KEYS.shipments);
+            const obj = {
+                id: editId || uid(),
+                container,
+                invoice,
+                contract: document.getElementById('s-contract').value,
+                buyer_id: document.getElementById('s-buyer-id').value,
+                date: document.getElementById('s-date').value,
+                status: document.getElementById('s-status').value,
+                product: document.getElementById('s-product').value,
+                cartons: document.getElementById('s-cartons').value,
+                nw: document.getElementById('s-nw').value,
+                gw: document.getElementById('s-gw').value,
+                price: document.getElementById('s-price').value,
+                currency: document.getElementById('s-currency').value,
+                port_load: document.getElementById('s-port-load').value,
+                port_dest: document.getElementById('s-port-dest').value,
+                notes: document.getElementById('s-notes').value
+            };
+            if (editId) {
+                const idx = data.findIndex(x => x.id === editId);
+                if (idx >= 0) data[idx] = obj
+            } else data.push(obj);
+            save(KEYS.shipments, data);
+            logActivity(`${editId?'แก้ไข':'เพิ่ม'} Shipment: ${container} (${invoice})`, '#2563eb');
+            closeModal('modal-shipment');
+            renderShipments();
+            updateBadges();
+        }
+
+        function deleteShipment(id) {
+            if (!confirm('ลบ Shipment นี้?')) return;
+            save(KEYS.shipments, load(KEYS.shipments).filter(s => s.id !== id));
+            logActivity('ลบ Shipment: ' + id, '#ef4444');
+            renderShipments();
+            updateBadges();
+        }
+
+        // ── PRODUCTS ──
+        function renderProducts() {
+            const data = load(KEYS.products);
+            const tb = document.getElementById('products-tbody');
+            if (!tb) return;
+            tb.innerHTML = data.length ? data.map(p => `<tr>
     <td><code style="font-size:.78rem">${p.id}</code></td>
     <td><strong>${p.name_en}</strong><br><span style="font-size:.78rem;color:var(--gray)">${p.name_th||''}</span></td>
     <td><span class="badge badge-blue">${p.variety||'—'}</span></td>
@@ -1146,54 +2093,90 @@ function renderProducts(){
       <button class="btn btn-ghost btn-xs" onclick="editProduct('${p.id}')">✏️</button>
       <button class="btn btn-danger btn-xs" onclick="deleteProduct('${p.id}')">🗑️</button>
     </td>
-  </tr>`).join(''):'<tr><td colspan="8"><div class="empty"><div class="empty-icon">🌿</div><p>ไม่พบสินค้า</p></div></td></tr>';
-  updateBadges();
-}
-function openProductModal(id=null){
-  document.getElementById('prod-edit-id').value='';
-  ['id','name-en','name-th','hs','variety','unit','price-fob','price-cnf','nw-box','gw-box','notes']
-    .forEach(f=>{const el=document.getElementById('p-'+f);if(el)el.value=''});
-  document.getElementById('p-hs').value='0810.60';document.getElementById('p-unit').value='kg'; // Default unit
-  if(id){
-    const p=load(KEYS.products).find(x=>x.id===id);if(!p)return;
-    document.getElementById('prod-edit-id').value=id;
-    ['id','name_en:name-en','name_th:name-th','hs','variety','unit','price_fob:price-fob','price_cnf:price-cnf','nw_box:nw-box','gw_box:gw-box','notes']
-      .forEach(m=>{const[k,f]=m.includes(':')?m.split(':'):[m,m.replace('_','-')];
-        const el=document.getElementById('p-'+f);if(el)el.value=p[k]||''});
-  }
-  openModal('modal-product');
-}
-function editProduct(id){openProductModal(id)}
-function saveProduct(){
-  const editId=document.getElementById('prod-edit-id').value;
-  const id=document.getElementById('p-id').value.trim();
-  const name_en=document.getElementById('p-name-en').value.trim();
-  if(!id||!name_en){alert('กรุณากรอก รหัส และ ชื่อสินค้า');return}
-  const data=load(KEYS.products);
-  const obj={id,name_en,name_th:document.getElementById('p-name-th').value,
-    hs:document.getElementById('p-hs').value,variety:document.getElementById('p-variety').value,
-    unit:document.getElementById('p-unit').value,
-    price_fob:parseFloat(document.getElementById('p-price-fob').value)||0,
-    price_cnf:parseFloat(document.getElementById('p-price-cnf').value)||0,
-    nw_box:parseFloat(document.getElementById('p-nw-box').value)||0,
-    gw_box:parseFloat(document.getElementById('p-gw-box').value)||0,
-    notes:document.getElementById('p-notes').value,updated:Date.now()};
-  if(editId){const idx=data.findIndex(x=>x.id===editId);if(idx>=0)data[idx]=obj}
-  else{if(data.find(x=>x.id===id)){alert('รหัสซ้ำ');return}data.push(obj)}
-  save(KEYS.products,data);logActivity(`บันทึกสินค้า: ${name_en}`);
-  closeModal('modal-product');renderProducts();updateBadges();
-}
-function deleteProduct(id){
-  if(!confirm('ลบสินค้านี้?'))return;
-  save(KEYS.products,load(KEYS.products).filter(p=>p.id!==id));
-  renderProducts();updateBadges();
-}
+  </tr>`).join('') : '<tr><td colspan="8"><div class="empty"><div class="empty-icon">🌿</div><p>ไม่พบสินค้า</p></div></td></tr>';
+            updateBadges();
+        }
 
-// ── ROUTES ──
-function renderRoutes(){
-  const data=load(KEYS.routes);
-  const tb=document.getElementById('routes-tbody');if(!tb)return;
-  tb.innerHTML=data.length?data.map(r=>`<tr>
+        function openProductModal(id = null) {
+            document.getElementById('prod-edit-id').value = '';
+            ['id', 'name-en', 'name-th', 'hs', 'variety', 'unit', 'price-fob', 'price-cnf', 'nw-box', 'gw-box', 'notes']
+            .forEach(f => {
+                const el = document.getElementById('p-' + f);
+                if (el) el.value = ''
+            });
+            document.getElementById('p-hs').value = '0810.60';
+            document.getElementById('p-unit').value = 'kg'; // Default unit
+            if (id) {
+                const p = load(KEYS.products).find(x => x.id === id);
+                if (!p) return;
+                document.getElementById('prod-edit-id').value = id;
+                ['id', 'name_en:name-en', 'name_th:name-th', 'hs', 'variety', 'unit', 'price_fob:price-fob', 'price_cnf:price-cnf', 'nw_box:nw-box', 'gw_box:gw-box', 'notes']
+                .forEach(m => {
+                    const [k, f] = m.includes(':') ? m.split(':') : [m, m.replace('_', '-')];
+                    const el = document.getElementById('p-' + f);
+                    if (el) el.value = p[k] || ''
+                });
+            }
+            openModal('modal-product');
+        }
+
+        function editProduct(id) {
+            openProductModal(id)
+        }
+
+        function saveProduct() {
+            const editId = document.getElementById('prod-edit-id').value;
+            const id = document.getElementById('p-id').value.trim();
+            const name_en = document.getElementById('p-name-en').value.trim();
+            if (!id || !name_en) {
+                alert('กรุณากรอก รหัส และ ชื่อสินค้า');
+                return
+            }
+            const data = load(KEYS.products);
+            const obj = {
+                id,
+                name_en,
+                name_th: document.getElementById('p-name-th').value,
+                hs: document.getElementById('p-hs').value,
+                variety: document.getElementById('p-variety').value,
+                unit: document.getElementById('p-unit').value,
+                price_fob: parseFloat(document.getElementById('p-price-fob').value) || 0,
+                price_cnf: parseFloat(document.getElementById('p-price-cnf').value) || 0,
+                nw_box: parseFloat(document.getElementById('p-nw-box').value) || 0,
+                gw_box: parseFloat(document.getElementById('p-gw-box').value) || 0,
+                notes: document.getElementById('p-notes').value,
+                updated: Date.now()
+            };
+            if (editId) {
+                const idx = data.findIndex(x => x.id === editId);
+                if (idx >= 0) data[idx] = obj
+            } else {
+                if (data.find(x => x.id === id)) {
+                    alert('รหัสซ้ำ');
+                    return
+                }
+                data.push(obj)
+            }
+            save(KEYS.products, data);
+            logActivity(`บันทึกสินค้า: ${name_en}`);
+            closeModal('modal-product');
+            renderProducts();
+            updateBadges();
+        }
+
+        function deleteProduct(id) {
+            if (!confirm('ลบสินค้านี้?')) return;
+            save(KEYS.products, load(KEYS.products).filter(p => p.id !== id));
+            renderProducts();
+            updateBadges();
+        }
+
+        // ── ROUTES ──
+        function renderRoutes() {
+            const data = load(KEYS.routes);
+            const tb = document.getElementById('routes-tbody');
+            if (!tb) return;
+            tb.innerHTML = data.length ? data.map(r => `<tr>
     <td><strong>${r.name}</strong></td>
     <td>${r.from||'—'}</td><td style="font-size:.8rem;max-width:150px">${r.via||'—'}</td>
     <td>${r.to||'—'}</td><td>${r.port_load||'—'}</td><td>${r.port_entry||'—'}</td>
@@ -1202,54 +2185,101 @@ function renderRoutes(){
       <button class="btn btn-ghost btn-xs" onclick="editRoute('${r.id}')">✏️</button>
       <button class="btn btn-danger btn-xs" onclick="deleteRoute('${r.id}')">🗑️</button>
     </td>
-  </tr>`).join(''):'<tr><td colspan="8"><div class="empty"><div class="empty-icon">🗺️</div><p>ไม่พบเส้นทาง</p></div></td></tr>';
-  updateBadges();
-}
-function openRouteModal(id=null){
-  document.getElementById('route-edit-id').value='';
-  if(id){
-    const r=load(KEYS.routes).find(x=>x.id===id);if(!r)return;
-    document.getElementById('route-edit-id').value=id;
-    document.getElementById('r-name').value=r.name||'';document.getElementById('r-transport').value=r.transport||'';
-    document.getElementById('r-from').value=r.from||'';document.getElementById('r-port-load').value=r.port_load||'';
-    document.getElementById('r-via').value=r.via||'';document.getElementById('r-port-entry').value=r.port_entry||'';
-    document.getElementById('r-to').value=r.to||'';document.getElementById('r-full').value=r.full||'';
-    document.getElementById('r-notes').value=r.notes||'';
-  }
-  openModal('modal-route');
-}
-function editRoute(id){openRouteModal(id)}
-function saveRoute(){
-  const editId=document.getElementById('route-edit-id').value;
-  const name=document.getElementById('r-name').value.trim();
-  if(!name){alert('กรุณากรอกชื่อเส้นทาง');return}
-  const data=load(KEYS.routes);
-  const obj={id:editId||('RT-'+String(data.length+1).padStart(3,'0')),name,
-    transport:document.getElementById('r-transport').value,from:document.getElementById('r-from').value,
-    port_load:document.getElementById('r-port-load').value,via:document.getElementById('r-via').value,
-    port_entry:document.getElementById('r-port-entry').value,to:document.getElementById('r-to').value,
-    full:document.getElementById('r-full').value,notes:document.getElementById('r-notes').value};
-  if(editId){const idx=data.findIndex(x=>x.id===editId);if(idx>=0)data[idx]=obj}else data.push(obj);
-  save(KEYS.routes,data);logActivity(`บันทึกเส้นทาง: ${name}`);
-  closeModal('modal-route');renderRoutes();updateBadges();
-}
-function deleteRoute(id){
-  if(!confirm('ลบเส้นทางนี้?'))return;
-  save(KEYS.routes,load(KEYS.routes).filter(r=>r.id!==id));renderRoutes();updateBadges();
-}
+  </tr>`).join('') : '<tr><td colspan="8"><div class="empty"><div class="empty-icon">🗺️</div><p>ไม่พบเส้นทาง</p></div></td></tr>';
+            updateBadges();
+        }
 
-// ── PARTNERS ──
-function renderPartners(){
-  const q=(document.getElementById('partner-search')||{value:''}).value.toLowerCase();
-  const ft=(document.getElementById('partner-filter-type')||{value:''}).value;
-  let data=load(KEYS.partners).filter(p=>{
-    const m=!q||(p.name||'').toLowerCase().includes(q);
-    const t=!ft||p.type===ft; return m&&t;
-  });
-  const typeLabel={logistics:'Logistics',buyer:'Buyer Agent',lab:'ห้องแล็บ',customs:'ตัวแทนศุลกากร',other:'อื่นๆ'};
-  const typeBadge={logistics:'badge-blue',buyer:'badge-green',lab:'badge-purple',customs:'badge-yellow',other:'badge-gray'};
-  const tb=document.getElementById('partners-tbody');if(!tb)return;
-  tb.innerHTML=data.length?data.map(p=>`<tr>
+        function openRouteModal(id = null) {
+            document.getElementById('route-edit-id').value = '';
+            if (id) {
+                const r = load(KEYS.routes).find(x => x.id === id);
+                if (!r) return;
+                document.getElementById('route-edit-id').value = id;
+                document.getElementById('r-name').value = r.name || '';
+                document.getElementById('r-transport').value = r.transport || '';
+                document.getElementById('r-from').value = r.from || '';
+                document.getElementById('r-port-load').value = r.port_load || '';
+                document.getElementById('r-via').value = r.via || '';
+                document.getElementById('r-port-entry').value = r.port_entry || '';
+                document.getElementById('r-to').value = r.to || '';
+                document.getElementById('r-full').value = r.full || '';
+                document.getElementById('r-notes').value = r.notes || '';
+            }
+            openModal('modal-route');
+        }
+
+        function editRoute(id) {
+            openRouteModal(id)
+        }
+
+        function saveRoute() {
+            const editId = document.getElementById('route-edit-id').value;
+            const name = document.getElementById('r-name').value.trim();
+            if (!name) {
+                alert('กรุณากรอกชื่อเส้นทาง');
+                return
+            }
+            const data = load(KEYS.routes);
+            const obj = {
+                id: editId || ('RT-' + String(data.length + 1).padStart(3, '0')),
+                name,
+                transport: document.getElementById('r-transport').value,
+                from: document.getElementById('r-from').value,
+                port_load: document.getElementById('r-port-load').value,
+                via: document.getElementById('r-via').value,
+                port_entry: document.getElementById('r-port-entry').value,
+                to: document.getElementById('r-to').value,
+                full: document.getElementById('r-full').value,
+                notes: document.getElementById('r-notes').value
+            };
+            if (editId) {
+                const idx = data.findIndex(x => x.id === editId);
+                if (idx >= 0) data[idx] = obj
+            } else data.push(obj);
+            save(KEYS.routes, data);
+            logActivity(`บันทึกเส้นทาง: ${name}`);
+            closeModal('modal-route');
+            renderRoutes();
+            updateBadges();
+        }
+
+        function deleteRoute(id) {
+            if (!confirm('ลบเส้นทางนี้?')) return;
+            save(KEYS.routes, load(KEYS.routes).filter(r => r.id !== id));
+            renderRoutes();
+            updateBadges();
+        }
+
+        // ── PARTNERS ──
+        function renderPartners() {
+            const q = (document.getElementById('partner-search') || {
+                value: ''
+            }).value.toLowerCase();
+            const ft = (document.getElementById('partner-filter-type') || {
+                value: ''
+            }).value;
+            let data = load(KEYS.partners).filter(p => {
+                const m = !q || (p.name || '').toLowerCase().includes(q);
+                const t = !ft || p.type === ft;
+                return m && t;
+            });
+            const typeLabel = {
+                logistics: 'Logistics',
+                buyer: 'Buyer Agent',
+                lab: 'ห้องแล็บ',
+                customs: 'ตัวแทนศุลกากร',
+                other: 'อื่นๆ'
+            };
+            const typeBadge = {
+                logistics: 'badge-blue',
+                buyer: 'badge-green',
+                lab: 'badge-purple',
+                customs: 'badge-yellow',
+                other: 'badge-gray'
+            };
+            const tb = document.getElementById('partners-tbody');
+            if (!tb) return;
+            tb.innerHTML = data.length ? data.map(p => `<tr>
     <td><strong>${p.name}</strong></td>
     <td><span class="badge ${typeBadge[p.type]||'badge-gray'}">${typeLabel[p.type]||p.type}</span></td>
     <td>${p.country||'—'}</td><td>${p.contact||'—'}</td><td>${p.tel||'—'}</td>
@@ -1258,62 +2288,97 @@ function renderPartners(){
       <button class="btn btn-ghost btn-xs" onclick="editPartner('${p.id}')">✏️</button>
       <button class="btn btn-danger btn-xs" onclick="deletePartner('${p.id}')">🗑️</button>
     </td>
-  </tr>`).join(''):'<tr><td colspan="7"><div class="empty"><div class="empty-icon">🤝</div><p>ไม่พบคู่ค้า</p></div></td></tr>';
-  updateBadges();
-}
-function openPartnerModal(id=null){
-  document.getElementById('partner-edit-id').value='';
-  ['name','address','country','contact','tel','email','notes'].forEach(f=>{
-    const el=document.getElementById('pt-'+f);if(el)el.value='';
-  });
-  document.getElementById('pt-country').value='THAILAND';
-  if(id){
-    const p=load(KEYS.partners).find(x=>x.id===id);if(!p)return;
-    document.getElementById('partner-edit-id').value=id;
-    ['name','address','country','contact','tel','email','notes'].forEach(f=>{
-      const el=document.getElementById('pt-'+f);if(el)el.value=p[f]||'';
-    });
-    document.getElementById('pt-type').value=p.type||'other';
-  }
-  openModal('modal-partner');
-}
-function editPartner(id){openPartnerModal(id)}
-function savePartner(){
-  const editId=document.getElementById('partner-edit-id').value;
-  const name=document.getElementById('pt-name').value.trim();
-  if(!name){alert('กรุณากรอกชื่อ');return}
-  const data=load(KEYS.partners);
-  const obj={id:editId||('PT-'+String(data.length+1).padStart(3,'0')),name,
-    type:document.getElementById('pt-type').value,address:document.getElementById('pt-address').value,
-    country:document.getElementById('pt-country').value,contact:document.getElementById('pt-contact').value,
-    tel:document.getElementById('pt-tel').value,email:document.getElementById('pt-email').value,
-    notes:document.getElementById('pt-notes').value};
-  if(editId){const idx=data.findIndex(x=>x.id===editId);if(idx>=0)data[idx]=obj}else data.push(obj);
-  save(KEYS.partners,data);logActivity(`บันทึกคู่ค้า: ${name}`);
-  closeModal('modal-partner');renderPartners();updateBadges();
-}
-function deletePartner(id){
-  if(!confirm('ลบคู่ค้านี้?'))return;
-  save(KEYS.partners,load(KEYS.partners).filter(p=>p.id!==id));renderPartners();updateBadges();
-}
+  </tr>`).join('') : '<tr><td colspan="7"><div class="empty"><div class="empty-icon">🤝</div><p>ไม่พบคู่ค้า</p></div></td></tr>';
+            updateBadges();
+        }
 
-// ── DOC REGISTRY ──
-function renderDocReg(){
-  const q=(document.getElementById('docreg-search')||{value:''}).value.toLowerCase();
-  const ft=(document.getElementById('docreg-filter-type')||{value:''}).value;
-  const fs=(document.getElementById('docreg-filter-status')||{value:''}).value;
-  const buyers=load(KEYS.buyers);
-  let data=load(KEYS.docreg).filter(d=>{
-    const m=!q||(d.doc_no||'').toLowerCase().includes(q)||(d.container||'').toLowerCase().includes(q);
-    const t=!ft||d.type===ft; const s=!fs||d.status===fs; return m&&t&&s;
-  });
-  const tb=document.getElementById('docreg-tbody');if(!tb)return;
-  tb.innerHTML=data.length?data.slice().reverse().map(d=>{
-    const buyer=buyers.find(b=>b.id===d.buyer_id);
-    const expiring=d.expiry&&new Date(d.expiry)<new Date(Date.now()+30*86400000);
-    return`<tr>
+        function openPartnerModal(id = null) {
+            document.getElementById('partner-edit-id').value = '';
+            ['name', 'address', 'country', 'contact', 'tel', 'email', 'notes'].forEach(f => {
+                const el = document.getElementById('pt-' + f);
+                if (el) el.value = '';
+            });
+            document.getElementById('pt-country').value = 'THAILAND';
+            if (id) {
+                const p = load(KEYS.partners).find(x => x.id === id);
+                if (!p) return;
+                document.getElementById('partner-edit-id').value = id;
+                ['name', 'address', 'country', 'contact', 'tel', 'email', 'notes'].forEach(f => {
+                    const el = document.getElementById('pt-' + f);
+                    if (el) el.value = p[f] || '';
+                });
+                document.getElementById('pt-type').value = p.type || 'other';
+            }
+            openModal('modal-partner');
+        }
+
+        function editPartner(id) {
+            openPartnerModal(id)
+        }
+
+        function savePartner() {
+            const editId = document.getElementById('partner-edit-id').value;
+            const name = document.getElementById('pt-name').value.trim();
+            if (!name) {
+                alert('กรุณากรอกชื่อ');
+                return
+            }
+            const data = load(KEYS.partners);
+            const obj = {
+                id: editId || ('PT-' + String(data.length + 1).padStart(3, '0')),
+                name,
+                type: document.getElementById('pt-type').value,
+                address: document.getElementById('pt-address').value,
+                country: document.getElementById('pt-country').value,
+                contact: document.getElementById('pt-contact').value,
+                tel: document.getElementById('pt-tel').value,
+                email: document.getElementById('pt-email').value,
+                notes: document.getElementById('pt-notes').value
+            };
+            if (editId) {
+                const idx = data.findIndex(x => x.id === editId);
+                if (idx >= 0) data[idx] = obj
+            } else data.push(obj);
+            save(KEYS.partners, data);
+            logActivity(`บันทึกคู่ค้า: ${name}`);
+            closeModal('modal-partner');
+            renderPartners();
+            updateBadges();
+        }
+
+        function deletePartner(id) {
+            if (!confirm('ลบคู่ค้านี้?')) return;
+            save(KEYS.partners, load(KEYS.partners).filter(p => p.id !== id));
+            renderPartners();
+            updateBadges();
+        }
+
+        // ── DOC REGISTRY ──
+        function renderDocReg() {
+            const q = (document.getElementById('docreg-search') || {
+                value: ''
+            }).value.toLowerCase();
+            const ft = (document.getElementById('docreg-filter-type') || {
+                value: ''
+            }).value;
+            const fs = (document.getElementById('docreg-filter-status') || {
+                value: ''
+            }).value;
+            const buyers = load(KEYS.buyers);
+            let data = load(KEYS.docreg).filter(d => {
+                const m = !q || (d.doc_no || '').toLowerCase().includes(q) || (d.container || '').toLowerCase().includes(q);
+                const t = !ft || d.type === ft;
+                const s = !fs || d.status === fs;
+                return m && t && s;
+            });
+            const tb = document.getElementById('docreg-tbody');
+            if (!tb) return;
+            tb.innerHTML = data.length ? data.slice().reverse().map(d => {
+                        const buyer = buyers.find(b => b.id === d.buyer_id);
+                        const expiring = d.expiry && new Date(d.expiry) < new Date(Date.now() + 30 * 86400000);
+                        return `<tr>
       <td><span class="badge badge-blue">${docTypeLabel(d.type)}</span></td>
-      <td><strong>${d.doc_no||'—'}</strong></td>
+      <td><strong>${d.doc_no||'—'}</strong>${d.ecs?`<div style="font-size:.72rem;color:var(--gray);margin-top:.3rem">ECS: ${d.ecs}</div>`:''}${d.ca?`<div style="font-size:.72rem;color:var(--gray);margin-top:.2rem">CA: ${d.ca}</div>`:''}</td>
       <td style="font-size:.82rem">${d.container||'—'}</td>
       <td style="font-size:.8rem;max-width:160px">${buyer?buyer.name_en:'—'}</td>
       <td style="font-size:.82rem">${d.issued||'—'}</td>
@@ -1328,13 +2393,13 @@ function renderDocReg(){
   }).join(''):'<tr><td colspan="9"><div class="empty"><div class="empty-icon">📋</div><p>ยังไม่มีเอกสารที่บันทึก</p></div></td></tr>';
   updateBadges();
 }
-function openDocRegModal(id=null){
+function openDocRegModal(id=null, defaultStatus='issued'){
   populateBuyerSelects();
   document.getElementById('dr-edit-id').value='';
-  ['docno','container','notes'].forEach(f=>{const el=document.getElementById('dr-'+f);if(el)el.value=''});
+  ['docno','container','ecs','ca','notes'].forEach(f=>{const el=document.getElementById('dr-'+f);if(el)el.value=''});
   document.getElementById('dr-issued').value=new Date().toISOString().split('T')[0];
   document.getElementById('dr-expiry').value='';
-  document.getElementById('dr-status').value='issued';
+  document.getElementById('dr-status').value=defaultStatus;
   if(id){
     const d=load(KEYS.docreg).find(x=>x.id===id);if(!d)return;
     document.getElementById('dr-edit-id').value=id;
@@ -1344,28 +2409,68 @@ function openDocRegModal(id=null){
     document.getElementById('dr-buyer-id').value=d.buyer_id||'';
     document.getElementById('dr-issued').value=d.issued||'';
     document.getElementById('dr-expiry').value=d.expiry||'';
-    document.getElementById('dr-status').value=d.status||'issued';
+    document.getElementById('dr-ecs').value=d.ecs||'';
+    document.getElementById('dr-ca').value=d.ca||'';
+    document.getElementById('dr-status').value=d.status||defaultStatus;
     document.getElementById('dr-notes').value=d.notes||'';
   }
   openModal('modal-docreg');
 }
 function editDocReg(id){openDocRegModal(id)}
-function saveDocReg(){
+function saveDocReg(asDraft=false){
   const editId=document.getElementById('dr-edit-id').value;
   const doc_no=document.getElementById('dr-docno').value.trim();
   if(!doc_no){alert('กรุณากรอกเลขเอกสาร');return}
+  const status=asDraft ? 'draft' : document.getElementById('dr-status').value;
   const data=load(KEYS.docreg);
   const obj={id:editId||uid(),type:document.getElementById('dr-type').value,doc_no,
     container:document.getElementById('dr-container').value,buyer_id:document.getElementById('dr-buyer-id').value,
     issued:document.getElementById('dr-issued').value,expiry:document.getElementById('dr-expiry').value,
-    status:document.getElementById('dr-status').value,notes:document.getElementById('dr-notes').value};
+    ecs:document.getElementById('dr-ecs').value,ca:document.getElementById('dr-ca').value,
+    status,notes:document.getElementById('dr-notes').value};
   if(editId){const idx=data.findIndex(x=>x.id===editId);if(idx>=0)data[idx]=obj}else data.push(obj);
   save(KEYS.docreg,data);logActivity(`บันทึกเอกสาร ${docTypeLabel(obj.type)}: ${doc_no}`,'#06b6d4');
-  closeModal('modal-docreg');renderDocReg();updateBadges();
+  closeModal('modal-docreg');renderDocReg();renderDrafts();updateBadges();
 }
 function deleteDocReg(id){
   if(!confirm('ลบรายการนี้?'))return;
-  save(KEYS.docreg,load(KEYS.docreg).filter(d=>d.id!==id));renderDocReg();updateBadges();
+  save(KEYS.docreg,load(KEYS.docreg).filter(d=>d.id!==id));renderDocReg();renderDrafts();updateBadges();
+}
+
+function publishDraft(id){
+  const data = load(KEYS.docreg);
+  const idx = data.findIndex(d=>d.id===id);
+  if(idx < 0) return;
+  data[idx].status = 'issued';
+  save(KEYS.docreg, data);
+  logActivity(`ออกเอกสารจากแบบร่าง: ${data[idx].doc_no}`,'#10b981');
+  renderDocReg();renderDrafts();updateBadges();
+}
+
+function renderDrafts(){
+  const q=(document.getElementById('draft-search')||{value:''}).value.toLowerCase();
+  const ft=(document.getElementById('draft-filter-type')||{value:''}).value;
+  const buyers=load(KEYS.buyers);
+  let data=load(KEYS.docreg).filter(d=>d.status==='draft'&&(
+    !q||(d.doc_no||'').toLowerCase().includes(q)||(d.container||'').toLowerCase().includes(q)
+  )&&(!ft||d.type===ft));
+  const tb=document.getElementById('drafts-tbody');if(!tb)return;
+  tb.innerHTML=data.length?data.slice().reverse().map(d=>{
+    const buyer=buyers.find(b=>b.id===d.buyer_id);
+    return `<tr>
+      <td><span class="badge badge-blue">${docTypeLabel(d.type)}</span></td>
+      <td><strong>${d.doc_no||'—'}</strong>${d.ecs?`<div style="font-size:.72rem;color:var(--gray);margin-top:.3rem">ECS: ${d.ecs}</div>`:''}${d.ca?`<div style="font-size:.72rem;color:var(--gray);margin-top:.2rem">CA: ${d.ca}</div>`:''}</td>
+      <td style="font-size:.82rem">${d.container||'—'}</td>
+      <td style="font-size:.8rem;max-width:160px">${buyer?buyer.name_en:'—'}</td>
+      <td style="font-size:.82rem">${d.issued||'—'}</td>
+      <td>${statusBadge(d.status)}</td>
+      <td style="font-size:.8rem;max-width:120px">${d.notes||'—'}</td>
+      <td class="td-actions">
+        <button class="btn btn-ghost btn-xs" onclick="editDocReg('${d.id}')">✏️</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteDocReg('${d.id}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="8"><div class="empty"><div class="empty-icon">📝</div><p>ยังไม่มีแบบร่างเอกสาร</p></div></td></tr>';
 }
 
 // ── RATES ──
@@ -1476,6 +2581,7 @@ updateBadges();
 renderDashboard();
 document.getElementById('dash-date').textContent=
   'วันที่ '+new Date().toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-</script>
+    </script>
 </body>
+
 </html>

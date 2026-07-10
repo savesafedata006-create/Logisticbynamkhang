@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logistics by namkhang - Fleet Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="shared.css">
 <script src="auth.js"></script>
@@ -11,11 +15,10 @@
 <script src="nav-component.js"></script>
 <script>MCK_Auth.check('fleet');</script>
 <style>
-body{background:#f0f4f8;}
+body{background:#f0f4f8;font-family:'Sarabun',sans-serif;}
 .tab-pane{display:none;}.tab-pane.active{display:block;}
-.nav-btn{display:flex;align-items:center;padding:10px 14px;border-radius:8px;font-size:14px;cursor:pointer;transition:.2s;color:#94a3b8;gap:10px;border-left:3px solid transparent;}
-.nav-btn:hover{background:rgba(255,255,255,.06);color:#e2e8f0;}
-.nav-btn.act{background:rgba(59,130,246,.15);color:#93c5fd;border-left-color:#3b82f6;}
+.tab-btn{transition:all .2s;}
+.tab-btn.active{background:#1e40af;color:#fff;}
 .card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;}
 .s-run{background:#dcfce7;color:#166534;}.s-wait{background:#fef9c3;color:#854d0e;}
 .s-idle{background:#dbeafe;color:#1d4ed8;}.s-repair{background:#fee2e2;color:#991b1b;}
@@ -81,89 +84,23 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
 <!-- Standard Topbar -->
 <div id="topbar-root" data-title="Fleet Hub" data-subtitle="ระบบบริหารจัดการรถและคนขับ" data-logo="LN"></div>
 
-<div class="flex min-h-screen">
-  <!-- SIDEBAR -->
-  <div class="w-64 bg-slate-900 flex flex-col" style="min-height:100vh;">
-    <div class="p-5 border-b border-slate-700">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
-          <i class="fas fa-truck text-white"></i>
-        </div>
-        <div>
-          <div class="text-white font-bold text-sm">Logistics by namkhang</div>
-          <div class="text-slate-400 text-xs">Fleet Hub</div>
-        </div>
-      </div>
-    </div>
-    <!-- user badge -->
-    <div class="px-4 py-3 border-b border-slate-700">
-      <div id="sb-user" class="text-white text-sm font-semibold">—</div>
-      <div id="sb-badge" class="text-xs mt-1 px-2 py-0.5 rounded-full bg-blue-700 text-blue-100 inline-block">—</div>
-    </div>
-    <!-- nav -->
-    <nav class="flex-1 p-3 space-y-1" id="sidebar-nav">
-      <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-btn w-full text-left act">
-        <i class="fas fa-tachometer-alt w-4"></i><span>Dashboard</span>
-      </button>
-      <button onclick="showTab('dispatch')" id="nav-dispatch" class="nav-btn w-full text-left">
-        <i class="fas fa-clipboard-list w-4"></i><span>จัดรถ (Dispatch)</span>
-      </button>
-      <button onclick="showTab('tracking')" id="nav-tracking" class="nav-btn w-full text-left">
-        <i class="fas fa-satellite-dish w-4"></i><span>ติดตามรถ</span>
-      </button>
-      <button onclick="showTab('payment')" id="nav-payment" class="nav-btn w-full text-left">
-        <i class="fas fa-wallet w-4"></i><span>ค่าเที่ยว</span>
-      </button>
-      <button onclick="showTab('fuel')" id="nav-fuel" class="nav-btn w-full text-left">
-        <i class="fas fa-gas-pump w-4"></i><span>น้ำมัน</span>
-      </button>
-      <button onclick="showTab('drivers')" id="nav-drivers" class="nav-btn w-full text-left">
-        <i class="fas fa-id-card w-4"></i><span>คนขับ</span>
-      </button>
-      <button onclick="showTab('vehicles')" id="nav-vehicles" class="nav-btn w-full text-left">
-        <i class="fas fa-truck-moving w-4"></i><span>รถ (Fleet)</span>
-      </button>
-      <button onclick="showTab('vehdocs')" id="nav-vehdocs" class="nav-btn w-full text-left">
-        <i class="fas fa-file-invoice w-4"></i><span>ทะเบียนเอกสารรถ</span>
-      </button>
-      <button onclick="showTab('trailers')" id="nav-trailers" class="nav-btn w-full text-left">
-        <i class="fas fa-trailer w-4"></i><span>หางรถเทลเลอร์</span>
-      </button>
-      <button onclick="showTab('pairing')" id="nav-pairing" class="nav-btn w-full text-left">
-        <i class="fas fa-link w-4"></i><span>วิเคราะห์การจับคู่</span>
-      </button>
-      <button onclick="showTab('costcalc')" id="nav-costcalc" class="nav-btn w-full text-left">
-        <i class="fas fa-calculator w-4"></i><span>คำนวณต้นทุน</span>
-      </button>
-      <button onclick="showTab('repair')" id="nav-repair" class="nav-btn w-full text-left">
-        <i class="fas fa-tools w-4"></i><span>แจ้งซ่อมรถ</span>
-      </button>
-    </nav>
-    <div class="p-3 border-t border-slate-700">
-      <a href="index.html" class="nav-btn w-full text-left text-slate-400 hover:text-white">
-        <i class="fas fa-arrow-left w-4"></i><span>หน้าหลัก</span>
-      </a>
-      <button onclick="doLogout()" class="nav-btn w-full text-left text-red-400 hover:text-red-300 mt-1">
-        <i class="fas fa-sign-out-alt w-4"></i><span>ออกจากระบบ</span>
-      </button>
-    </div>
+<!-- Tab Navigation (same pattern as Container Hub) -->
+<div class="bg-white border-b border-slate-200 px-6 sticky top-16 z-30 shadow-sm">
+  <div class="flex gap-1 overflow-x-auto py-2" id="tab-bar">
+    <button onclick="showTab('dashboard')" class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap" id="nav-dashboard"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</button>
+    <button onclick="showTab('dispatch')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-dispatch"><i class="fas fa-clipboard-list mr-2"></i>จัดรถ</button>
+    <button onclick="showTab('tracking')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-tracking"><i class="fas fa-satellite-dish mr-2"></i>ติดตามรถ</button>
+    <button onclick="showTab('payment')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-payment"><i class="fas fa-wallet mr-2"></i>ค่าเที่ยว</button>
+    <button onclick="showTab('fuel')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-fuel"><i class="fas fa-gas-pump mr-2"></i>น้ำมัน</button>
+    <button onclick="showTab('drivers')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-drivers"><i class="fas fa-id-card mr-2"></i>คนขับ</button>
+    <button onclick="showTab('vehicles')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-vehicles"><i class="fas fa-truck-moving mr-2"></i>รถ</button>
+    <button onclick="showTab('vehdocs')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-vehdocs"><i class="fas fa-file-invoice mr-2"></i>เอกสารรถ</button>
+    <button onclick="showTab('trailers')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-trailers"><i class="fas fa-trailer mr-2"></i>หางรถ</button>
+    <button onclick="showTab('pairing')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-pairing"><i class="fas fa-link mr-2"></i>วิเคราะห์คู่</button>
+    <button onclick="showTab('costcalc')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-costcalc"><i class="fas fa-calculator mr-2"></i>ต้นทุน</button>
+    <button onclick="showTab('repair')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100" id="nav-repair"><i class="fas fa-tools mr-2"></i>แจ้งซ่อม</button>
   </div>
-
-  <!-- CONTENT -->
-  <div class="flex-1 overflow-auto">
-    <!-- header bar -->
-    <div class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-10">
-      <div>
-        <h2 class="text-xl font-bold text-slate-800" id="page-title">Dashboard</h2>
-        <p class="text-xs text-slate-400" id="page-sub">ภาพรวมระบบรถขนส่ง</p>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="text-xs text-slate-400">วันที่ <span id="hdr-date"></span></span>
-        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-          <i class="fas fa-user text-white text-sm"></i>
-        </div>
-      </div>
-    </div>
+</div>
 
     <!-- ===== TAB: DASHBOARD ===== -->
     <div id="tab-dashboard" class="tab-pane active p-8">
@@ -601,7 +538,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
     <div id="tab-vehdocs" class="tab-pane p-8">
       <div class="flex justify-between items-center mb-6">
         <h2 class="font-bold text-slate-700">คลังเอกสารเทคนิคและใบอนุญาต</h2>
-        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">
+        <button onclick="document.getElementById('modal-upload-doc').classList.remove('hidden')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">
           <i class="fas fa-upload mr-2"></i>อัปโหลดเอกสาร
         </button>
       </div>
@@ -635,14 +572,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
             <span class="text-[10px] bg-red-100 text-red-700 px-2 py-1 rounded-full font-bold">ชำรุด: 2</span>
           </div>
         </div>
-        <button class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-700">
+        <button onclick="document.getElementById('modal-add-trailer').classList.remove('hidden')" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-700">
           <i class="fas fa-plus mr-2"></i>เพิ่มหางรถ
         </button>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="trailer-cards">
         <!-- JS Rendered -->
       </div>
-      
+
       <div class="mt-8 card overflow-hidden">
         <div class="px-6 py-4 border-b bg-slate-50">
           <h3 class="font-bold text-slate-700 text-sm">ตารางตรวจสอบสถานะและเอกสารหางรถ</h3>
@@ -833,7 +770,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
             <option value="idle">ว่าง</option>
             <option value="repair">ซ่อม</option>
           </select>
-          <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">
+          <button onclick="document.getElementById('modal-add-vehicle').classList.remove('hidden')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">
             <i class="fas fa-plus mr-2"></i>เพิ่มรถ
           </button>
         </div>
@@ -899,8 +836,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
       </div>
     </div>
 
-  </div><!-- end content -->
-</div><!-- end layout -->
 
 <!-- ===== MODALS ===== -->
 
@@ -1021,6 +956,123 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6;}
   </div>
 </div>
 
+<!-- Add Vehicle Modal -->
+<div id="modal-add-vehicle" class="modal-bg hidden">
+  <div class="bg-white rounded-xl w-full max-w-md mx-4 overflow-hidden shadow-2xl">
+    <div class="bg-blue-700 text-white px-6 py-4 flex justify-between">
+      <span class="font-bold"><i class="fas fa-truck mr-2"></i>เพิ่มรถใหม่</span>
+      <button onclick="closeModal('modal-add-vehicle')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6 space-y-3">
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ทะเบียนรถ</label>
+        <input type="text" id="add-veh-plate" placeholder="เช่น กข-1234 กทม." class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ประเภท</label>
+          <select id="add-veh-type" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+            <option>20GP</option><option>40HC</option><option>40GP</option><option>40RH</option>
+          </select></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">เลขไมล์ปัจจุบัน</label>
+          <input type="number" id="add-veh-km" placeholder="0" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+      </div>
+      <div class="grid grid-cols-3 gap-3">
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ภาษีหมดอายุ</label>
+          <input type="date" id="add-veh-tax" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ประกันหมดอายุ</label>
+          <input type="date" id="add-veh-ins" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">พรบ.หมดอายุ</label>
+          <input type="date" id="add-veh-prb" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+      </div>
+      <div class="flex gap-3 mt-4">
+        <button onclick="closeModal('modal-add-vehicle')" class="flex-1 border rounded-lg py-2 text-sm text-slate-600 hover:bg-slate-50">ยกเลิก</button>
+        <button onclick="addVehicle()" class="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm font-bold hover:bg-blue-700">บันทึก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Trailer Modal -->
+<div id="modal-add-trailer" class="modal-bg hidden">
+  <div class="bg-white rounded-xl w-full max-w-md mx-4 overflow-hidden shadow-2xl">
+    <div class="bg-slate-800 text-white px-6 py-4 flex justify-between">
+      <span class="font-bold"><i class="fas fa-trailer mr-2"></i>เพิ่มหางรถใหม่</span>
+      <button onclick="closeModal('modal-add-trailer')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6 space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">รหัสหาง</label>
+          <input type="text" id="add-tlr-id" placeholder="TLR-005" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ทะเบียนหาง</label>
+          <input type="text" id="add-tlr-plate" placeholder="82-5555 ชป." class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+      </div>
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ประเภท</label>
+        <select id="add-tlr-type" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          <option>Skeleton 40'</option><option>Skeleton 20'</option><option>Flatbed 40'</option><option>Reefer 40'</option>
+        </select></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ภาษีหางหมดอายุ</label>
+          <input type="date" id="add-tlr-tax" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ประกันหางหมดอายุ</label>
+          <input type="date" id="add-tlr-ins" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+      </div>
+      <div class="flex gap-3 mt-4">
+        <button onclick="closeModal('modal-add-trailer')" class="flex-1 border rounded-lg py-2 text-sm text-slate-600 hover:bg-slate-50">ยกเลิก</button>
+        <button onclick="addTrailer()" class="flex-1 bg-slate-800 text-white rounded-lg py-2 text-sm font-bold hover:bg-slate-700">บันทึก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Document Modal -->
+<div id="modal-upload-doc" class="modal-bg hidden">
+  <div class="bg-white rounded-xl w-full max-w-md mx-4 overflow-hidden shadow-2xl">
+    <div class="bg-green-700 text-white px-6 py-4 flex justify-between">
+      <span class="font-bold"><i class="fas fa-upload mr-2"></i>อัปโหลดเอกสารรถ</span>
+      <button onclick="closeModal('modal-upload-doc')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6 space-y-3">
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ทะเบียนรถ</label>
+        <select id="upload-doc-truck" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          <option>70-0981 มห.</option><option>กข-1234 กทม.</option><option>ฮภ-5678 ขก.</option>
+          <option>นข-9012 กทม.</option><option>คร-3456 สมุทรสาคร</option>
+        </select></div>
+      <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ประเภทเอกสาร</label>
+        <select id="upload-doc-type" class="w-full border rounded px-3 py-2 text-sm border-slate-200">
+          <option>ใบรับรอง GPS</option><option>ตรวจควันดำ</option><option>ใบอนุญาตขนส่ง (วอ.8)</option>
+          <option>ตรวจสภาพประจำปี</option><option>อื่นๆ</option>
+        </select></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">เลขที่เอกสาร</label>
+          <input type="text" id="upload-doc-no" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">วันหมดอายุ</label>
+          <input type="date" id="upload-doc-expiry" class="w-full border rounded px-3 py-2 text-sm border-slate-200"></div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ไฟล์เอกสาร</label>
+        <label class="flex items-center justify-center gap-2 w-full border-2 border-dashed border-slate-300 rounded-lg py-4 cursor-pointer hover:bg-slate-50 transition">
+          <i class="fas fa-cloud-upload-alt text-slate-400"></i>
+          <span class="text-sm text-slate-500" id="upload-doc-filename">เลือกไฟล์ PDF / รูปภาพ</span>
+          <input type="file" accept=".pdf,image/*" class="hidden" onchange="document.getElementById('upload-doc-filename').textContent=this.files[0]?.name||'เลือกไฟล์'">
+        </label>
+      </div>
+      <div class="flex gap-3 mt-4">
+        <button onclick="closeModal('modal-upload-doc')" class="flex-1 border rounded-lg py-2 text-sm text-slate-600 hover:bg-slate-50">ยกเลิก</button>
+        <button onclick="uploadDocument()" class="flex-1 bg-green-600 text-white rounded-lg py-2 text-sm font-bold hover:bg-green-700">อัปโหลด</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Trailer History Modal -->
+<div id="modal-trailer-history" class="modal-bg hidden">
+  <div class="bg-white rounded-xl w-full max-w-lg mx-4 overflow-hidden shadow-2xl">
+    <div class="bg-slate-800 text-white px-6 py-4 flex justify-between">
+      <span class="font-bold"><i class="fas fa-history mr-2"></i>ประวัติหางรถ</span>
+      <button onclick="closeModal('modal-trailer-history')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6" id="modal-trailer-history-content"></div>
+  </div>
+</div>
+
 <script>
 // ===== DATA =====
 const USERS = {
@@ -1133,49 +1185,37 @@ function doLogout() { MCK_Auth.logout(); }
 
 function applyRole(role) {
   const cfg = ROLE_CONFIG[role] || ROLE_CONFIG['Administrator'];
-  document.getElementById('sb-user').textContent = currentUser.name;
-  const badge = document.getElementById('sb-badge');
-  badge.textContent = cfg.badge;
-  badge.className = 'text-xs mt-1 px-2 py-0.5 rounded-full inline-block text-white ' + cfg.color;
-
-  // hide all nav buttons first
-  document.querySelectorAll('.nav-btn').forEach(b => {
+  // Hide tabs that the user doesn't have access to
+  document.querySelectorAll('#tab-bar .tab-btn').forEach(b => {
     const id = b.id ? b.id.replace('nav-', '') : '';
     if (id && !cfg.tabs.includes(id)) b.style.display = 'none';
+    else b.style.display = '';
   });
 }
 
 // ===== TABS =====
 function showTab(name) {
   if (!currentUser) return;
-  const allowed = ROLE_CONFIG[currentUser.role].tabs;
-  if (!allowed.includes(name)) { showToast('คุณไม่มีสิทธิ์เข้าถึงหน้านี้', 'error'); return; }
+  const allowed = ROLE_CONFIG[currentUser.role]?.tabs || [];
   if (!allowed.includes(name) && !allowed.includes('all')) { showToast('คุณไม่มีสิทธิ์เข้าถึงหน้านี้', 'error'); return; }
 
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('act'));
+  document.querySelectorAll('#tab-bar .tab-btn').forEach(b => {
+    b.classList.remove('active');
+    if (!b.classList.contains('active')) {
+      b.classList.add('text-slate-600');
+    }
+  });
   document.getElementById('tab-' + name).classList.add('active');
   const nb = document.getElementById('nav-' + name);
-  if (nb) nb.classList.add('act');
-
-  const titles = {
-    dashboard:'Dashboard', dispatch:'จัดรถ (Dispatch)', tracking:'ติดตามรถ',
-    payment:'ค่าเที่ยว', fuel:'น้ำมัน', drivers:'คนขับ', vehicles:'รถ (Fleet)', repair:'แจ้งซ่อมรถ', costcalc:'คำนวณต้นทุนน้ำมัน',
-    vehdocs:'ทะเบียนเอกสารรถ', trailers:'หางรถเทลเลอร์', pairing:'วิเคราะห์การจับคู่'
-  };
-  const subs = {
-    dashboard:'ภาพรวมระบบรถขนส่ง', dispatch:'สร้างงาน & จัดรถให้คนขับ', tracking:'ตำแหน่งและสถานะรถทุกคัน',
-    payment:'คำนวณค่าเที่ยวและจ่ายเงิน', fuel:'บันทึกน้ำมันและเรทราคา', drivers:'โปรไฟล์และ KPI คนขับ',
-    vehicles:'ทะเบียนรถ เอกสาร และบำรุงรักษา', repair:'แจ้งซ่อมและติดตามงานซ่อม', costcalc:'เครื่องมือวิเคราะห์ต้นทุนน้ำมันต้นทุน',
-    vehdocs:'การจัดการใบอนุญาตและเอกสารเทคนิคของตัวรถ', trailers:'การจัดการสถานะและเอกสารของหางพ่วง', pairing:'วิเคราะห์ประสิทธิภาพการทำงานร่วมกันระหว่างรถหัวลากและหาง'
-  };
-  document.getElementById('page-title').textContent = titles[name] || name;
-  document.getElementById('page-sub').textContent = subs[name] || '';
+  if (nb) {
+    nb.classList.add('active');
+    nb.classList.remove('text-slate-600');
+  }
 }
 
 // ===== INIT =====
 function initPage() {
-  document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('th-TH', {year:'numeric',month:'long',day:'numeric'});
   renderJobTable();
   renderTrackingList();
   renderPayroll();
@@ -1507,7 +1547,7 @@ function renderDashboardFuelChart() {
 function renderPairingAnalysis() {
   const tb = document.getElementById('pairing-tbody');
   if (!tb) return;
-  
+
   // Mock pairing analytics data
   const pairings = [
     { truck:'70-0981 มห.', trailer:'TLR-001', type:'40HC + Skeleton', trips:42, avg_eff:3.45, status:'optimal' },
@@ -1568,7 +1608,7 @@ function renderVehDocsTable() {
       <td class="p-4 text-xs">${d.issue}</td>
       <td class="p-4 text-xs ${daysLeft < 30 ? 'text-red-600 font-bold' : ''}">${d.expiry}</td>
       <td class="p-4 text-center">${statusTag}</td>
-      <td class="p-4 text-center"><button class="text-blue-500 hover:text-blue-700"><i class="fas fa-file-pdf"></i></button></td>
+      <td class="p-4 text-center"><button onclick="viewDocFile('${d.no}')" class="text-blue-500 hover:text-blue-700" title="ดูไฟล์"><i class="fas fa-file-pdf"></i></button></td>
     </tr>`;
   }).join('');
 }
@@ -1584,7 +1624,7 @@ function renderTrailerTable() {
   const tb = document.getElementById('trailers-tbody');
   const cards = document.getElementById('trailer-cards');
   if (!tb || !cards) return;
-  
+
   const statusMap = { running:'s-run', idle:'s-idle', repair:'s-repair' };
   const statusLbl = { running:'ใช้งานอยู่', idle:'ว่าง', repair:'ชำรุด/ซ่อม' };
 
@@ -1597,7 +1637,7 @@ function renderTrailerTable() {
       <td class="p-4 text-xs">${t.truck}</td>
       <td class="p-4 text-xs">${t.tax}</td>
       <td class="p-4 text-xs">${t.ins}</td>
-      <td class="p-4 text-center"><button class="text-blue-600 hover:underline text-xs">แก้ไข</button></td>
+      <td class="p-4 text-center"><button onclick="editTrailer('${t.id}')" class="text-blue-600 hover:underline text-xs">แก้ไข</button></td>
     </tr>`).join('');
 
   cards.innerHTML = mockTrailers.map(t => `
@@ -1615,8 +1655,8 @@ function renderTrailerTable() {
         <div class="flex justify-between"><span>ประกันหาง:</span><span class="${new Date(t.ins)<new Date()?'text-red-600':''}">${t.ins}</span></div>
       </div>
       <div class="flex gap-2">
-        <button class="flex-1 text-xs bg-slate-100 py-1.5 rounded font-bold hover:bg-slate-200">ประวัติการซ่อม</button>
-        <button class="flex-1 text-xs bg-blue-50 text-blue-700 py-1.5 rounded font-bold hover:bg-blue-100">ดูเอกสาร</button>
+        <button onclick="showTrailerHistory('${t.id}')" class="flex-1 text-xs bg-slate-100 py-1.5 rounded font-bold hover:bg-slate-200">ประวัติการซ่อม</button>
+        <button onclick="showTrailerDocs('${t.id}')" class="flex-1 text-xs bg-blue-50 text-blue-700 py-1.5 rounded font-bold hover:bg-blue-100">ดูเอกสาร</button>
       </div>
     </div>`).join('');
 }
@@ -1625,10 +1665,10 @@ function runCostCalc() {
   const price = parseFloat(document.getElementById('calc-fuel-price').value) || 0;
   const cons  = parseFloat(document.getElementById('calc-consumption').value) || 1;
   const dist  = parseFloat(document.getElementById('calc-distance').value) || 0;
-  
+
   const totalCost = (dist / cons) * price;
   const costPerKm = price / cons;
-  
+
   document.getElementById('res-total-cost').textContent = '฿ ' + totalCost.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2});
   document.getElementById('res-cost-per-km').textContent = '฿ ' + costPerKm.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' / km';
   document.getElementById('rec-cost').textContent = costPerKm.toFixed(2);
@@ -1859,21 +1899,156 @@ function showToast(msg, type = 'success') {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+// ===== RESPONSIVE SIDEBAR =====
+// (removed — now using horizontal tab bar)
+
+// ===== ADD VEHICLE =====
+function addVehicle() {
+  const plate = document.getElementById('add-veh-plate').value.trim();
+  const type = document.getElementById('add-veh-type').value;
+  const km = parseInt(document.getElementById('add-veh-km').value) || 0;
+  const tax = document.getElementById('add-veh-tax').value || '2027-01-01';
+  const ins = document.getElementById('add-veh-ins').value || '2027-01-01';
+  const prb = document.getElementById('add-veh-prb').value || '2027-01-01';
+  if (!plate) { showToast('กรุณากรอกทะเบียนรถ', 'error'); return; }
+  const id = 'TRK' + String(trucks.length + 1).padStart(3, '0');
+  trucks.push({ id, plate, type, status:'idle', driver:null, km, tax, ins, prb });
+  closeModal('modal-add-vehicle');
+  renderVehicleTable();
+  saveData();
+  showToast(`เพิ่มรถ ${plate} สำเร็จ`, 'success');
+  ['add-veh-plate','add-veh-km'].forEach(id => document.getElementById(id).value = '');
+}
+
+// ===== ADD TRAILER =====
+function addTrailer() {
+  const tid = document.getElementById('add-tlr-id').value.trim();
+  const plate = document.getElementById('add-tlr-plate').value.trim();
+  const type = document.getElementById('add-tlr-type').value;
+  const tax = document.getElementById('add-tlr-tax').value || '2027-01-01';
+  const ins = document.getElementById('add-tlr-ins').value || '2027-01-01';
+  if (!tid || !plate) { showToast('กรุณากรอกรหัสและทะเบียนหาง', 'error'); return; }
+  mockTrailers.push({ id:tid, plate, type, status:'idle', truck:'—', tax, ins });
+  closeModal('modal-add-trailer');
+  renderTrailerTable();
+  saveData();
+  showToast(`เพิ่มหาง ${tid} (${plate}) สำเร็จ`, 'success');
+  ['add-tlr-id','add-tlr-plate'].forEach(id => document.getElementById(id).value = '');
+}
+
+// ===== UPLOAD DOCUMENT =====
+function uploadDocument() {
+  const truck = document.getElementById('upload-doc-truck').value;
+  const type = document.getElementById('upload-doc-type').value;
+  const no = document.getElementById('upload-doc-no').value.trim();
+  const expiry = document.getElementById('upload-doc-expiry').value;
+  if (!no || !expiry) { showToast('กรุณากรอกเลขที่เอกสารและวันหมดอายุ', 'error'); return; }
+  const today = new Date().toISOString().split('T')[0];
+  mockVehDocs.push({ truck, type, no, issue:today, expiry, status:'active' });
+  closeModal('modal-upload-doc');
+  renderVehDocsTable();
+  saveData();
+  showToast(`อัปโหลดเอกสาร ${type} ของ ${truck} สำเร็จ`, 'success');
+  document.getElementById('upload-doc-no').value = '';
+  document.getElementById('upload-doc-filename').textContent = 'เลือกไฟล์ PDF / รูปภาพ';
+}
+
+// ===== TRAILER ACTIONS =====
+function editTrailer(id) {
+  const t = mockTrailers.find(x => x.id === id);
+  if (!t) return;
+  showToast(`เปิดหน้าแก้ไข ${t.id} (${t.plate})`, 'info');
+}
+
+function showTrailerHistory(id) {
+  const t = mockTrailers.find(x => x.id === id);
+  if (!t) return;
+  const el = document.getElementById('modal-trailer-history-content');
+  el.innerHTML = `
+    <h3 class="font-bold text-slate-800 mb-3">${t.id} — ${t.plate}</h3>
+    <div class="space-y-2 text-sm">
+      <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
+        <i class="fas fa-wrench text-orange-500"></i>
+        <div><div class="font-semibold">เปลี่ยนยาง 4 เส้น</div><div class="text-xs text-slate-400">2026-04-15 | ค่าใช้จ่าย ฿ 24,000</div></div>
+      </div>
+      <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
+        <i class="fas fa-oil-can text-blue-500"></i>
+        <div><div class="font-semibold">ตรวจเช็คทั่วไป + เปลี่ยนจาระบี</div><div class="text-xs text-slate-400">2026-03-01 | ค่าใช้จ่าย ฿ 3,500</div></div>
+      </div>
+      <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
+        <i class="fas fa-tools text-red-500"></i>
+        <div><div class="font-semibold">ซ่อมระบบล็อคตู้</div><div class="text-xs text-slate-400">2026-01-20 | ค่าใช้จ่าย ฿ 5,800</div></div>
+      </div>
+    </div>
+    <button onclick="closeModal('modal-trailer-history')" class="w-full mt-4 border rounded-lg py-2 text-sm text-slate-600 hover:bg-slate-50">ปิด</button>`;
+  document.getElementById('modal-trailer-history').classList.remove('hidden');
+}
+
+function showTrailerDocs(id) {
+  const t = mockTrailers.find(x => x.id === id);
+  if (!t) return;
+  const el = document.getElementById('modal-trailer-history-content');
+  el.innerHTML = `
+    <h3 class="font-bold text-slate-800 mb-3">${t.id} — เอกสาร</h3>
+    <div class="space-y-2 text-sm">
+      <div class="flex justify-between bg-slate-50 rounded p-3"><span>ภาษีหาง</span><span class="font-bold ${new Date(t.tax)<new Date()?'text-red-600':''}">${t.tax}</span></div>
+      <div class="flex justify-between bg-slate-50 rounded p-3"><span>ประกันหาง</span><span class="font-bold ${new Date(t.ins)<new Date()?'text-red-600':''}">${t.ins}</span></div>
+    </div>
+    <button onclick="closeModal('modal-trailer-history')" class="w-full mt-4 border rounded-lg py-2 text-sm text-slate-600 hover:bg-slate-50">ปิด</button>`;
+  document.getElementById('modal-trailer-history').classList.remove('hidden');
+}
+
+function viewDocFile(docNo) {
+  showToast(`เปิดไฟล์เอกสาร ${docNo} (Demo)`, 'info');
+}
+
+// ===== DATA PERSISTENCE =====
+function saveData() {
+  try {
+    localStorage.setItem('fleet_trucks', JSON.stringify(trucks));
+    localStorage.setItem('fleet_drivers', JSON.stringify(drivers));
+    localStorage.setItem('fleet_jobs', JSON.stringify(jobs));
+    localStorage.setItem('fleet_fuel', JSON.stringify(fuelData));
+    localStorage.setItem('fleet_repairs', JSON.stringify(repairRequests));
+    localStorage.setItem('fleet_vehdocs', JSON.stringify(mockVehDocs));
+    localStorage.setItem('fleet_trailers', JSON.stringify(mockTrailers));
+    localStorage.setItem('fleet_payroll', JSON.stringify(payrollData));
+  } catch(e) { console.warn('Save failed:', e); }
+}
+
+function loadData() {
+  try {
+    const t = localStorage.getItem('fleet_trucks');
+    if (t) { trucks.length = 0; JSON.parse(t).forEach(x => trucks.push(x)); }
+    const d = localStorage.getItem('fleet_drivers');
+    if (d) { drivers.length = 0; JSON.parse(d).forEach(x => drivers.push(x)); }
+    const j = localStorage.getItem('fleet_jobs');
+    if (j) { jobs.length = 0; JSON.parse(j).forEach(x => jobs.push(x)); }
+    const f = localStorage.getItem('fleet_fuel');
+    if (f) { fuelData.length = 0; JSON.parse(f).forEach(x => fuelData.push(x)); }
+    const r = localStorage.getItem('fleet_repairs');
+    if (r) { repairRequests.length = 0; JSON.parse(r).forEach(x => repairRequests.push(x)); }
+    const vd = localStorage.getItem('fleet_vehdocs');
+    if (vd) { mockVehDocs.length = 0; JSON.parse(vd).forEach(x => mockVehDocs.push(x)); }
+    const tl = localStorage.getItem('fleet_trailers');
+    if (tl) { mockTrailers.length = 0; JSON.parse(tl).forEach(x => mockTrailers.push(x)); }
+    const p = localStorage.getItem('fleet_payroll');
+    if (p) { payrollData.length = 0; JSON.parse(p).forEach(x => payrollData.push(x)); }
+  } catch(e) { console.warn('Load failed:', e); }
+}
+
 // ===== BOOT =====
     window.addEventListener('DOMContentLoaded', () => {
+        // โหลดข้อมูลจาก localStorage ก่อน
+        loadData();
+
         // ดึงข้อมูลจาก Session หลัก หรือใช้ค่าเริ่มต้น
-        const portalSession = JSON.parse(sessionStorage.getItem('mck_user') || '{"name":"Admin","role":"Admin"}');
+        const portalSession = JSON.parse(sessionStorage.getItem('mck_user') || localStorage.getItem('mck_session') || '{"name":"Admin","role":"Admin","initials":"AD"}');
         currentUser = portalSession;
-        
+
         document.getElementById('login-overlay').style.display = 'none';
-        
-        // อัปเดตข้อมูล Header
-        document.getElementById('sb-user-name').textContent = currentUser.name;
-        document.getElementById('sb-user-role').textContent = currentUser.role;
-        document.getElementById('header-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
-        
+
         applyRole(currentUser.role);
-        const tabs = ROLE_CONFIG[currentUser.role]?.tabs || ROLE_CONFIG['Admin'].tabs;
         showTab('dashboard');
         initPage();
     });
